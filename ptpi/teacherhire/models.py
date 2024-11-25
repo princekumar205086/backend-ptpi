@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 # Create your models here.
 class Subject(models.Model):
     subject_name = models.CharField(max_length=100)
@@ -50,3 +50,53 @@ class Teacher(models.Model):
     availability_status = models.CharField(max_length=50, default='Available')
     def __str__(self):
         return self.user_id
+
+class EducationalQualification(models.Model):	
+   id = models.AutoField()
+   name = models.CharField(max_length=255, unique=True)
+   description = models.TextField(null=True, blank=True)
+
+   def _str_(self):
+        return self.id
+
+class TeacherQualification(models.Model):
+    id = models.AutoField()
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    qualification = models.ForeignKey(EducationalQualification, on_delete=models.CASCADE)
+    institution = models.CharField(max_length=225)  
+    year_of_passing = models.PositiveIntegerField()  
+    grade_or_percentage = models.CharField(max_length=50, null=True, blank=True)
+
+    def _str_(self):
+        return self.id
+
+class TeacherExperiences(models.Model):
+    id = models.AutoField()
+    user_id = models.ForeignKey(User,on_delete=models.CASCADE)
+    institution = models.CharField(max_length=255)
+    role = models.CharField(max_length=255)
+    start_date	= models.DateField()
+    end_date = models.DateField(null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    achievements = models.TextField(null=True, blank=True)
+
+    def _str_(self):
+        return self.id
+
+class Skill(models.Model):
+   id = models.AutoField()
+   name = models.CharField(max_length=255, unique=True)
+   description = models.TextField(null=True, blank=True)
+
+   def _str_(self):
+        return self.id
+
+class TeacherSkill(models.Model):
+    id = models.AutoField()
+    user_id	 = models.ForeignKey(User, on_delete=models.CASCADE)
+    skill = models.ForeignKey(Skill, on_delete=models.CASCADE)
+    proficiency_level = models.CharField(max_length=100, null=True, blank=True)
+    years_of_experience = models.PositiveIntegerField(default=0)
+    
+    def _str_(self):
+        return self.id
