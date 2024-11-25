@@ -25,17 +25,10 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ['email', 'username', 'password']
 
     def validate_email(self, value):
-        if ' ' in value:
-            raise serializers.ValidationError("Email cannot contain spaces.")
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("A user with this email already exists.")
         return value
-    def validate(self, attrs):        
-        password = attrs.get('password')        
-        if ' ' in password:
-            raise serializers.ValidationError("Password cannot contain spaces.")
-    
-        return attrs  
+
     def create(self, validated_data):
         user = User.objects.create(
             username=validated_data['username'],
@@ -45,6 +38,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
+# Login Serializer (for User Login)
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(style={'input_type': 'password'}, write_only=True)

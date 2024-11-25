@@ -5,9 +5,9 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from teacherhire.serializers import UserSerializer
 from django.db import IntegrityError
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
-from rest_framework_simplejwt.tokens import RefreshToken
 
 
 class RegisterUser(APIView):
