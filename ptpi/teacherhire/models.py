@@ -52,15 +52,13 @@ class Teacher(models.Model):
         return self.user_id
 
 class EducationalQualification(models.Model):	
-   id = models.AutoField()
    name = models.CharField(max_length=255, unique=True)
    description = models.TextField(null=True, blank=True)
 
    def _str_(self):
-        return self.id
+        return self.name
 
 class TeacherQualification(models.Model):
-    id = models.AutoField()
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     qualification = models.ForeignKey(EducationalQualification, on_delete=models.CASCADE)
     institution = models.CharField(max_length=225)  
@@ -68,10 +66,9 @@ class TeacherQualification(models.Model):
     grade_or_percentage = models.CharField(max_length=50, null=True, blank=True)
 
     def _str_(self):
-        return self.id
+        return self.user_id
 
 class TeacherExperiences(models.Model):
-    id = models.AutoField()
     user_id = models.ForeignKey(User,on_delete=models.CASCADE)
     institution = models.CharField(max_length=255)
     role = models.CharField(max_length=255)
@@ -81,22 +78,20 @@ class TeacherExperiences(models.Model):
     achievements = models.TextField(null=True, blank=True)
 
     def _str_(self):
-        return self.id
+        return self.user_id
 
 class Skill(models.Model):
-   id = models.AutoField()
    name = models.CharField(max_length=255, unique=True)
    description = models.TextField(null=True, blank=True)
 
    def _str_(self):
-        return self.id
+        return self.name
 
 class TeacherSkill(models.Model):
-    id = models.AutoField()
     user_id	 = models.ForeignKey(User, on_delete=models.CASCADE)
     skill = models.ForeignKey(Skill, on_delete=models.CASCADE)
     proficiency_level = models.CharField(max_length=100, null=True, blank=True)
     years_of_experience = models.PositiveIntegerField(default=0)
     
     def _str_(self):
-        return self.id
+        return self.user_id
