@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from .models import TeachersAddress,EducationalQualification
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 from teacherhire.models import Subject,Teacher,ClassCategory, Skill, TeacherSkill, TeacherQualification, TeacherExperiences
@@ -59,7 +60,11 @@ class LoginSerializer(serializers.Serializer):
     
    
 
-# Create your views here.
+# def validate_blank_fields(data):
+#     for field, value in data.items():
+#         if isinstance(value, str) and value.strip() == '':
+#             raise serializers.ValidationError(f"{field} cannot be empty or just spaces.")
+#     return data
 
 class TeacherQualificationSerializer(serializers.ModelSerializer):
     # user_id = UserSerializer(read_only=True)
@@ -99,3 +104,22 @@ class TeacherSkillSerializer(serializers.ModelSerializer):
     class Meta:
         model = TeacherSkill
         fields = ['user_id', 'skill', 'proficiency_level', ]
+class TeachersAddressSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    class Meta:
+        model = TeachersAddress
+        fields = '__all__'
+        
+    def validate_user(self,value):
+        try:
+            user = User.objects.get(id=value.id)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("The user does not exist.")        
+        return value
+    # def validate(self, data):
+    #     return validate_blank_fields(data)
+    
+class EducationalQualificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EducationalQualification
+        fields = '__all__'

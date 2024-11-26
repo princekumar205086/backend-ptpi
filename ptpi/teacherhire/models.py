@@ -115,4 +115,4 @@ class TeacherSkill(models.Model):
     years_of_experience = models.PositiveIntegerField(default=0)
     
     def _str_(self):
-        return self.user
+        return self.user_id
