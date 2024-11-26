@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework import viewsets
 from teacherhire.models import (
-    Subject,TeacherQualification, TeacherExperiences, Skill, TeacherSkill)
+    Subject,TeacherQualification, TeacherExperiences, Skill, TeacherSkill, Teacher)
 from teacherhire.serializers import (
     SubjectSerializer,TeacherQualificationSerializer, TeacherExperiencesSerializer, UserSerializer, SkillSerializer, TeacherSkillSerializer)
 from rest_framework.views import APIView
@@ -143,9 +143,6 @@ class SkillDelete(APIView):
             return Response({"error" : "skill not found or unauthorized"}, status=status.HTTP_404_NOT_FOUND)
 
 
-class TeacherSkillViewSet(viewsets.ModelViewSet):
-    queryset = TeacherSkill.objects.all()
-    serializer_class = TeacherSkillSerializer
 #Teacher GET ,CREATE ,DELETE 
 
 #Subject GET ,CREATE ,DELETE 
@@ -219,4 +216,42 @@ class TeacherExperiencesDeleteView(APIView):
             return Response({"message": "teacherexperiences  deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
         except TeacherExperiences.DoesNotExist:
             return Response({"error": "teacherexperiences  not found or unauthorized"}, status=status.HTTP_404_NOT_FOUND)
+        
 
+# TeacherSkill GET  & DELETE
+class TeacherSkillViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = TeacherSkill.objects.select_related('user','skill')
+    serializer_class = TeacherSkillSerializer
+
+# TeacherSkill POST
+class TeacherSkillCreateView(APIView):
+    def post(self, request):
+        if not request.user.is_authenticated:
+            return Response({"error": "User is not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        if TeacherSkill.objects.filter(user=request.user).exists():
+            return Response({"error": "Teacher profile already exists."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        data = request.data.copy()
+        data['user'] = request.user.id  
+
+        serializer = TeacherSkillSerializer(data=data)
+        if serializer.is_valid():
+            try:
+                teacherskill = serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)  
+            except IntegrityError as e:
+                return Response({"error": "Database integrity error", "details": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+# TeacherSkill DELETE
+class TeacherSkillDeleteSet(APIView):
+    def delete(self, request, pk):
+        try:
+            teacherskill = TeacherSkill.objects.get(pk=pk)
+            user = teacherskill.user.username
+            teacherskill.delete()
+            return Response({"message": f"{user} TeacherSkill deleted successfuly"}, status=status.HTTP_204_NO_CONTENT)
+        except TeacherSkill.DoesNotExist:
+            return Response({"error": "TeacherSkill not found or unauthorized"}, status=status.HTTP_404_NOT_FOUND)

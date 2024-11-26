@@ -62,15 +62,14 @@ class LoginSerializer(serializers.Serializer):
 # Create your views here.
 
 class TeacherQualificationSerializer(serializers.ModelSerializer):
-    # user_id = UserSerializer(read_only=True)
     class Meta:
         model = TeacherQualification
-        fields = "__all__"
+        fields = "_all_"
 
 class TeacherExperiencesSerializer(serializers.ModelSerializer):
     class Meta:
         model = TeacherExperiences
-        fields = "__all__"
+        fields = "_all_"
 class SubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subject
@@ -94,9 +93,15 @@ class SkillSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class TeacherSkillSerializer(serializers.ModelSerializer):
-    user_id = UserSerializer(read_only="true")
-    skill = SkillSerializer(read_only="true")
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)
+    skill = serializers.PrimaryKeyRelatedField(queryset=Skill.objects.all(), required=True)
 
     class Meta:
         model = TeacherSkill
-        fields = ['user_id', 'skill', 'proficiency_level', ]
+        fields = ['id', 'user', 'skill', 'proficiency_level']  
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['user'] = UserSerializer(instance.user).data
+        representation['skill'] = SkillSerializer(instance.skill).data
+        return representation
