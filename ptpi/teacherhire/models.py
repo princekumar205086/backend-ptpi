@@ -43,7 +43,7 @@ class ClassCategory(models.Model):
     def __str__(self):
         return self.name
 class Teacher(models.Model):
-    user_id = models.ForeignKey(User,on_delete=models.CASCADE)
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
     fullname = models.	CharField(max_length=255)
     gender	 = models.CharField(
         max_length=10,
@@ -70,7 +70,7 @@ class Teacher(models.Model):
     date_of_birth = models.	DateField()
     availability_status = models.CharField(max_length=50, default='Available')
     def __str__(self):
-        return self.user_id
+        return self.user
 
 class EducationalQualification(models.Model):	
    name = models.CharField(max_length=255, unique=True)
@@ -80,17 +80,17 @@ class EducationalQualification(models.Model):
         return self.name
 
 class TeacherQualification(models.Model):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     qualification = models.ForeignKey(EducationalQualification, on_delete=models.CASCADE)
     institution = models.CharField(max_length=225)  
     year_of_passing = models.PositiveIntegerField()  
     grade_or_percentage = models.CharField(max_length=50, null=True, blank=True)
 
     def _str_(self):
-        return self.user_id
+        return self.user
 
 class TeacherExperiences(models.Model):
-    user_id = models.ForeignKey(User,on_delete=models.CASCADE)
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
     institution = models.CharField(max_length=255)
     role = models.CharField(max_length=255)
     start_date	= models.DateField()
@@ -99,7 +99,7 @@ class TeacherExperiences(models.Model):
     achievements = models.TextField(null=True, blank=True)
 
     def _str_(self):
-        return self.user_id
+        return self.user
 
 class Skill(models.Model):
    name = models.CharField(max_length=255, unique=True)
@@ -109,10 +109,10 @@ class Skill(models.Model):
         return self.name
 
 class TeacherSkill(models.Model):
-    user_id	 = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     skill = models.ForeignKey(Skill, on_delete=models.CASCADE)
     proficiency_level = models.CharField(max_length=100, null=True, blank=True)
     years_of_experience = models.PositiveIntegerField(default=0)
     
     def _str_(self):
-        return self.user_id
+        return self.user

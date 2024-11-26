@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from rest_framework.response import Response
+from rest_framework import viewsets
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
 from django.db import IntegrityError
@@ -137,8 +138,9 @@ class SkillDelete(APIView):
     def delete(self, request, pk):
         try:
             skill = Skill.objects.get(pk=pk)
+            skill_name = skill.name
             skill.delete()
-            return Response({"message": "Skill delete successfuly"}, status= status.HTTP_204_NO_CONTENT)
+            return Response({"message": f"{skill_name} deleted successfuly"}, status= status.HTTP_204_NO_CONTENT)
         except Skill.DoesNotExist:
             return Response({"error" : "skill not found or unauthorized"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -210,9 +212,44 @@ class ClassCategoryDeleteView(APIView):
 
 
 class TeacherQualificationViewSet(viewsets.ModelViewSet): 
+    permission_classes = [IsAuthenticated]
     queryset = TeacherQualification.objects.all()
-    serializer_class=TeacherQualificationSerializer
+class TeacherQualificationCreateView(APIView):
+    def post(self, request):
+        serializer = TeacherQualificationSerializer(data=request.data)
+        if serializer.is_valid():
+            teacherqualification = serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)    
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class TeacherQualificationDeleteView(APIView):
+   def delete(self, request, pk):
+        try:
+            teacherQualification = TeacherQualification.objects.get(pk=pk)
+            teacherQualification.delete()
+
+            return Response({"message": "teacherQualification  deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        except TeacherQualification.DoesNotExist:
+            return Response({"error": "teacherQualification  not found or unauthorized"}, status=status.HTTP_404_NOT_FOUND)
 
 class TeacherExperiencesViewSet(viewsets.ModelViewSet): 
     queryset = TeacherExperiences.objects.all()
-    serializer_class=TeacherExperiencesSerializer
+    permission_classes = [IsAuthenticated]
+
+class TeacherExperiencesCreateView(APIView):
+    def post(self, request):
+        serializer = TeacherExperiencesSerializer(data=request.data)
+        if serializer.is_valid():
+            teacherexperiences = serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)    
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class TeacherExperiencesDeleteView(APIView):
+   def delete(self, request, pk):
+        try:
+            teacherexperiences = TeacherExperiences.objects.get(pk=pk)
+            teacherexperiences.delete()
+
+            return Response({"message": "teacherexperiences  deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        except TeacherExperiences.DoesNotExist:
+            return Response({"error": "teacherexperiences  not found or unauthorized"}, status=status.HTTP_404_NOT_FOUND)
+
