@@ -1,10 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-# Create your models here.
-
-
-    
+# Create your models here.   
 class TeachersAddress(models.Model):
     ADDRESS_TYPE_CHOICES = [
         ('current', 'Current'),
@@ -63,7 +60,7 @@ class Teacher(models.Model):
             ("other","other"),
         ]
         )
-    image = models.	ImageField(upload_to='images/')
+    image = models.	ImageField(upload_to='images/',null=True)
     aadhar_no = models.CharField(max_length=12, unique=True)
     phone = models.	CharField(max_length=15)
     alternate_phone = models. CharField(max_length=15, null=True, blank=True)

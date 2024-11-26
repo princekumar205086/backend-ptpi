@@ -115,3 +115,4 @@ class LoginUser(APIView):
                 'status': 401,
                 'message': 'Invalid credentials, please try again.'
             }, status=status.HTTP_401_UNAUTHORIZED)
+        
