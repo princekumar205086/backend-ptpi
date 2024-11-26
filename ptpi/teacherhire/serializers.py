@@ -57,7 +57,6 @@ class LoginSerializer(serializers.Serializer):
         data['user'] = user
         return data
 class SubjectSerializer(serializers.ModelSerializer):
-    # user = UserSerializer(read_only=True) 
     class Meta:
         model = Subject
         fields = ['subject_name','subject_description']

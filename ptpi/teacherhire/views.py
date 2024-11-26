@@ -1,22 +1,24 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
 from teacherhire.serializers import UserSerializer
 from django.db import IntegrityError
 from django.contrib.auth import authenticate
-
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
-
-
+from rest_framework import viewsets
+from teacherhire.models import (
+    Subject)
+from teacherhire.serializers import (
+    SubjectSerializer)
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 def home(request):
   return render(request,"home.html")
 
 def dashboard(request):
     return render(request, "admin_panel/dashboard.html")
-
 
 class RegisterUser(APIView):
     def post(self, request):
@@ -116,3 +118,34 @@ class LoginUser(APIView):
                 'message': 'Invalid credentials, please try again.'
             }, status=status.HTTP_401_UNAUTHORIZED)
         
+#Teacher GET ,CREATE ,DELETE 
+
+#Subject GET ,CREATE ,DELETE 
+class SubjectViewSet(viewsets.ModelViewSet):    
+    permission_classes = [IsAuthenticated]
+    queryset= Subject.objects.all()
+  
+    serializer_class = SubjectSerializer
+class SubjectCreateView(APIView):
+    def post(self, request):
+        serializer = SubjectSerializer(data=request.data)
+        if serializer.is_valid():
+            subject_name = serializer.validated_data.get("subject_name")
+            if Subject.objects.filter(subject_name=subject_name).exists():
+                return Response(
+                    {"error": "Subject with this name already exists."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            subject = serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)    
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class SubjectDeleteView(APIView):
+   def delete(self, request, pk):
+        try:
+            subject = Subject.objects.get(pk=pk)
+            subject.delete()
+
+            return Response({"message": "subject deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        except Subject.DoesNotExist:
+            return Response({"error": "subject not found or unauthorized"}, status=status.HTTP_404_NOT_FOUND)
+
