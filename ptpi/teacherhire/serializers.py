@@ -64,14 +64,15 @@ class LoginSerializer(serializers.Serializer):
 # Create your views here.
 
 class TeacherQualificationSerializer(serializers.ModelSerializer):
+    # user_id = UserSerializer(read_only=True)
     class Meta:
         model = TeacherQualification
-        fields = "_all_"
+        fields = "__all__"
 
 class TeacherExperiencesSerializer(serializers.ModelSerializer):
     class Meta:
         model = TeacherExperiences
-        fields = "_all_"
+        fields = "__all__"
 class SubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subject
