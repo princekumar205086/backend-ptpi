@@ -60,7 +60,6 @@ class LoginSerializer(serializers.Serializer):
     
    
 
-# Create your views here.
 # def validate_blank_fields(data):
 #     for field, value in data.items():
 #         if isinstance(value, str) and value.strip() == '':
@@ -98,7 +97,6 @@ class SkillSerializer(serializers.ModelSerializer):
     class Meta:
         model = Skill
         fields = "__all__"
-
 class TeacherSkillSerializer(serializers.ModelSerializer):
     user_id = UserSerializer(read_only="true")
     skill = SkillSerializer(read_only="true")

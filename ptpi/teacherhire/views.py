@@ -14,9 +14,11 @@ from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework import viewsets
 from teacherhire.models import (
-    Subject,TeacherQualification, TeacherExperiences, Skill, TeacherSkill)
+    Subject,ClassCategory,TeacherQualification, TeacherExperiences,
+    Skill, TeacherSkill)   
 from teacherhire.serializers import (
-    SubjectSerializer,TeacherQualificationSerializer, TeacherExperiencesSerializer, UserSerializer, SkillSerializer, TeacherSkillSerializer)
+    SubjectSerializer, ClassCategorySerializer, TeacherQualificationSerializer,
+      TeacherExperiencesSerializer, UserSerializer, SkillSerializer, TeacherSkillSerializer)
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
@@ -213,6 +215,37 @@ class SubjectDeleteView(APIView):
             return Response({"message": "subject deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
         except Subject.DoesNotExist:
             return Response({"error": "subject not found or unauthorized"}, status=status.HTTP_404_NOT_FOUND)
+
+# Classcategory GET ,CREATE ,DELETE
+class ClassCategoryViewSet(viewsets.ModelViewSet):    
+    permission_classes = [IsAuthenticated]
+    queryset= ClassCategory.objects.all()
+    serializer_class = ClassCategorySerializer
+class ClassCategoryCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        serializer = ClassCategorySerializer(data=request.data)
+        if serializer.is_valid():
+            name = serializer.validated_data.get("name")
+            if ClassCategory.objects.filter(name=name).exists():
+                return Response(
+                    {"error": "ClassCategory with this name already exists."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            subject = serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)    
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class ClassCategoryDeleteView(APIView):
+   permission_classes = [IsAuthenticated]
+   def delete(self, request, pk):
+        try:
+            subject = ClassCategory.objects.get(pk=pk)
+            subject.delete()
+
+            return Response({"message": "classcategory deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        except ClassCategory.DoesNotExist:
+            return Response({"error": "classcategory not found or unauthorized"}, status=status.HTTP_404_NOT_FOUND)
+
 
 class TeacherQualificationViewSet(viewsets.ModelViewSet): 
     permission_classes = [IsAuthenticated]
