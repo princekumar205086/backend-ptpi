@@ -1,8 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from rest_framework.response import Response
 from rest_framework import viewsets
-from teacherhire.models import TeacherQualification, TeacherExperiences
-from teacherhire.serializers import TeacherQualificationSerializer, TeacherExperiencesSerializer
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
@@ -13,9 +11,9 @@ from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework import viewsets
 from teacherhire.models import (
-    Subject)
+    Subject,TeacherQualification, TeacherExperiences)
 from teacherhire.serializers import (
-    SubjectSerializer)
+    SubjectSerializer,TeacherQualificationSerializer, TeacherExperiencesSerializer)
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 def home(request):

@@ -1,8 +1,9 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-from teacherhire.models import TeacherQualification, TeacherExperiences
+from teacherhire.models import (
+    TeacherQualification, TeacherExperiences,Subject,Teacher,
+    ClassCategory)
 from rest_framework import serializers
-from teacherhire.models import Subject,Teacher,ClassCategory
 
 
 class UserSerializer(serializers.ModelSerializer):
