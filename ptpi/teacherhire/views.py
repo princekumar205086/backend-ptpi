@@ -126,9 +126,9 @@ class LoginUser(APIView):
 class SubjectViewSet(viewsets.ModelViewSet):    
     permission_classes = [IsAuthenticated]
     queryset= Subject.objects.all()
-  
     serializer_class = SubjectSerializer
 class SubjectCreateView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         serializer = SubjectSerializer(data=request.data)
         if serializer.is_valid():
@@ -142,6 +142,7 @@ class SubjectCreateView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)    
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 class SubjectDeleteView(APIView):
+   permission_classes = [IsAuthenticated]
    def delete(self, request, pk):
         try:
             subject = Subject.objects.get(pk=pk)
