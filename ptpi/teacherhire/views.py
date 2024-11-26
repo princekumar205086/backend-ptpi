@@ -20,7 +20,7 @@ def dashboard(request):
     return render(request, "admin_panel/dashboard.html")
 
 
-class TeacherAddressViewSet(viewsets.ModelViewSet):
+class TeachersAddressViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]    
     queryset = TeachersAddress.objects.select_related('user')
     serializer_class=TeachersAddressSerializer
