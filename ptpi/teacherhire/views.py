@@ -135,8 +135,9 @@ class SkillDelete(APIView):
     def delete(self, request, pk):
         try:
             skill = Skill.objects.get(pk=pk)
+            skill_name = skill.name
             skill.delete()
-            return Response({"message": "Skill delete successfuly"}, status= status.HTTP_204_NO_CONTENT)
+            return Response({"message": f"{skill_name} deleted successfuly"}, status= status.HTTP_204_NO_CONTENT)
         except Skill.DoesNotExist:
             return Response({"error" : "skill not found or unauthorized"}, status=status.HTTP_404_NOT_FOUND)
 
