@@ -98,6 +98,8 @@ class LoginUser(APIView):
 
             # teacher_data = None
 
+
+
             # try:
             #     teacher = Teacher.objects.get(user=user)
             #     teacher_data = {
