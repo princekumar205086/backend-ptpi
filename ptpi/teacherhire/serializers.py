@@ -92,7 +92,6 @@ class SkillSerializer(serializers.ModelSerializer):
     class Meta:
         model = Skill
         fields = "__all__"
-
 class TeacherSkillSerializer(serializers.ModelSerializer):
     user_id = UserSerializer(read_only="true")
     skill = SkillSerializer(read_only="true")
