@@ -3,11 +3,8 @@ from django.urls import path, include
 from teacherhire.views import (
     RegisterUser, LoginUser, SubjectViewSet, SubjectCreateView,
     SubjectDeleteView, ClassCategoryViewSet, ClassCategoryCreateView,ClassCategoryDeleteView,
-    RegisterUser, LoginUser,SubjectViewSet,SubjectCreateView, TeacherQualificationCreateView, TeacherExperiencesCreateView,
-    SubjectDeleteView, TeacherExperiencesDeleteView, TeacherQualificationDeleteView,
-     RegisterUser,
-     RegisterUser,
-    LoginUser,
+     TeacherQualificationCreateView, TeacherExperiencesCreateView,
+     TeacherExperiencesDeleteView, TeacherQualificationDeleteView,
     EducationalQulificationViewSet,TeachersAddressViewSet,TeachersAddressCreateView,EducationalQulificationCreateView
 ,TeacherQualificationViewSet,TeacherExperiencesViewSet,SkillViewSet,TeacherSkillViewSet,SkillCreateView,SkillDelete
     )
@@ -16,8 +13,8 @@ from rest_framework import routers
 
 router = routers.DefaultRouter()
 #router.register(r'subjects',SubjectViewSet)
-router.register(r"admin/teacherexperiences",TeacherExperiencesViewSet)
-router.register(r"admin/teacherqualification",TeacherQualificationViewSet)
+# router.register(r"admin/teacherexperiences",TeacherExperiencesViewSet)
+# router.register(r"admin/teacherqualification",TeacherQualificationViewSet)
 router.register(r"admin/skills",SkillViewSet)
 router.register(r"admin/teacherskills",TeacherSkillViewSet),
 router.register(r"admin/subjects",SubjectViewSet),
@@ -45,9 +42,15 @@ urlpatterns = [
     path('teacherSkill/', TeacherSkillViewSet.as_view({'get' : 'list'}), name='teacherskill'), 
     # teacherqualification
     path('admin/teacherqualification/create/', TeacherQualificationCreateView.as_view(), name='teacherqualification-create'),
-    path('admin/teacherQualification/<int:pk>/', TeacherQualificationDeleteView.as_view(), name='teacherQualification-delete'),  
+    path('admin/teacherQualification/view/', TeacherQualificationViewSet.as_view({'get': 'list'}), name='view-teacherQualification'),
+    path('admin/teacherQualification/<int:pk>/', TeacherQualificationDeleteView.as_view(), name='teacherQualification-delete'),
+
+    # teacherexperiences  
     path('admin/teacherexperiences/create/',TeacherExperiencesCreateView.as_view(), name='teacherexperiences-create'),
-    path('admin/teacherexperiences/<int:pk>/',TeacherExperiencesDeleteView.as_view(), name='teacherexperiences-delete'), 
+    path('admin/teacherexperiences/view/', TeacherExperiencesViewSet.as_view({'get': 'list'}), name='view-teacherexperiences'),
+    path('admin/teacherexperiences/<int:pk>/',TeacherExperiencesDeleteView.as_view(), name='teacherexperiences-delete'),
+
+
     path('login/', LoginUser.as_view(), name='login'), 
     path('admin/subject/<int:pk>/', SubjectDeleteView.as_view(), name='subject-delete'),  
 

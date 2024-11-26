@@ -54,12 +54,9 @@ class LoginSerializer(serializers.Serializer):
         
         if not user:
             raise serializers.ValidationError("Invalid email or password, please try again.")
-        
         data['user'] = user
         return data
     
-   
-
 # def validate_blank_fields(data):
 #     for field, value in data.items():
 #         if isinstance(value, str) and value.strip() == '':
@@ -73,6 +70,7 @@ class TeacherQualificationSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class TeacherExperiencesSerializer(serializers.ModelSerializer):
+    # user_id = UserSerializer(read_only=True)
     class Meta:
         model = TeacherExperiences
         fields = "__all__"

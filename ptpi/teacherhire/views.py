@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from rest_framework import viewsets
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
-from teacherhire.models import EducationalQualification,TeachersAddress
 from teacherhire.serializers import UserSerializer,EducationalQualificationSerializer,TeachersAddressSerializer
 from django.db import IntegrityError
 from rest_framework.views import APIView
@@ -15,7 +14,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework import viewsets
 from teacherhire.models import (
     Subject,ClassCategory,TeacherQualification, TeacherExperiences,
-    Skill, TeacherSkill)   
+    Skill, TeacherSkill, EducationalQualification, TeachersAddress)   
 from teacherhire.serializers import (
     SubjectSerializer, ClassCategorySerializer, TeacherQualificationSerializer,
       TeacherExperiencesSerializer, UserSerializer, SkillSerializer, TeacherSkillSerializer)
@@ -184,7 +183,6 @@ class SkillDelete(APIView):
 class TeacherSkillViewSet(viewsets.ModelViewSet):
     queryset = TeacherSkill.objects.all()
     serializer_class = TeacherSkillSerializer
-#Teacher GET ,CREATE ,DELETE 
 
 #Subject GET ,CREATE ,DELETE 
 class SubjectViewSet(viewsets.ModelViewSet):    
@@ -250,14 +248,22 @@ class ClassCategoryDeleteView(APIView):
 class TeacherQualificationViewSet(viewsets.ModelViewSet): 
     permission_classes = [IsAuthenticated]
     queryset = TeacherQualification.objects.all()
+    serializer_class = TeacherQualificationSerializer
+
 class TeacherQualificationCreateView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         serializer = TeacherQualificationSerializer(data=request.data)
         if serializer.is_valid():
+            institution = serializer.validated_data.get("institution")
+            if TeacherQualification.objects.filter(institution=institution).exists():
+                return Response(
+                    {"error": "TeacherQualification with this name already exists."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
             teacherqualification = serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)    
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
 class TeacherQualificationDeleteView(APIView):
    def delete(self, request, pk):
         try:
@@ -271,11 +277,19 @@ class TeacherQualificationDeleteView(APIView):
 class TeacherExperiencesViewSet(viewsets.ModelViewSet): 
     queryset = TeacherExperiences.objects.all()
     permission_classes = [IsAuthenticated]
+    serializer_class = TeacherExperiencesSerializer
 
 class TeacherExperiencesCreateView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         serializer = TeacherExperiencesSerializer(data=request.data)
         if serializer.is_valid():
+            institution = serializer.validated_data.get("institution")
+            if TeacherExperiences.objects.filter(institution=institution).exists():
+                return Response(
+                    {"error": "TeacherExperience with this name already exists."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
             teacherexperiences = serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)    
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
