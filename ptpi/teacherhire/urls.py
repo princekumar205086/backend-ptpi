@@ -1,16 +1,10 @@
 from django.contrib import admin
 from django.urls import path, include
 from teacherhire.views import (
-    RegisterUser, LoginUser,SubjectViewSet,SubjectCreateView,
-    SubjectDeleteView,ClassCategoryViewSet,ClassCategoryCreateView,ClassCategoryDeleteView,
-    RegisterUser, TeacherQualificationViewSet, TeacherExperiencesViewSet,
-     RegisterUser,
-    LoginUser,
-    SkillViewSet,
-    TeacherSkillViewSet, SkillCreateView, SkillDelete, LoginUser,SubjectViewSet,SubjectCreateView,
-    SubjectDeleteView,
+    RegisterUser, LoginUser, SubjectViewSet, SubjectCreateView,
+    SubjectDeleteView, ClassCategoryViewSet, ClassCategoryCreateView,ClassCategoryDeleteView,
     TeacherQualificationViewSet, TeacherExperiencesViewSet,
-    LoginUser
+    SkillViewSet,TeacherSkillViewSet, SkillCreateView, SkillDelete, 
     )
 from rest_framework import routers
 router = routers.DefaultRouter()
@@ -30,13 +24,9 @@ urlpatterns = [
     path('admin/classcategory/view/', ClassCategoryViewSet.as_view({'get': 'list'}), name='view-classcategory'),
     path('admin/classcategory/create/', ClassCategoryCreateView.as_view(), name='classcategory-create'),
     path('admin/classcategory/<int:pk>/', ClassCategoryDeleteView.as_view(), name='classcategory-delete'),  
-    
-    path('login/', LoginUser.as_view(), name='login'),    
+        
     path('skill/', SkillViewSet.as_view({'get': 'list'}), name='skill'), 
     path('skill/create/', SkillCreateView.as_view(), name='skill-create'),    
     path('skill/<int:pk>/', SkillDelete.as_view(), name="skill-delete"),
-    path('teacherSkill/', TeacherSkillViewSet.as_view({'get' : 'list'}), name='teacherskill'), 
-    path('admin/subject/view/', SubjectViewSet.as_view({'get': 'list'}), name='view-subject'),
-    path('admin/subject/create/', SubjectCreateView.as_view(), name='subject-create'),
-    path('admin/subject/<int:pk>/', SubjectDeleteView.as_view(), name='subject-delete'),  
+    path('teacherSkill/', TeacherSkillViewSet.as_view({'get' : 'list'}), name='teacherskill'),  
 ]
