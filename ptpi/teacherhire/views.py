@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
 from teacherhire.models import EducationalQualification,TeachersAddress
-from teacherhire.serializers import UserSerializer,EducationalQulificationSerializer,TeachersAddressSerializer
+from teacherhire.serializers import UserSerializer,EducationalQualificationSerializer,TeachersAddressSerializer
 from django.db import IntegrityError
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
@@ -24,13 +24,30 @@ class TeachersAddressViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]    
     queryset = TeachersAddress.objects.select_related('user')
     serializer_class=TeachersAddressSerializer
-    
-    
+
+
 class EducationalQulificationViewSet(viewsets.ModelViewSet):    
     permission_classes = [IsAuthenticated]
     queryset= EducationalQualification.objects.all()
-    serializer_class=EducationalQulificationSerializer
+    serializer_class=EducationalQualificationSerializer
     
+class EducationalQulificationCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        serializer = EducationalQualificationSerializer(data=request.data)        
+        if serializer.is_valid():
+            educationalQualification = serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
+       
+class TeachersAddressCreateView(APIView):
+    def post(self,request):
+        serializer = TeachersAddressSerializer(data=request.data)
+        if serializer.is_valid():
+            teachersAddress = serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        return Response(serializer.data,status=status.HTTP_400_BAD_REQUEST)
+        
 class RegisterUser(APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)

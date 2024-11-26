@@ -56,26 +56,29 @@ class LoginSerializer(serializers.Serializer):
         data['user'] = user
         return data
 
-def validate_blank_fields(data):
-    for field, value in data.items():
-        if isinstance(value, str) and value.strip() == '':
-            raise serializers.ValidationError(f"{field} cannot be empty or just spaces.")
-    return data
+# def validate_blank_fields(data):
+#     for field, value in data.items():
+#         if isinstance(value, str) and value.strip() == '':
+#             raise serializers.ValidationError(f"{field} cannot be empty or just spaces.")
+#     return data
+
 
 class TeachersAddressSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
-
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     class Meta:
         model = TeachersAddress
         fields = '__all__'
-
-    def validate(self, data):
-        return validate_blank_fields(data)
-
-class EducationalQulificationSerializer(serializers.ModelSerializer):
+        
+    def validate_user(self,value):
+        try:
+            user = User.objects.get(id=value.id)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("The user does not exist.")        
+        return value
+    # def validate(self, data):
+    #     return validate_blank_fields(data)
+    
+class EducationalQualificationSerializer(serializers.ModelSerializer):
     class Meta:
-        model = EducationalQualification 
+        model = EducationalQualification
         fields = '__all__'
-
-    def validate(self, data):
-        return validate_blank_fields(data)
