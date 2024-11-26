@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
+from teacherhire.models import TeacherQualification, TeacherExperiences
 from rest_framework import serializers
 from teacherhire.models import Subject,Teacher,ClassCategory
 
@@ -56,6 +57,20 @@ class LoginSerializer(serializers.Serializer):
         
         data['user'] = user
         return data
+    
+   
+
+# Create your views here.
+
+class TeacherQualificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TeacherQualification
+        fields = "_all_"
+
+class TeacherExperiencesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TeacherExperiences
+        fields = "_all_"
 class SubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subject

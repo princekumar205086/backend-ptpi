@@ -1,5 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from rest_framework.response import Response
+from rest_framework import viewsets
+from teacherhire.models import TeacherQualification, TeacherExperiences
+from teacherhire.serializers import TeacherQualificationSerializer, TeacherExperiencesSerializer
+from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
 from teacherhire.serializers import UserSerializer
@@ -149,3 +153,10 @@ class SubjectDeleteView(APIView):
         except Subject.DoesNotExist:
             return Response({"error": "subject not found or unauthorized"}, status=status.HTTP_404_NOT_FOUND)
 
+class TeacherQualificationViewSet(viewsets.ModelViewSet): 
+    queryset = TeacherQualification.objects.all()
+    serializer_class=TeacherQualificationSerializer
+
+class TeacherExperiencesViewSet(viewsets.ModelViewSet): 
+    queryset = TeacherExperiences.objects.all()
+    serializer_class=TeacherExperiencesSerializer
