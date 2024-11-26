@@ -1,6 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import viewsets
+from teacherhire.models import TeacherQualification, TeacherExperiences
+from teacherhire.serializers import TeacherQualificationSerializer, TeacherExperiencesSerializer
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from teacherhire.serializers import UserSerializer
@@ -107,3 +110,11 @@ class LoginUser(APIView):
                 'status': 401,
                 'message': 'Invalid credentials, please try again.'
             }, status=status.HTTP_401_UNAUTHORIZED)
+        
+class TeacherQualificationViewSet(viewsets.ModelViewSet): 
+    queryset = TeacherQualification.objects.all()
+    serializer_class=TeacherQualificationSerializer
+
+class TeacherExperiencesViewSet(viewsets.ModelViewSet): 
+    queryset = TeacherExperiences.objects.all()
+    serializer_class=TeacherExperiencesSerializer
