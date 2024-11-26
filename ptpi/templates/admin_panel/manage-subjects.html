@@ -1,0 +1,71 @@
+{% extends "admin_panel/layout.html" %}
+ {% block content %}
+<div class="flex">
+  <table class="w-full border-collapse shadow-md p-[10%] mx-14 my-5 rounded-lg">
+    <thead class="bg-slate-200">
+      <th class="px-2 py-1">Id</th>
+      <th class="px-2 py-1">subject name</th>
+      <th class="px-2 py-1">Description</th>
+      <th class="px-2 py-1">Marks</th>
+      <th class="px-2 py-1">status</th>
+      <th class="px-2 py-1">backlogs</th>
+      <th class="px-2 py-1">Action</th>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-300">
+      {% for subject in response %}
+      <tr class="text-gray-700">
+        <td class="px-2 py-1 text-center">{{subject.id}}</td>
+        <td class="px-2 py-1 text-center">{{subject.title}}</td>
+        <td class="px-2 py-1 text-center">{{subject.description}}</td>
+        <td class="px-2 py-1 text-center">{{subject.marks}}</td>
+        <td class="px-2 py-1 text-center">{{subject.status}}</td>
+        <td class="px-2 py-1 text-center">{{subject.backlogs}}</td>
+        <td
+          class="px-2 py-1 text-center flex flex-1 justify-center items-center gap-2"
+        >
+          <a class="">
+            <svg
+              class="w-7 h-7 text-teal-600"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
+              />
+            </svg>
+          </a>
+
+          <a href="{% url 'admin.delete.subject' subject.id %}">
+            <svg
+              class="w-6 h-6 text-red-600"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"
+              />
+            </svg>
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock content %}

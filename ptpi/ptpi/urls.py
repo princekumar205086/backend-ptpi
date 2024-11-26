@@ -1,22 +1,35 @@
-"""
-URL configuration for ptpi project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from rest_framework.authtoken import views
+from teacherhire.views import home, dashboard
 
 urlpatterns = [
+
+    # admin panel url
+    path("home/", home),
+    path("admin/dashboard/", dashboard, name='admin.dashboard'),
+
+    # Teachers
+    # path("admin/manage/teacher/", manage_teacher, name='admin.manage.teacher'),
+    # path("admin/<int:pk>/delete/teacher/", delete_teacher, name='admin.delete.teacher'),
+    # path("admin/<int:pk>/edit/", edit_teacher, name='admin.edit.teacher'),
+
+    # Subjects
+    # path("admin/manage/subject/", manage_subject, name='admin.manage.subject'),
+    # path("admin/<int:pk>/delete/subject/", delete_subject, name='admin.delete.subject'),
+
+    # Qualification
+    # path("admin/manage/qualification/", manage_qualification, name='admin.manage.qualification'),
+    # path("admin/<int:pk>/delete/qualification/", delete_quali, name='admin.delete.qualification'),
+
+    # Rating
+    # path("admin/manage/rating/", manage_rating, name='admin.manage.rating'),
+    # path("admin/<int:pk>/delete/rating/", delete_rating, name='admin.delete.rating'),
+
+    # Question 
+    # path("admin/manage/question/", manage_questions, name='admin.manage.question'),
+
     path('admin/', admin.site.urls),
+    path('api-token-auth/', views.obtain_auth_token),    
+    path("api/",include('teacherhire.urls'))
 ]

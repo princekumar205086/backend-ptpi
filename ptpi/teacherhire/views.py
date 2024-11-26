@@ -1,13 +1,21 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.contrib.auth import authenticate
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
 from teacherhire.serializers import UserSerializer
 from django.db import IntegrityError
-from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import authenticate
+
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
+
+
+def home(request):
+  return render(request,"home.html")
+
+def dashboard(request):
+    return render(request, "admin_panel/dashboard.html")
 
 
 class RegisterUser(APIView):
