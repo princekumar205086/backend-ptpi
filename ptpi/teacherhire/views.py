@@ -1,15 +1,17 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
-from teacherhire.serializers import UserSerializer, SkillSerializer, TeacherSkillSerializer
 from django.db import IntegrityError
 from django.contrib.auth import authenticate
-from .models import Skill, TeacherSkill
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework import viewsets
+from teacherhire.models import (
+    Subject,TeacherQualification, TeacherExperiences, Skill, TeacherSkill)
+from teacherhire.serializers import (
+    SubjectSerializer,TeacherQualificationSerializer, TeacherExperiencesSerializer, UserSerializer, SkillSerializer, TeacherSkillSerializer)
+from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
 def home(request):
@@ -17,7 +19,6 @@ def home(request):
 
 def dashboard(request):
     return render(request, "admin_panel/dashboard.html")
-
 
 class RegisterUser(APIView):
     def post(self, request):
@@ -143,3 +144,42 @@ class SkillDelete(APIView):
 class TeacherSkillViewSet(viewsets.ModelViewSet):
     queryset = TeacherSkill.objects.all()
     serializer_class = TeacherSkillSerializer
+#Teacher GET ,CREATE ,DELETE 
+
+#Subject GET ,CREATE ,DELETE 
+class SubjectViewSet(viewsets.ModelViewSet):    
+    permission_classes = [IsAuthenticated]
+    queryset= Subject.objects.all()
+    serializer_class = SubjectSerializer
+class SubjectCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        serializer = SubjectSerializer(data=request.data)
+        if serializer.is_valid():
+            subject_name = serializer.validated_data.get("subject_name")
+            if Subject.objects.filter(subject_name=subject_name).exists():
+                return Response(
+                    {"error": "Subject with this name already exists."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            subject = serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)    
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class SubjectDeleteView(APIView):
+   permission_classes = [IsAuthenticated]
+   def delete(self, request, pk):
+        try:
+            subject = Subject.objects.get(pk=pk)
+            subject.delete()
+
+            return Response({"message": "subject deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        except Subject.DoesNotExist:
+            return Response({"error": "subject not found or unauthorized"}, status=status.HTTP_404_NOT_FOUND)
+
+class TeacherQualificationViewSet(viewsets.ModelViewSet): 
+    queryset = TeacherQualification.objects.all()
+    serializer_class=TeacherQualificationSerializer
+
+class TeacherExperiencesViewSet(viewsets.ModelViewSet): 
+    queryset = TeacherExperiences.objects.all()
+    serializer_class=TeacherExperiencesSerializer
