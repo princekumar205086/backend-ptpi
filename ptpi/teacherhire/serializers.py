@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework import serializers
-from teacherhire.models import Subject,Teacher,ClassCategory
+from teacherhire.models import Subject,Teacher,ClassCategory, Skill, TeacherSkill
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -73,3 +73,16 @@ class TeacherSerializer(serializers.ModelSerializer):
     class Meta:
         model = Teacher
         fields = "__all__"
+
+class SkillSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Skill
+        fields = "__all__"
+
+class TeacherSkillSerializer(serializers.ModelSerializer):
+    user_id = UserSerializer(read_only="true")
+    skill = SkillSerializer(read_only="true")
+
+    class Meta:
+        model = TeacherSkill
+        fields = ['user_id', 'skill', 'proficiency_level', ]
