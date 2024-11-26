@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from .models import TeachersAddress,EducationalQualification
 from django.contrib.auth import authenticate
 
 class UserSerializer(serializers.ModelSerializer):
@@ -55,5 +56,26 @@ class LoginSerializer(serializers.Serializer):
         data['user'] = user
         return data
 
+def validate_blank_fields(data):
+    for field, value in data.items():
+        if isinstance(value, str) and value.strip() == '':
+            raise serializers.ValidationError(f"{field} cannot be empty or just spaces.")
+    return data
 
+class TeachersAddressSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
 
+    class Meta:
+        model = TeachersAddress
+        fields = '__all__'
+
+    def validate(self, data):
+        return validate_blank_fields(data)
+
+class EducationalQulificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EducationalQualification 
+        fields = '__all__'
+
+    def validate(self, data):
+        return validate_blank_fields(data)

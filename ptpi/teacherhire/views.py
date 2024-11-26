@@ -1,12 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from rest_framework.views import APIView
+from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
-from teacherhire.serializers import UserSerializer
+from teacherhire.models import EducationalQualification,TeachersAddress
+from teacherhire.serializers import UserSerializer,EducationalQulificationSerializer,TeachersAddressSerializer
 from django.db import IntegrityError
+from rest_framework.views import APIView
 from django.contrib.auth import authenticate
-
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 
@@ -18,6 +20,17 @@ def dashboard(request):
     return render(request, "admin_panel/dashboard.html")
 
 
+class TeacherAddressViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]    
+    queryset = TeachersAddress.objects.select_related('user')
+    serializer_class=TeachersAddressSerializer
+    
+    
+class EducationalQulificationViewSet(viewsets.ModelViewSet):    
+    permission_classes = [IsAuthenticated]
+    queryset= EducationalQualification.objects.all()
+    serializer_class=EducationalQulificationSerializer
+    
 class RegisterUser(APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)
@@ -115,3 +128,4 @@ class LoginUser(APIView):
                 'status': 401,
                 'message': 'Invalid credentials, please try again.'
             }, status=status.HTTP_401_UNAUTHORIZED)
+            
