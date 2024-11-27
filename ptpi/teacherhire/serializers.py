@@ -129,8 +129,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
 #         data['user'] = user
 #         return data
     
-   
-
 # def validate_blank_fields(data):
 #     for field, value in data.items():
 #         if isinstance(value, str) and value.strip() == '':
@@ -138,11 +136,13 @@ class UserProfileSerializer(serializers.ModelSerializer):
 #     return data
 
 class TeacherQualificationSerializer(serializers.ModelSerializer):
+    # user_id = UserSerializer(read_only=True)
     class Meta:
         model = TeacherQualification
         fields = "__all__"
 
 class TeacherExperiencesSerializer(serializers.ModelSerializer):
+    # user_id = UserSerializer(read_only=True)
     class Meta:
         model = TeacherExperiences
         fields = "__all__"
@@ -168,20 +168,12 @@ class SkillSerializer(serializers.ModelSerializer):
         model = Skill
         fields = "__all__"
 class TeacherSkillSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)
-    skill = serializers.PrimaryKeyRelatedField(queryset=Skill.objects.all(), required=True)
+    user_id = UserSerializer(read_only="true")
+    skill = SkillSerializer(read_only="true")
 
     class Meta:
         model = TeacherSkill
-        fields = ['id', 'user', 'skill', 'proficiency_level']  
-
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        representation['user'] = UserSerializer(instance.user).data
-        representation['skill'] = SkillSerializer(instance.skill).data
-        return representation
         fields = ['user_id', 'skill', 'proficiency_level', ]
-        
 class TeachersAddressSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     class Meta:
