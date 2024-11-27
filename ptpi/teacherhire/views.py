@@ -30,7 +30,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
 class TeachersAddressViewSet(viewsets.ModelViewSet):
     #permission_classes = [IsAuthenticated]    
-    queryset = TeachersAddress.objects.select_related('user')
+    queryset = TeachersAddress.objects.all().select_related('user')
     serializer_class=TeachersAddressSerializer
 
 

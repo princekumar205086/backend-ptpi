@@ -183,7 +183,7 @@ class TeacherSkillSerializer(serializers.ModelSerializer):
         fields = ['user_id', 'skill', 'proficiency_level', ]
         
 class TeachersAddressSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    user = UserSerializer(read_only=True)
     class Meta:
         model = TeachersAddress
         fields = '__all__'
