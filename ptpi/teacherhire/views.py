@@ -11,13 +11,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework import viewsets
-from teacherhire.models import (
-    Subject,TeacherQualification, TeacherExperiences, Skill, TeacherSkill, Teacher,
-    Subject,ClassCategory,TeacherQualification, TeacherExperiences,
-    Skill, TeacherSkill, EducationalQualification,TeachersAddress,UserProfile)   
-from teacherhire.serializers import (
-    SubjectSerializer, ClassCategorySerializer, TeacherQualificationSerializer,
-      TeacherExperiencesSerializer, UserSerializer,UserProfileSerializer, SkillSerializer, TeacherSkillSerializer,EducationalQualificationSerializer,TeachersAddressSerializer)
+from teacherhire.models import *
+from teacherhire.serializers import *
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
