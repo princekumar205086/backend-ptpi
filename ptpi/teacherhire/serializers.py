@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from .models import TeachersAddress,EducationalQualification
 from django.contrib.auth import authenticate
 from rest_framework import serializers
-from teacherhire.models import Subject,Teacher,ClassCategory, Skill, TeacherSkill, TeacherQualification, TeacherExperiences
+from teacherhire.models import Subject,UserProfile,Teacher,ClassCategory, Skill, TeacherSkill, TeacherQualification, TeacherExperiences
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -19,6 +19,61 @@ class UserSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
+import re
+from rest_framework import serializers
+from django.contrib.auth.models import User
+from .models import UserProfile
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    profile_picture = serializers.ImageField(required=False, allow_null=True)
+
+    class Meta:
+        model = UserProfile
+        fields = ['user', 'bio', 'profile_picture', 'phone_number', 'address', 'is_teacher', 'created_at', 'updated_at']
+
+    def create(self, validated_data):        
+        return UserProfile.objects.create(**validated_data)
+
+    def update(self, instance, validated_data): 
+        for field, value in validated_data.items():
+            setattr(instance, field, value)        
+        instance.save()
+        return instance
+
+    def validate_bio(self, value):
+        
+        value = value.strip() if value else ""
+        if not value:
+            raise serializers.ValidationError("Bio cannot be empty or just spaces.")
+        return value
+
+    def validate_address(self, value):        
+        value = value.strip() if value else ""
+        if not value:
+            raise serializers.ValidationError("Address cannot be empty or just spaces.")
+        return value
+
+    def validate_phone_number(self, value):       
+        if value:
+            cleaned_value = re.sub(r'[^0-9]', '', value)
+            if len(cleaned_value) < 10:
+                raise serializers.ValidationError("Phone number must have at least 10 digits.")
+            
+            return cleaned_value
+        
+        return value
+
+    def validate_profile_picture(self, value):        
+        if value and value.size > 5 * 1024 * 1024: 
+            raise serializers.ValidationError("Profile picture must be under 5 MB.")
+        return value
+
+    def validate(self, data):
+    
+        if 'phone_number' in data and len(data['phone_number']) < 10:
+            raise serializers.ValidationError({"phone_number": "Phone number must have at least 10 digits."})
+        return data
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(style={'input_type': 'password'}, write_only=True)

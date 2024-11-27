@@ -6,7 +6,15 @@ from teacherhire.views import (
      TeacherQualificationCreateView, TeacherExperiencesCreateView,
      TeacherExperiencesDeleteView, TeacherQualificationDeleteView,
     EducationalQulificationViewSet,TeachersAddressViewSet,TeachersAddressCreateView,EducationalQulificationCreateView
-,TeacherQualificationViewSet,TeacherExperiencesViewSet,SkillViewSet,TeacherSkillViewSet,SkillCreateView,SkillDelete
+,TeacherQualificationViewSet,TeacherExperiencesViewSet,SkillViewSet,TeacherSkillViewSet,SkillCreateView,SkillDelete,
+    SubjectDeleteView, ClassCategoryViewSet, ClassCategoryCreateView,ClassCategoryDeleteView, 
+    LoginUser,SubjectViewSet,SubjectCreateView, TeacherQualificationCreateView, 
+    TeacherExperiencesCreateView,
+    SubjectDeleteView, TeacherExperiencesDeleteView, TeacherQualificationDeleteView,
+    SkillViewSet,
+    TeacherSkillViewSet, SkillCreateView, SkillDelete,SubjectViewSet,SubjectCreateView,
+    TeacherQualificationViewSet, TeacherExperiencesViewSet,TeacherSkillCreateView,TeacherSkillDeleteSet,
+    EducationalQulificationViewSet,TeachersAddressViewSet,UserProfileViewSet,TeachersAddressCreateView,EducationalQulificationCreateView,
     )
 from rest_framework import routers
 
@@ -23,6 +31,9 @@ router.register(r"admin/subjects",SubjectViewSet)
 
 
 
+router.register(r"admin/teacherskills",TeacherSkillViewSet),
+router.register(r"admin/subjects",SubjectViewSet),
+router.register(r'userprofiles', UserProfileViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
