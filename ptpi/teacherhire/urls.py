@@ -12,12 +12,14 @@ from rest_framework import routers
 
 
 router = routers.DefaultRouter()
-#router.register(r'subjects',SubjectViewSet)
-# router.register(r"admin/teacherexperiences",TeacherExperiencesViewSet)
-# router.register(r"admin/teacherqualification",TeacherQualificationViewSet)
+router.register(r"admin/teacherexperiences",TeacherExperiencesViewSet)
+router.register(r"admin/teacherqualification",TeacherQualificationViewSet)
 router.register(r"admin/skills",SkillViewSet)
-router.register(r"admin/teacherskills",TeacherSkillViewSet),
-router.register(r"admin/subjects",SubjectViewSet),
+router.register(r"admin/educationqulification",EducationalQulificationViewSet)
+router.register(r"admin/classcategory",ClassCategoryViewSet)
+router.register(r"admin/teacheraddress",TeachersAddressViewSet)
+router.register(r"admin/teacherskills",TeacherSkillViewSet)
+router.register(r"admin/subjects",SubjectViewSet)
 
 
 
@@ -50,11 +52,6 @@ urlpatterns = [
     path('admin/teacherexperiences/view/', TeacherExperiencesViewSet.as_view({'get': 'list'}), name='view-teacherexperiences'),
     path('admin/teacherexperiences/<int:pk>/',TeacherExperiencesDeleteView.as_view(), name='teacherexperiences-delete'),
 
-
-    path('login/', LoginUser.as_view(), name='login'), 
-    path('admin/subject/<int:pk>/', SubjectDeleteView.as_view(), name='subject-delete'),  
-
-    path('login/', LoginUser.as_view(), name='login'),    
     path('edQulification/view/', EducationalQulificationViewSet.as_view({'get':'list'}), name='edQulification'),    
     path('edQulification/create/', EducationalQulificationCreateView.as_view(), name='edQulification-create'),
     path('teachersAddress/view/', TeachersAddressViewSet.as_view({'get':'list'}), name='teacherAddress'),    
