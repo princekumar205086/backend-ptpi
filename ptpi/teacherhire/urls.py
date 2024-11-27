@@ -24,6 +24,8 @@ router.register(r"admin/subject",SubjectViewSet),
 router.register(r"admin/classcategory",ClassCategoryViewSet),
 router.register(r"admin/teacher",TeacherViewSet),
 router.register(r'userprofiles', UserProfileViewSet)
+router.register(r'admin/educationalQulification', EducationalQulificationViewSet)
+router.register(r'admin/teachersAddress', TeachersAddressViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -61,7 +63,7 @@ urlpatterns = [
     path('login/', LoginUser.as_view(), name='login'), 
 
     # EducationalQulification
-    path('edQulification/view/', EducationalQulificationViewSet.as_view({'get':'list'}), name='edQulification'),    
+    # path('edQulification/view/', EducationalQulificationViewSet.as_view({'get':'list'}), name='edQulification'),    
     path('edQulification/create/', EducationalQulificationCreateView.as_view(), name='edQulification-create'),
     # TeachersAddress
     path('teachersAddress/view/', TeachersAddressViewSet.as_view({'get':'list'}), name='teacherAddress'),    
