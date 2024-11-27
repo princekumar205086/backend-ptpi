@@ -1,5 +1,4 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import viewsets
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -15,10 +14,8 @@ from rest_framework.authentication import TokenAuthentication
 
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
-from rest_framework import viewsets
 from teacherhire.models import *
 from teacherhire.serializers import *
-from rest_framework.views import APIView
 
 def home(request):
   return render(request,"home.html")
@@ -40,7 +37,8 @@ class TeachersAddressViewSet(viewsets.ModelViewSet):
 
 
 class EducationalQulificationViewSet(viewsets.ModelViewSet):    
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated] 
+    authentication_classes = [TokenAuthentication] 
     queryset= EducationalQualification.objects.all()
     serializer_class=EducationalQualificationSerializer
     
@@ -188,6 +186,7 @@ class LoginUser(APIView):
         
 class SkillViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication] 
     queryset = Skill.objects.all()
     serializer_class = SkillSerializer
 
@@ -217,6 +216,8 @@ class SkillDelete(APIView):
 
 class TeacherSkillViewSet(viewsets.ModelViewSet):
     queryset = TeacherSkill.objects.all()
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication] 
     serializer_class = TeacherSkillSerializer
 
 #Subject GET ,CREATE ,DELETE 
@@ -254,7 +255,8 @@ class SubjectDeleteView(APIView):
 
 #Teacher GET
 class TeacherViewSet(viewsets.ModelViewSet):    
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication] 
     queryset= Teacher.objects.all()
     serializer_class = TeacherSerializer
 
@@ -288,7 +290,8 @@ class TeacherDeleteView(APIView):
 
 # Classcategory GET method
 class ClassCategoryViewSet(viewsets.ModelViewSet):    
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication] 
     queryset= ClassCategory.objects.all()
     serializer_class = ClassCategorySerializer
 class ClassCategoryCreateView(APIView):
@@ -318,7 +321,8 @@ class ClassCategoryDeleteView(APIView):
 
 
 class TeacherQualificationViewSet(viewsets.ModelViewSet): 
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication] 
     queryset = TeacherQualification.objects.all()
     serializer_class = TeacherQualificationSerializer
 
@@ -348,7 +352,8 @@ class TeacherQualificationDeleteView(APIView):
         
 # TeacherExperiences GET method
 class TeacherExperiencesViewSet(viewsets.ModelViewSet):
-    #permission_classes = [IsAuthenticated] 
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication] 
     queryset = TeacherExperiences.objects.all()
     serializer_class = TeacherExperiencesSerializer
 # TeacherExperiences POST method
