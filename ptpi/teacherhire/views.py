@@ -14,10 +14,10 @@ from rest_framework import viewsets
 from teacherhire.models import (
     Subject,TeacherQualification, TeacherExperiences, Skill, TeacherSkill, Teacher,
     Subject,ClassCategory,TeacherQualification, TeacherExperiences,
-    Skill, TeacherSkill, EducationalQualification,TeachersAddress)   
+    Skill, TeacherSkill, EducationalQualification,TeachersAddress,UserProfile)   
 from teacherhire.serializers import (
     SubjectSerializer, ClassCategorySerializer, TeacherQualificationSerializer,
-      TeacherExperiencesSerializer, UserSerializer, SkillSerializer, TeacherSkillSerializer,EducationalQualificationSerializer,TeachersAddressSerializer)
+      TeacherExperiencesSerializer, UserSerializer,UserProfileSerializer, SkillSerializer, TeacherSkillSerializer,EducationalQualificationSerializer,TeachersAddressSerializer)
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
@@ -27,6 +27,12 @@ def home(request):
 def dashboard(request):
     return render(request, "admin_panel/dashboard.html")
 
+
+
+class UserProfileViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = UserProfile.objects.all().select_related('user')
+    serializer_class = UserProfileSerializer
 
 class TeachersAddressViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]    
