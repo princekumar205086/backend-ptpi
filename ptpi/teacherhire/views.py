@@ -339,7 +339,7 @@ class TeacherExperiencesDeleteView(APIView):
 
 # TeacherSkill GET  
 class TeacherSkillViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     queryset = TeacherSkill.objects.select_related('user','skill')
     serializer_class = TeacherSkillSerializer
 

@@ -137,11 +137,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
 #             raise serializers.ValidationError(f"{field} cannot be empty or just spaces.")
 #     return data
 
-class TeacherQualificationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TeacherQualification
-        fields = "__all__"
-
 class TeacherExperiencesSerializer(serializers.ModelSerializer):
     class Meta:
         model = TeacherExperiences
@@ -169,7 +164,7 @@ class SkillSerializer(serializers.ModelSerializer):
         fields = "__all__"
 class TeacherSkillSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)
-    skill = serializers.PrimaryKeyRelatedField(queryset=Skill.objects.all(), required=True)
+    skill = serializers.PrimaryKeyRelatedField(queryset=Skill.objects.all(), required=False)
 
     class Meta:
         model = TeacherSkill
@@ -180,24 +175,32 @@ class TeacherSkillSerializer(serializers.ModelSerializer):
         representation['user'] = UserSerializer(instance.user).data
         representation['skill'] = SkillSerializer(instance.skill).data
         return representation
-        fields = ['user_id', 'skill', 'proficiency_level', ]
         
 class TeachersAddressSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)    
+    
     class Meta:
         model = TeachersAddress
         fields = '__all__'
-        
-    def validate_user(self,value):
-        try:
-            user = User.objects.get(id=value.id)
-        except User.DoesNotExist:
-            raise serializers.ValidationError("The user does not exist.")        
-        return value
-    # def validate(self, data):
-    #     return validate_blank_fields(data)
+
+    def to_representation(self, instance):      
+        representation = super().to_representation(instance)
+        representation['user'] = UserSerializer(instance.user).data                
+        return representation
     
 class EducationalQualificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = EducationalQualification
         fields = '__all__'
+class TeacherQualificationSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(),required=True)
+    qualification = serializers.PrimaryKeyRelatedField(queryset=EducationalQualification.objects.all(),required=True)
+    class Meta:
+        model = TeacherQualification
+        fields = "__all__"
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['user'] = UserSerializer(instance.user).data
+        representation['qualification'] = EducationalQualificationSerializer(instance.qualification).data
+        return representation
+
