@@ -289,7 +289,7 @@ class ClassCategoryDeleteView(APIView):
 class TeacherQualificationViewSet(viewsets.ModelViewSet): 
     #permission_classes = [IsAuthenticated]
     queryset = TeacherQualification.objects.all()
-
+    serializer_class = TeacherQualificationSerializer
 
 # TeacherQualification POST method
 class TeacherQualificationCreateView(APIView):
@@ -315,7 +315,7 @@ class TeacherQualificationDeleteView(APIView):
 class TeacherExperiencesViewSet(viewsets.ModelViewSet):
     #permission_classes = [IsAuthenticated] 
     queryset = TeacherExperiences.objects.all()
-    
+    serializer_class = TeacherExperiencesSerializer
 # TeacherExperiences POST method
 class TeacherExperiencesCreateView(APIView):
     def post(self, request):
