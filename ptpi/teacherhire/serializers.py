@@ -7,17 +7,20 @@ from teacherhire.models import Subject,UserProfile,Teacher,ClassCategory, Skill,
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password']
-        extra_kwargs = {'password': {'write_only': True}}
+        fields = ['id', 'username', 'password']
+        # extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        user = User.objects.create(
+         user = User.objects.create(
             username=validated_data['username'],
-            email=validated_data['email'],
+            #   email=validated_data['email'],
         )
-        user.set_password(validated_data['password'])
-        user.save()
-        return user
+         user.set_password(validated_data['password'])
+         user.save()
+         return user
+    
+    
+
 import re
 from rest_framework import serializers
 from django.contrib.auth.models import User
@@ -39,6 +42,10 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
+    
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=100)
+    password = serializers.CharField(max_length=100)
 
 class UserProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
@@ -149,7 +156,7 @@ class TeacherExperiencesSerializer(serializers.ModelSerializer):
 class SubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subject
-        fields = ['subject_name','subject_description']
+        fields = ['id','subject_name','subject_description']
 
 class ClassCategorySerializer(serializers.ModelSerializer):
     # user = UserSerializer(read_only=True) 

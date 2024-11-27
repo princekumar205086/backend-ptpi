@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'teacherhire',
     'rest_framework',
-    'rest_framework_simplejwt',
+    'rest_framework.authtoken',
+
 ]
 
 MIDDLEWARE = [
@@ -78,7 +79,8 @@ WSGI_APPLICATION = 'ptpi.wsgi.application'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ]
 }
 

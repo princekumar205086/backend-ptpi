@@ -3,19 +3,22 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import viewsets
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.authtoken.models import Token
+
 from django.contrib.auth.models import User
 from teacherhire.serializers import UserSerializer,EducationalQualificationSerializer,TeachersAddressSerializer
 from django.db import IntegrityError
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate,login
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
+
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework import viewsets
 from teacherhire.models import *
 from teacherhire.serializers import *
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
 
 def home(request):
   return render(request,"home.html")
@@ -30,7 +33,8 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     serializer_class = UserProfileSerializer
 
 class TeachersAddressViewSet(viewsets.ModelViewSet):
-    #permission_classes = [IsAuthenticated]    
+    permission_classes = [IsAuthenticated] 
+    authentication_classes = [TokenAuthentication]   
     queryset = TeachersAddress.objects.all().select_related('user')
     serializer_class=TeachersAddressSerializer
 
@@ -57,6 +61,7 @@ class TeachersAddressCreateView(APIView):
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.data,status=status.HTTP_400_BAD_REQUEST)
         
+
 # class RegisterUser(APIView):
 #     def post(self, request):
 #         serializer = UserSerializer(data=request.data)
@@ -82,53 +87,14 @@ class TeachersAddressCreateView(APIView):
 #                     'message': 'Username already exists.',
 #                     'errors': str(e)
 #                 }, status=status.HTTP_400_BAD_REQUEST)
-#             return Response({
-#                 'status': 400,
-#                 'message': 'Username or email already exists.',
-#                 'errors': str(e)
-#             }, status=status.HTTP_400_BAD_REQUEST)
-
-#         refresh = RefreshToken.for_user(user)
-#         access_token = str(refresh.access_token)
 
 #         return Response({
-#             'status': 200,
+#             'status': 201,
 #             'payload': serializer.data,
-#             'token': access_token,
 #             'message': 'User registered successfully.'
 #         }, status=status.HTTP_201_CREATED)
 
-class RegisterUser(APIView):
-    def post(self, request):
-        serializer = UserSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response({
-                'status': 400,
-                'errors': serializer.errors,
-                'message': 'Invalid data provided.'
-            }, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            user = serializer.save()
-        except IntegrityError as e:
-            if 'email' in str(e):
-                return Response({
-                    'status': 400,
-                    'message': 'Email already exists.',
-                    'errors': str(e)
-                }, status=status.HTTP_400_BAD_REQUEST)
-            elif 'username' in str(e):
-                return Response({
-                    'status': 400,
-                    'message': 'Username already exists.',
-                    'errors': str(e)
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-        return Response({
-            'status': 201,
-            'payload': serializer.data,
-            'message': 'User registered successfully.'
-        }, status=status.HTTP_201_CREATED)
 
 
                
@@ -191,29 +157,42 @@ class RegisterUser(APIView):
 #                 'message': 'Invalid credentials, please try again.'
 #             }, status=status.HTTP_401_UNAUTHORIZED)
 
-class LoginAPIView(APIView):
-    def post(self,request):
-        email = request.data.get('email')
-        password = request.data.get('password')
-        if not email or not password:
-            return Response(
-                {'message': 'Email and password are required.'}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
+class  RegisterUser(APIView):
+    def post(self, request):
+        serializers = UserSerializer(data = request.data)
 
-        user = authenticate(email=email,password=password)
-        if user is not None:
-            login(request,user)
-            return Response({'message':'Login'},status=status.HTTP_200_OK)
-        else:
-            return Response({'message':'Invalid email and password'}, status=status.HTTP_401_UNAUTHORIZED)
+        if not serializers.is_valid():
+            return Response({'status': 403, 'error': serializers.errors,'message':'something went worng'})
+        
+        serializers.save()
+        user = User.objects.get(username = serializers.data['username'])
+        token_obj , __ = Token.objects.get_or_create(user=user)
+
+        return Response({'status': 200, 'payload': serializers.data,'token':str(token_obj),'message':'your data is save'})
+    
+
+class LoginUser(APIView):
+        serializer_class = LoginSerializer
+
+        authentication_classes = [TokenAuthentication]
+    
+        def post(self, request):
+            serializer = LoginSerializer(data = request.data)
+            if serializer.is_valid(raise_exception=True):
+                user = authenticate(username=serializer.data['username'], password=serializer.data['password'])
+                if user:
+                    token, created = Token.objects.get_or_create(user=user)
+                    return Response({'token': [token.key], "Sucsses":"Login SucssesFully"}, status=status.HTTP_201_CREATED )
+                return Response({'Massage': 'Invalid Username and Password'}, status=401)
+
         
 class SkillViewSet(viewsets.ModelViewSet):
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = Skill.objects.all()
     serializer_class = SkillSerializer
 
 class SkillCreateView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         serializer = SkillSerializer(data=request.data)
         if serializer.is_valid():
@@ -230,6 +209,10 @@ class SkillDelete(APIView):
             return Response({"message": f"{skill_name} deleted successfuly"}, status= status.HTTP_204_NO_CONTENT)
         except Skill.DoesNotExist:
             return Response({"error" : "skill not found or unauthorized"}, status=status.HTTP_404_NOT_FOUND)
+        
+        from rest_framework.authtoken.models import Token
+
+    
 
 
 class TeacherSkillViewSet(viewsets.ModelViewSet):
@@ -238,11 +221,13 @@ class TeacherSkillViewSet(viewsets.ModelViewSet):
 
 #Subject GET ,CREATE ,DELETE 
 class SubjectViewSet(viewsets.ModelViewSet):    
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated] 
+    authentication_classes = [TokenAuthentication] 
     queryset= Subject.objects.all()
     serializer_class = SubjectSerializer
 class SubjectCreateView(APIView):
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated] 
+    authentication_classes = [TokenAuthentication] 
     def post(self, request):
         serializer = SubjectSerializer(data=request.data)
         if serializer.is_valid():
@@ -256,8 +241,9 @@ class SubjectCreateView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)    
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 class SubjectDeleteView(APIView):
-   #permission_classes = [IsAuthenticated]
-   def delete(self, request, pk):
+    permission_classes = [IsAuthenticated] 
+    authentication_classes = [TokenAuthentication] 
+    def delete(self, request, pk):
         try:
             subject = Subject.objects.get(pk=pk)
             subject.delete()
