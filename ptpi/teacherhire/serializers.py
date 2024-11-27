@@ -129,8 +129,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
 #         data['user'] = user
 #         return data
     
-   
-
 # def validate_blank_fields(data):
 #     for field, value in data.items():
 #         if isinstance(value, str) and value.strip() == '':
@@ -138,6 +136,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 #     return data
 
 class TeacherExperiencesSerializer(serializers.ModelSerializer):
+    # user_id = UserSerializer(read_only=True)
     class Meta:
         model = TeacherExperiences
         fields = "__all__"
