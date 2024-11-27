@@ -23,25 +23,24 @@ def dashboard(request):
     return render(request, "admin_panel/dashboard.html")
 
 
-
 class UserProfileViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
     queryset = UserProfile.objects.all().select_related('user')
     serializer_class = UserProfileSerializer
 
 class TeachersAddressViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]    
+    #permission_classes = [IsAuthenticated]    
     queryset = TeachersAddress.objects.select_related('user')
     serializer_class=TeachersAddressSerializer
 
 
 class EducationalQulificationViewSet(viewsets.ModelViewSet):    
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
     queryset= EducationalQualification.objects.all()
     serializer_class=EducationalQualificationSerializer
     
 class EducationalQulificationCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
     def post(self, request):
         serializer = EducationalQualificationSerializer(data=request.data)        
         if serializer.is_valid():
@@ -159,7 +158,7 @@ class LoginUser(APIView):
         
 # Skill GET method
 class SkillViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
     queryset = Skill.objects.all()
     serializer_class = SkillSerializer
 
@@ -186,13 +185,13 @@ class SkillDelete(APIView):
 
 #Subject GET method
 class SubjectViewSet(viewsets.ModelViewSet):    
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
     queryset= Subject.objects.all()
     serializer_class = SubjectSerializer
 
 #Subject POST method
 class SubjectCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
     def post(self, request):
         serializer = SubjectSerializer(data=request.data)
         if serializer.is_valid():
@@ -208,7 +207,7 @@ class SubjectCreateView(APIView):
     
 #Subject DELETE method
 class SubjectDeleteView(APIView):
-   permission_classes = [IsAuthenticated]
+   #permission_classes = [IsAuthenticated]
    def delete(self, request, pk):
         try:
             subject = Subject.objects.get(pk=pk)
@@ -218,15 +217,49 @@ class SubjectDeleteView(APIView):
         except Subject.DoesNotExist:
             return Response({"error": "subject not found or unauthorized"}, status=status.HTTP_404_NOT_FOUND)
 
+#Teacher GET
+class TeacherViewSet(viewsets.ModelViewSet):    
+    #permission_classes = [IsAuthenticated]
+    queryset= Teacher.objects.all()
+    serializer_class = TeacherSerializer
+
+#Teacher POST method
+class TeacherCreateView(APIView):
+    #permission_classes = [IsAuthenticated]
+    def post(self, request):
+        serializer = TeacherSerializer(data=request.data)
+        if serializer.is_valid():
+            fullname = serializer.validated_data.get("fullname")
+            if Teacher.objects.filter(fullname=fullname).exists():
+                return Response(
+                    {"error": "Teacher with this name already exists."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            subject = serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)    
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+#Teacher DELETE method
+class TeacherDeleteView(APIView):
+   #permission_classes = [IsAuthenticated]
+   def delete(self, request, pk):
+        try:
+            subject = Teacher.objects.get(pk=pk)
+            subject.delete()
+
+            return Response({"message": "teacher deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        except Subject.DoesNotExist:
+            return Response({"error": "teacher not found or unauthorized"}, status=status.HTTP_404_NOT_FOUND)
+
 # Classcategory GET method
 class ClassCategoryViewSet(viewsets.ModelViewSet):    
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
     queryset= ClassCategory.objects.all()
     serializer_class = ClassCategorySerializer
 
 # Classcategory CREATE method
 class ClassCategoryCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
     def post(self, request):
         serializer = ClassCategorySerializer(data=request.data)
         if serializer.is_valid():
@@ -242,7 +275,7 @@ class ClassCategoryCreateView(APIView):
     
 # Classcategory DELETE method
 class ClassCategoryDeleteView(APIView):
-   permission_classes = [IsAuthenticated]
+   #permission_classes = [IsAuthenticated]
    def delete(self, request, pk):
         try:
             subject = ClassCategory.objects.get(pk=pk)
@@ -254,8 +287,9 @@ class ClassCategoryDeleteView(APIView):
 
 # TeacherQualification GET method
 class TeacherQualificationViewSet(viewsets.ModelViewSet): 
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
     queryset = TeacherQualification.objects.all()
+
 
 # TeacherQualification POST method
 class TeacherQualificationCreateView(APIView):
@@ -278,10 +312,10 @@ class TeacherQualificationDeleteView(APIView):
             return Response({"error": "teacherQualification  not found or unauthorized"}, status=status.HTTP_404_NOT_FOUND)
         
 # TeacherExperiences GET method
-class TeacherExperiencesViewSet(viewsets.ModelViewSet): 
+class TeacherExperiencesViewSet(viewsets.ModelViewSet):
+    #permission_classes = [IsAuthenticated] 
     queryset = TeacherExperiences.objects.all()
-    permission_classes = [IsAuthenticated]
-
+    
 # TeacherExperiences POST method
 class TeacherExperiencesCreateView(APIView):
     def post(self, request):
