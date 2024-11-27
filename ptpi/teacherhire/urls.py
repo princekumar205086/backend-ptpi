@@ -1,21 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from teacherhire.views import (
-    RegisterUser, LoginUser, SubjectViewSet, SubjectCreateView,
-    SubjectDeleteView, ClassCategoryViewSet, ClassCategoryCreateView,ClassCategoryDeleteView,
-     TeacherQualificationCreateView, TeacherExperiencesCreateView,
-     TeacherExperiencesDeleteView, TeacherQualificationDeleteView,
-    EducationalQulificationViewSet,TeachersAddressViewSet,TeachersAddressCreateView,EducationalQulificationCreateView
-,TeacherQualificationViewSet,TeacherExperiencesViewSet,SkillViewSet,TeacherSkillViewSet,SkillCreateView,SkillDelete,
-    SubjectDeleteView, ClassCategoryViewSet, ClassCategoryCreateView,ClassCategoryDeleteView, 
-    LoginUser,SubjectViewSet,SubjectCreateView, TeacherQualificationCreateView, 
-    TeacherExperiencesCreateView,
-    SubjectDeleteView, TeacherExperiencesDeleteView, TeacherQualificationDeleteView,
-    SkillViewSet,
-    TeacherSkillViewSet, SkillCreateView, SkillDelete,SubjectViewSet,SubjectCreateView,
-    TeacherQualificationViewSet, TeacherExperiencesViewSet,TeacherSkillCreateView,TeacherSkillDeleteSet,
-    EducationalQulificationViewSet,TeachersAddressViewSet,UserProfileViewSet,TeachersAddressCreateView,EducationalQulificationCreateView,
-    )
+from teacherhire.views import *
 from rest_framework import routers
 
 
@@ -28,18 +13,13 @@ router.register(r"admin/classcategory",ClassCategoryViewSet)
 router.register(r"admin/teacheraddress",TeachersAddressViewSet)
 router.register(r"admin/teacherskills",TeacherSkillViewSet)
 router.register(r"admin/subjects",SubjectViewSet)
-
-
-
-router.register(r"admin/teacherskills",TeacherSkillViewSet),
-router.register(r"admin/subjects",SubjectViewSet),
 router.register(r'userprofiles', UserProfileViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
     path('auth/',include('rest_framework.urls',namespace='rest_framework')),
     path('register/', RegisterUser.as_view(), name='register'),
-    path('login/', LoginUser.as_view(), name='login'),
+     path('login/', LoginAPIView.as_view()),
     #subjects  
     path('admin/subject/view/', SubjectViewSet.as_view({'get': 'list'}), name='view-subject'),
     path('admin/subject/create/', SubjectCreateView.as_view(), name='subject-create'),
