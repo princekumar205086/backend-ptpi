@@ -57,46 +57,6 @@ class TeachersAddressCreateView(APIView):
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.data,status=status.HTTP_400_BAD_REQUEST)
         
-class RegisterUser(APIView):
-    def post(self, request):
-        serializer = UserSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response({
-                'status': 400,
-                'errors': serializer.errors,
-                'message': 'Invalid data provided.'
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            user = serializer.save()
-        except IntegrityError as e:
-            if 'email' in str(e):
-                return Response({
-                    'status': 400,
-                    'message': 'Email already exists.',
-                    'errors': str(e)
-                }, status=status.HTTP_400_BAD_REQUEST)
-            elif 'username' in str(e):
-                return Response({
-                    'status': 400,
-                    'message': 'Username already exists.',
-                    'errors': str(e)
-                }, status=status.HTTP_400_BAD_REQUEST)
-            return Response({
-                'status': 400,
-                'message': 'Username or email already exists.',
-                'errors': str(e)
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        refresh = RefreshToken.for_user(user)
-        access_token = str(refresh.access_token)
-
-        return Response({
-            'status': 200,
-            'payload': serializer.data,
-            'token': access_token,
-            'message': 'User registered successfully.'
-        }, status=status.HTTP_201_CREATED)
 
 class RegisterUser(APIView):
     def post(self, request):
