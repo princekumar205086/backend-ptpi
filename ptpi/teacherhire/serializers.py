@@ -136,26 +136,33 @@ class UserProfileSerializer(serializers.ModelSerializer):
 #     return data
 
 class TeacherExperiencesSerializer(serializers.ModelSerializer):
-    # user_id = UserSerializer(read_only=True)
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(),required=True)
     class Meta:
         model = TeacherExperiences
         fields = "__all__"
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['user']=UserSerializer(instance.user).data
+        return representation
 class SubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subject
         fields = ['subject_name','subject_description']
 
 class ClassCategorySerializer(serializers.ModelSerializer):
-    # user = UserSerializer(read_only=True) 
     class Meta:
         model =ClassCategory
         fields = ['name']
 
 class TeacherSerializer(serializers.ModelSerializer):
-    # user = UserSerializer(read_only=True) 
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(),required=True) 
     class Meta:
         model = Teacher
         fields = "__all__"
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['user'] = UserSerializer(instance.user).data
+        return representation
 
 class SkillSerializer(serializers.ModelSerializer):
     class Meta:
