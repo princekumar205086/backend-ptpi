@@ -20,7 +20,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('auth/',include('rest_framework.urls',namespace='rest_framework')),
     path('register/', RegisterUser.as_view(), name='register'),
-    path('login/', LoginAPIView.as_view()),
+    path('login/', LoginUser.as_view()),
     #subjects  
     path('admin/subject/view/', SubjectViewSet.as_view({'get': 'list'}), name='view-subject'),
     path('admin/subject/create/', SubjectCreateView.as_view(), name='subject-create'),

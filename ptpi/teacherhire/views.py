@@ -155,23 +155,7 @@ class LoginUser(APIView):
                 'message': 'Invalid credentials, please try again.'
             }, status=status.HTTP_401_UNAUTHORIZED)
 
-class LoginAPIView(APIView):
-    def post(self,request):
-        email = request.data.get('email')
-        password = request.data.get('password')
-        if not email or not password:
-            return Response(
-                {'message': 'Email and password are required.'}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
 
-        user = authenticate(email=email,password=password)
-        if user is not None:
-            login(request,user)
-            return Response({'message':'Login'},status=status.HTTP_200_OK)
-        else:
-            return Response({'message':'Invalid email and password'}, status=status.HTTP_401_UNAUTHORIZED)
-        
 class SkillViewSet(viewsets.ModelViewSet):
     #permission_classes = [IsAuthenticated]
     queryset = Skill.objects.all()
