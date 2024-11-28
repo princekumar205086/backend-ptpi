@@ -27,7 +27,9 @@ SECRET_KEY = 'django-insecure-rpw44z)9)m*q3x#ehomw)cogsm_2*hlz1s8g81f78^2)ykhr#w
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "192.168.29.2"
+]
 
 
 # Application definition
@@ -146,7 +148,8 @@ SIMPLE_JWT = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:8000',
-    'http://localhost:5173',
-
+    'http://localhost:8000',      # Localhost Django server
+    'http://localhost:5173',      # Localhost frontend (e.g., React/Vue/Vite)
+    'http://192.168.29.2:8000',   # Django server on the local network
 ]
+
