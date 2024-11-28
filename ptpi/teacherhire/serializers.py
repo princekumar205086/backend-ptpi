@@ -2,13 +2,14 @@ from django.contrib.auth.models import User
 from .models import TeachersAddress,EducationalQualification
 from django.contrib.auth import authenticate
 from rest_framework import serializers
+import re
 from teacherhire.models import Subject,UserProfile,Teacher,ClassCategory, Skill, TeacherSkill, TeacherQualification, TeacherExperiences
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'password']
-        # extra_kwargs = {'password': {'write_only': True}}
+        extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
          user = User.objects.create(
