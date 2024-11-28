@@ -209,6 +209,7 @@ class TeacherSkillViewSet(viewsets.ModelViewSet):
             )
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.delete()
