@@ -37,6 +37,18 @@ class LoginUser(APIView):
                     token, created = Token.objects.get_or_create(user=user)
                     return Response({'token': [token.key], "Sucsses":"Login SucssesFully"}, status=status.HTTP_201_CREATED )
                 return Response({'Massage': 'Invalid Username and Password'}, status=401)
+            
+class LogoutUser(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            token = Token.objects.get(user=request.user)
+            token.delete()
+            return Response({"success": "Logout successful"}, status=status.HTTP_200_OK)
+        except Token.DoesNotExist:
+            return Response({"error": "Invalid or expired token"}, status=status.HTTP_400_BAD_REQUEST)
 
     
 class UserProfileViewSet(viewsets.ModelViewSet):
