@@ -10,6 +10,8 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework import status
 from teacherhire.models import *
 from teacherhire.serializers import *
+from rest_framework.decorators import action
+
 import uuid  
 
 
@@ -68,6 +70,11 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all().select_related('user')
     serializer_class = UserProfileSerializer
 
+    @action(detail=False, methods=['get'])
+    def count(self, request):
+        count = self.get_queryset().count()
+        return Response({"count": count})
+
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.delete()
@@ -79,6 +86,11 @@ class TeachersAddressViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication]   
     queryset = TeachersAddress.objects.all().select_related('user')
     serializer_class=TeachersAddressSerializer
+
+    @action(detail=False, methods=['get'])
+    def count(self, request):
+        count = self.get_queryset().count()
+        return Response({"count": count})
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -92,6 +104,11 @@ class EducationalQulificationViewSet(viewsets.ModelViewSet):
     queryset= EducationalQualification.objects.all()
     serializer_class=EducationalQualificationSerializer
 
+    @action(detail=False, methods=['get'])
+    def count(self, request):
+        count = self.get_queryset().count()
+        return Response({"count": count})
+
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.delete()
@@ -103,6 +120,11 @@ class SkillViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication] 
     queryset = Skill.objects.all()
     serializer_class = SkillSerializer
+
+    @action(detail=False, methods=['get'])
+    def count(self, request):
+        count = self.get_queryset().count()
+        return Response({"count": count})
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -116,10 +138,17 @@ class TeacherSkillViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication] 
     serializer_class = TeacherSkillSerializer
 
+    @action(detail=False, methods=['get'])
+    def count(self, request):
+        count = self.get_queryset().count()
+        return Response({"count": count})
+
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.delete()
         return Response({"message": "TeacherSkill deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
+    
 
 #Subject GET ,CREATE ,DELETE 
 class SubjectViewSet(viewsets.ModelViewSet):    
@@ -132,9 +161,11 @@ class SubjectViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         instance.delete()
         return Response({"message": "Subject deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
-
-
-
+    
+    @action(detail=False, methods=['get'])
+    def count(self, request):
+        count = self.get_queryset().count()
+        return Response({"count": count})
 
 #Teacher GET ,DELETE ,POST
 class TeacherViewSet(viewsets.ModelViewSet):    
@@ -142,6 +173,11 @@ class TeacherViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication] 
     queryset= Teacher.objects.all()
     serializer_class = TeacherSerializer
+
+    @action(detail=False, methods=['get'])
+    def count(self, request):
+        count = self.get_queryset().count()
+        return Response({"count": count})
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -155,6 +191,11 @@ class ClassCategoryViewSet(viewsets.ModelViewSet):
     queryset= ClassCategory.objects.all()
     serializer_class = ClassCategorySerializer
 
+    @action(detail=False, methods=['get'])
+    def count(self, request):
+        count = self.get_queryset().count()
+        return Response({"count": count})
+
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.delete()
@@ -167,6 +208,11 @@ class TeacherQualificationViewSet(viewsets.ModelViewSet):
     queryset = TeacherQualification.objects.all()
     serializer_class = TeacherQualificationSerializer
 
+    @action(detail=False, methods=['get'])
+    def count(self, request):
+        count = self.get_queryset().count()
+        return Response({"count": count})
+
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.delete()
@@ -178,6 +224,11 @@ class TeacherExperiencesViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication] 
     queryset = TeacherExperiences.objects.all()
     serializer_class = TeacherExperiencesSerializer
+
+    @action(detail=False, methods=['get'])
+    def count(self, request):
+        count = self.get_queryset().count()
+        return Response({"count": count})
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
