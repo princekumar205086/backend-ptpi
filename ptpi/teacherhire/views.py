@@ -93,11 +93,7 @@ class TeachersAddressCreateView(APIView):
 #             'payload': serializer.data,
 #             'message': 'User registered successfully.'
 #         }, status=status.HTTP_201_CREATED)
-
-
-
-
-               
+#                
 # class LoginUser(APIView):
 #     def post(self, request):        
 #         email = request.data.get("email")
@@ -211,9 +207,6 @@ class SkillDelete(APIView):
             return Response({"error" : "skill not found or unauthorized"}, status=status.HTTP_404_NOT_FOUND)
         
         from rest_framework.authtoken.models import Token
-
-    
-
 
 class TeacherSkillViewSet(viewsets.ModelViewSet):
     queryset = TeacherSkill.objects.all()

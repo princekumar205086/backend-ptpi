@@ -2,8 +2,10 @@ from django.contrib.auth.models import User
 from .models import TeachersAddress,EducationalQualification
 from django.contrib.auth import authenticate
 from rest_framework import serializers
-from teacherhire.models import Subject,UserProfile,Teacher,ClassCategory, Skill, TeacherSkill, TeacherQualification, TeacherExperiences
-
+from teacherhire.models import *
+import re
+from .models import UserProfile
+from django.contrib.auth.models import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -13,20 +15,11 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
          user = User.objects.create(
             username=validated_data['username'],
-            #   email=validated_data['email'],
+            # email=validated_data['email'],
         )
          user.set_password(validated_data['password'])
          user.save()
          return user
-    
-    
-
-import re
-from rest_framework import serializers
-from django.contrib.auth.models import User
-from .models import UserProfile
-from rest_framework import serializers
-from django.contrib.auth.models import User
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
@@ -157,6 +150,8 @@ class SubjectSerializer(serializers.ModelSerializer):
         fields = ['id','subject_name','subject_description']
 
 class ClassCategorySerializer(serializers.ModelSerializer):
+    permission_classes = [IsAuthenticated] 
+    authentication_classes = [TokenAuthentication] 
     class Meta:
         model =ClassCategory
         fields = ['name']
