@@ -116,8 +116,6 @@ class TeacherSkill(models.Model):
     
     def _str_(self):
         return self.user
-
-
 class UserProfile(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="profile")
     bio = models.TextField(blank=True, null=True)
