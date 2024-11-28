@@ -20,6 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
          user.set_password(validated_data['password'])
          user.save()
          return user
+    
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
@@ -113,21 +114,21 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 # Login Serializer (for User Login)
-class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
+# class LoginSerializer(serializers.Serializer):
+#     email = serializers.EmailField()
+#     password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
 
-    def validate(self, data):
-        email = data.get('email')
-        password = data.get('password')
+#     def validate(self, data):
+#         email = data.get('email')
+#         password = data.get('password')
 
-        user = authenticate(username=email, password=password)
+#         user = authenticate(username=email, password=password)
         
-        if not user:
-            raise serializers.ValidationError("Invalid email or password, please try again.")
+#         if not user:
+#             raise serializers.ValidationError("Invalid email or password, please try again.")
         
-        data['user'] = user
-        return data
+#         data['user'] = user
+#         return data
     
 def validate_blank_fields(data):
     for field, value in data.items():
@@ -150,10 +151,8 @@ class SubjectSerializer(serializers.ModelSerializer):
         fields = ['id','subject_name','subject_description']
 
 class ClassCategorySerializer(serializers.ModelSerializer):
-    permission_classes = [IsAuthenticated] 
-    authentication_classes = [TokenAuthentication] 
     class Meta:
-        model =ClassCategory
+        model = ClassCategory
         fields = ['name']
 
 class TeacherSerializer(serializers.ModelSerializer):
