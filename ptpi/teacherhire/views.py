@@ -11,41 +11,6 @@ from rest_framework import status
 from teacherhire.models import *
 from teacherhire.serializers import *
 
-class UserProfileViewSet(viewsets.ModelViewSet):
-    #permission_classes = [IsAuthenticated]
-    queryset = UserProfile.objects.all().select_related('user')
-    serializer_class = UserProfileSerializer
-
-class TeachersAddressViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated] 
-    authentication_classes = [TokenAuthentication]   
-    queryset = TeachersAddress.objects.all().select_related('user')
-    serializer_class=TeachersAddressSerializer
-
-
-class EducationalQulificationViewSet(viewsets.ModelViewSet):    
-    permission_classes = [IsAuthenticated] 
-    authentication_classes = [TokenAuthentication] 
-    queryset= EducationalQualification.objects.all()
-    serializer_class=EducationalQualificationSerializer
-    
-class EducationalQulificationCreateView(APIView):
-    #permission_classes = [IsAuthenticated]
-    def post(self, request):
-        serializer = EducationalQualificationSerializer(data=request.data)        
-        if serializer.is_valid():
-            educationalQualification = serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)        
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
-       
-class TeachersAddressCreateView(APIView):
-    def post(self,request):
-        serializer = TeachersAddressSerializer(data=request.data)
-        if serializer.is_valid():
-            teachersAddress = serializer.save()
-            return Response(serializer.data,status=status.HTTP_201_CREATED)
-        return Response(serializer.data,status=status.HTTP_400_BAD_REQUEST)
-
 class  RegisterUser(APIView):
     def post(self, request):
         serializers = UserSerializer(data = request.data)
@@ -73,34 +38,35 @@ class LoginUser(APIView):
                     return Response({'token': [token.key], "Sucsses":"Login SucssesFully"}, status=status.HTTP_201_CREATED )
                 return Response({'Massage': 'Invalid Username and Password'}, status=401)
 
-        
+    
+class UserProfileViewSet(viewsets.ModelViewSet):
+    #permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]   
+    queryset = UserProfile.objects.all().select_related('user')
+    serializer_class = UserProfileSerializer
+
+#TeacerAddress GET ,CREATE ,DELETE 
+class TeachersAddressViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated] 
+    authentication_classes = [TokenAuthentication]   
+    queryset = TeachersAddress.objects.all().select_related('user')
+    serializer_class=TeachersAddressSerializer
+
+#EducationalQulification GET ,CREATE ,DELETE 
+class EducationalQulificationViewSet(viewsets.ModelViewSet):    
+    permission_classes = [IsAuthenticated] 
+    authentication_classes = [TokenAuthentication] 
+    queryset= EducationalQualification.objects.all()
+    serializer_class=EducationalQualificationSerializer
+
+#Subject GET ,CREATE ,DELETE  
 class SkillViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication] 
     queryset = Skill.objects.all()
     serializer_class = SkillSerializer
 
-class SkillCreateView(APIView):
-    permission_classes = [IsAuthenticated]
-    def post(self, request):
-        serializer = SkillSerializer(data=request.data)
-        if serializer.is_valid():
-            Skill = serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
-    
-class SkillDelete(APIView):
-    def delete(self, request, pk):
-        try:
-            skill = Skill.objects.get(pk=pk)
-            skill_name = skill.name
-            skill.delete()
-            return Response({"message": f"{skill_name} deleted successfuly"}, status= status.HTTP_204_NO_CONTENT)
-        except Skill.DoesNotExist:
-            return Response({"error" : "skill not found or unauthorized"}, status=status.HTTP_404_NOT_FOUND)
-        
-        from rest_framework.authtoken.models import Token
-
+#Teacher GET ,CREATE ,DELETE 
 class TeacherSkillViewSet(viewsets.ModelViewSet):
     queryset = TeacherSkill.objects.all()
     permission_classes = [IsAuthenticated]
@@ -113,159 +79,32 @@ class SubjectViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication] 
     queryset= Subject.objects.all()
     serializer_class = SubjectSerializer
-class SubjectCreateView(APIView):
-    permission_classes = [IsAuthenticated] 
-    authentication_classes = [TokenAuthentication] 
-    def post(self, request):
-        serializer = SubjectSerializer(data=request.data)
-        if serializer.is_valid():
-            subject_name = serializer.validated_data.get("subject_name")
-            if Subject.objects.filter(subject_name=subject_name).exists():
-                return Response(
-                    {"error": "Subject with this name already exists."},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            subject = serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)    
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-class SubjectDeleteView(APIView):
-    permission_classes = [IsAuthenticated] 
-    authentication_classes = [TokenAuthentication] 
-    def delete(self, request, pk):
-        try:
-            subject = Subject.objects.get(pk=pk)
-            subject.delete()
 
-            return Response({"message": "subject deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
-        except Subject.DoesNotExist:
-            return Response({"error": "subject not found or unauthorized"}, status=status.HTTP_404_NOT_FOUND)
-
-#Teacher GET
+#Teacher GET ,DELETE ,POST
 class TeacherViewSet(viewsets.ModelViewSet):    
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication] 
     queryset= Teacher.objects.all()
     serializer_class = TeacherSerializer
 
-#Teacher POST method
-class TeacherCreateView(APIView):
-    #permission_classes = [IsAuthenticated]
-    def post(self, request):
-        serializer = TeacherSerializer(data=request.data)
-        if serializer.is_valid():
-            fullname = serializer.validated_data.get("fullname")
-            if Teacher.objects.filter(fullname=fullname).exists():
-                return Response(
-                    {"error": "Teacher with this name already exists."},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            subject = serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)    
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-#Teacher DELETE method
-class TeacherDeleteView(APIView):
-   #permission_classes = [IsAuthenticated]
-   def delete(self, request, pk):
-        try:
-            subject = Teacher.objects.get(pk=pk)
-            subject.delete()
-
-            return Response({"message": "teacher deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
-        except Subject.DoesNotExist:
-            return Response({"error": "teacher not found or unauthorized"}, status=status.HTTP_404_NOT_FOUND)
-
-# Classcategory GET method
+# Classcategory GET ,DELETE ,POST method
 class ClassCategoryViewSet(viewsets.ModelViewSet):    
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication] 
     queryset= ClassCategory.objects.all()
     serializer_class = ClassCategorySerializer
-class ClassCategoryCreateView(APIView):
-    #permission_classes = [IsAuthenticated]
-    def post(self, request):
-        serializer = ClassCategorySerializer(data=request.data)
-        if serializer.is_valid():
-            name = serializer.validated_data.get("name")
-            if ClassCategory.objects.filter(name=name).exists():
-                return Response(
-                    {"error": "ClassCategory with this name already exists."},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            subject = serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)    
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-class ClassCategoryDeleteView(APIView):
-   #permission_classes = [IsAuthenticated]
-   def delete(self, request, pk):
-        try:
-            subject = ClassCategory.objects.get(pk=pk)
-            subject.delete()
-
-            return Response({"message": "classcategory deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
-        except ClassCategory.DoesNotExist:
-            return Response({"error": "classcategory not found or unauthorized"}, status=status.HTTP_404_NOT_FOUND)
-
-
+    
+# TeacherQualification GET ,DELETE ,POST method method
 class TeacherQualificationViewSet(viewsets.ModelViewSet): 
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication] 
     queryset = TeacherQualification.objects.all()
     serializer_class = TeacherQualificationSerializer
-
-class TeacherQualificationCreateView(APIView):
-    permission_classes = [IsAuthenticated]
-    def post(self, request):
-        serializer = TeacherQualificationSerializer(data=request.data)
-        if serializer.is_valid():
-            institution = serializer.validated_data.get("institution")
-            if TeacherQualification.objects.filter(institution=institution).exists():
-                return Response(
-                    {"error": "TeacherQualification with this name already exists."},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            teacherqualification = serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)    
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-class TeacherQualificationDeleteView(APIView):
-   def delete(self, request, pk):
-        try:
-            teacherQualification = TeacherQualification.objects.get(pk=pk)
-            teacherQualification.delete()
-
-            return Response({"message": "teacherQualification  deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
-        except TeacherQualification.DoesNotExist:
-            return Response({"error": "teacherQualification  not found or unauthorized"}, status=status.HTTP_404_NOT_FOUND)
-        
-# TeacherExperiences GET method
+      
+# TeacherExperiences GET ,DELETE ,POST method method
 class TeacherExperiencesViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication] 
     queryset = TeacherExperiences.objects.all()
     serializer_class = TeacherExperiencesSerializer
-# TeacherExperiences POST method
-class TeacherExperiencesCreateView(APIView):
-    permission_classes = [IsAuthenticated]
-    def post(self, request):
-        serializer = TeacherExperiencesSerializer(data=request.data)
-        if serializer.is_valid():
-            institution = serializer.validated_data.get("institution")
-            if TeacherExperiences.objects.filter(institution=institution).exists():
-                return Response(
-                    {"error": "TeacherExperience with this name already exists."},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            teacherexperiences = serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)    
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-class TeacherExperiencesDeleteView(APIView):
-   def delete(self, request, pk):
-        try:
-            teacherexperiences = TeacherExperiences.objects.get(pk=pk)
-            teacherexperiences.delete()
-
-            return Response({"message": "teacherexperiences  deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
-        except TeacherExperiences.DoesNotExist:
-            return Response({"error": "teacherexperiences  not found or unauthorized"}, status=status.HTTP_404_NOT_FOUND)
-
-            
+      
