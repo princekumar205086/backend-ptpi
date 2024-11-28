@@ -5,6 +5,10 @@ from rest_framework import serializers
 import re
 from teacherhire.models import Subject,UserProfile,Teacher,ClassCategory, Skill, TeacherSkill, TeacherQualification, TeacherExperiences
 
+from teacherhire.models import *
+import re
+from .models import UserProfile
+from django.contrib.auth.models import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -14,7 +18,7 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
          user = User.objects.create(
             username=validated_data['username'],
-            #   email=validated_data['email'],
+            # email=validated_data['email'],
         )
          user.set_password(validated_data['password'])
          user.save()
@@ -91,50 +95,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"phone_number": "Phone number must have at least 10 digits."})
         return data
 
-class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
-
-    class Meta:
-        model = User
-        fields = ['email', 'username', 'password']
-
-    def validate_email(self, value):
-        if User.objects.filter(email=value).exists():
-            raise serializers.ValidationError("A user with this email already exists.")
-        return value
-
-    def create(self, validated_data):
-        user = User.objects.create(
-            username=validated_data['username'],
-            email=validated_data['email'],
-        )
-        user.set_password(validated_data['password'])
-        user.save()
-        return user
-
-# Login Serializer (for User Login)
-# class LoginSerializer(serializers.Serializer):
-#     email = serializers.EmailField()
-#     password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
-
-#     def validate(self, data):
-#         email = data.get('email')
-#         password = data.get('password')
-
-#         user = authenticate(username=email, password=password)
-        
-#         if not user:
-#             raise serializers.ValidationError("Invalid email or password, please try again.")
-        
-#         data['user'] = user
-#         return data
-    
-def validate_blank_fields(data):
-    for field, value in data.items():
-        if isinstance(value, str) and value.strip() == '':
-            raise serializers.ValidationError(f"{field} cannot be empty or just spaces.")
-    return data
-
 class TeacherExperiencesSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(),required=True)
     class Meta:
@@ -184,7 +144,7 @@ class TeacherSkillSerializer(serializers.ModelSerializer):
         
 class TeachersAddressSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)    
-    
+
     class Meta:
         model = TeachersAddress
         fields = '__all__'
