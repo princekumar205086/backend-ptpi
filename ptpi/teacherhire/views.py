@@ -56,28 +56,7 @@ class LogoutUser(APIView):
         except Token.DoesNotExist:
             return Response({"error": "Invalid or expired token"}, status=status.HTTP_400_BAD_REQUEST)
 
-class SubjectViewSet(viewsets.ModelViewSet):    
-    permission_classes = [IsAuthenticated] 
-    authentication_classes = [TokenAuthentication] 
-    queryset = Subject.objects.all()
-    serializer_class = SubjectSerializer
 
-    def create(self, request):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        subject_name = serializer.validated_data.get('subject_name')
-        if Subject.objects.filter(subject_name=subject_name).exists():
-            return Response(
-                {'message': 'Duplicate entry: Subject already exists.'}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        self.perform_create(serializer)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.delete()
-        return Response({"message": "Subject deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
 
     
@@ -215,24 +194,33 @@ class TeacherSkillViewSet(viewsets.ModelViewSet):
         instance.delete()
         return Response({"message": "TeacherSkill deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
-    
-
-#Subject GET ,CREATE ,DELETE 
 class SubjectViewSet(viewsets.ModelViewSet):    
     permission_classes = [IsAuthenticated] 
     authentication_classes = [TokenAuthentication] 
-    queryset= Subject.objects.all()
+    queryset = Subject.objects.all()
     serializer_class = SubjectSerializer
 
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.delete()
-        return Response({"message": "Subject deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+    def create(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        subject_name = serializer.validated_data.get('subject_name')
+        if Subject.objects.filter(subject_name=subject_name).exists():
+            return Response(
+                {'message': 'Duplicate entry: Subject already exists.'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
     
     @action(detail=False, methods=['get'])
     def count(self, request):
         count = self.get_queryset().count()
         return Response({"count": count})
+    
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.delete()
+        return Response({"message": "Subject deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
 #Teacher GET ,DELETE ,POST
 class TeacherViewSet(viewsets.ModelViewSet):    
