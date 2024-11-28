@@ -10,6 +10,8 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework import status
 from teacherhire.models import *
 from teacherhire.serializers import *
+import uuid  
+
 
 class  RegisterUser(APIView):
     def post(self, request):
@@ -24,19 +26,40 @@ class  RegisterUser(APIView):
 
         return Response({'status': 200, 'payload': serializers.data,'token':str(token_obj),'message':'your data is save'})
     
-class LoginUser(APIView):
-        serializer_class = LoginSerializer
 
-        authentication_classes = [TokenAuthentication]
-    
-        def post(self, request):
-            serializer = LoginSerializer(data = request.data)
-            if serializer.is_valid(raise_exception=True):
-                user = authenticate(username=serializer.data['username'], password=serializer.data['password'])
-                if user:
-                    token, created = Token.objects.get_or_create(user=user)
-                    return Response({'token': [token.key], "Sucsses":"Login SucssesFully"}, status=status.HTTP_201_CREATED )
-                return Response({'Massage': 'Invalid Username and Password'}, status=401)
+class LoginUser(APIView):
+    serializer_class = LoginSerializer
+
+    authentication_classes = [TokenAuthentication]
+ 
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            user = authenticate(username=serializer.data['username'], password=serializer.data['password'])
+            if user:
+                token, created = Token.objects.get_or_create(user=user)
+                
+                refresh_token = str(uuid.uuid4())  
+                                
+                return Response({
+                    'token': token.key,
+                    'refresh_token': refresh_token,  
+                    "success": "Login Successfully"
+                }, status=status.HTTP_201_CREATED)
+                
+            return Response({'message': 'Invalid Username or Password'}, status=status.HTTP_401_UNAUTHORIZED)
+            
+class LogoutUser(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            token = Token.objects.get(user=request.user)
+            token.delete()
+            return Response({"success": "Logout successful"}, status=status.HTTP_200_OK)
+        except Token.DoesNotExist:
+            return Response({"error": "Invalid or expired token"}, status=status.HTTP_400_BAD_REQUEST)
 
     
 class UserProfileViewSet(viewsets.ModelViewSet):
