@@ -58,7 +58,7 @@ class LoginUser(APIView):
         return Response({'message': 'Invalid username or password'}, status=status.HTTP_401_UNAUTHORIZED)
             
 class LogoutUser(APIView):
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = [ExpiringTokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -69,13 +69,10 @@ class LogoutUser(APIView):
         except Token.DoesNotExist:
             return Response({"error": "Invalid or expired token"}, status=status.HTTP_400_BAD_REQUEST)
 
-
-
-
     
 class UserProfileViewSet(viewsets.ModelViewSet):
-    #permission_classes = [IsAuthenticated]
-    authentication_classes = [TokenAuthentication]   
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [ExpiringTokenAuthentication]   
     queryset = UserProfile.objects.all().select_related('user')
     serializer_class = UserProfileSerializer
 
@@ -92,7 +89,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 #TeacerAddress GET ,CREATE ,DELETE 
 class TeachersAddressViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated] 
-    authentication_classes = [TokenAuthentication]   
+    authentication_classes = [ExpiringTokenAuthentication]   
     queryset = TeachersAddress.objects.all().select_related('user')
     serializer_class=TeachersAddressSerializer
 
@@ -122,7 +119,7 @@ class TeachersAddressViewSet(viewsets.ModelViewSet):
 #EducationalQulification GET ,CREATE ,DELETE 
 class EducationalQulificationViewSet(viewsets.ModelViewSet):    
     permission_classes = [IsAuthenticated] 
-    authentication_classes = [TokenAuthentication] 
+    authentication_classes = [ExpiringTokenAuthentication] 
     queryset= EducationalQualification.objects.all()
     serializer_class=EducationalQualificationSerializer
 
@@ -148,10 +145,17 @@ class EducationalQulificationViewSet(viewsets.ModelViewSet):
         instance.delete()
         return Response({"message": "EducationalQulification deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
+
+
+class LevelView(viewsets.ModelViewSet):
+    queryset = Level.objects.all()
+    serializer_class = LevelSerializer
+
+
 #Subject GET ,CREATE ,DELETE  
 class SkillViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
-    authentication_classes = [TokenAuthentication] 
+    authentication_classes = [ExpiringTokenAuthentication] 
     queryset = Skill.objects.all()
     serializer_class = SkillSerializer
 
@@ -181,7 +185,7 @@ class SkillViewSet(viewsets.ModelViewSet):
 class TeacherSkillViewSet(viewsets.ModelViewSet):
     queryset = TeacherSkill.objects.all()
     permission_classes = [IsAuthenticated]
-    authentication_classes = [TokenAuthentication] 
+    authentication_classes = [ExpiringTokenAuthentication] 
     serializer_class = TeacherSkillSerializer
 
 
@@ -215,7 +219,7 @@ class SubjectViewSet(viewsets.ModelViewSet):
 
 class SubjectViewSet(viewsets.ModelViewSet):    
     permission_classes = [IsAuthenticated] 
-    authentication_classes = [TokenAuthentication] 
+    authentication_classes = [ExpiringTokenAuthentication] 
     queryset = Subject.objects.all()
     serializer_class = SubjectSerializer
 
@@ -272,7 +276,7 @@ class TeacherViewSet(viewsets.ModelViewSet):
 # Classcategory GET ,DELETE ,POST method
 class ClassCategoryViewSet(viewsets.ModelViewSet):    
     permission_classes = [IsAuthenticated]
-    authentication_classes = [TokenAuthentication] 
+    authentication_classes = [ExpiringTokenAuthentication] 
     queryset= ClassCategory.objects.all()
     serializer_class = ClassCategorySerializer
 
@@ -300,7 +304,7 @@ class ClassCategoryViewSet(viewsets.ModelViewSet):
 # TeacherQualification GET ,DELETE ,POST method method
 class TeacherQualificationViewSet(viewsets.ModelViewSet): 
     permission_classes = [IsAuthenticated]
-    authentication_classes = [TokenAuthentication] 
+    authentication_classes = [ExpiringTokenAuthentication] 
     queryset = TeacherQualification.objects.all()
     serializer_class = TeacherQualificationSerializer
 
@@ -328,7 +332,7 @@ class TeacherQualificationViewSet(viewsets.ModelViewSet):
 # TeacherExperiences GET ,DELETE ,POST method method
 class TeacherExperiencesViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
-    authentication_classes = [TokenAuthentication] 
+    authentication_classes = [ExpiringTokenAuthentication] 
     queryset = TeacherExperiences.objects.all()
     serializer_class = TeacherExperiencesSerializer
 
