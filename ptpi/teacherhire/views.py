@@ -10,14 +10,9 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework import status
 from teacherhire.models import *
 from teacherhire.serializers import *
-<<<<<<< HEAD
 from .authentication import ExpiringTokenAuthentication  
 from datetime import timedelta, datetime
-
-
-=======
 from rest_framework.decorators import action
->>>>>>> 4b84992a3bb4a8004b7c07c11fb2bf6aa098a322
 
 import uuid  
 
@@ -33,12 +28,11 @@ class  RegisterUser(APIView):
         token_obj , __ = Token.objects.get_or_create(user=user)
 
         return Response({'status': 200, 'payload': serializers.data,'token':str(token_obj),'message':'your data is save'})
-<<<<<<< HEAD
     
 
 def generate_refresh_token():
     refresh_token = str(uuid.uuid4())  
-    refresh_expires_at = datetime.now() + timedelta(days=7)  
+    # refresh_expires_at = datetime.now() + timedelta(minutes=10)  
     return refresh_token
 
 class LoginUser(APIView):
@@ -57,30 +51,11 @@ class LoginUser(APIView):
             return Response({
                 'access_token': token.key,   
                 'refresh_token': refresh_token,  
-                'refresh_expires_at': refresh_expires_at,  
+                # 'refresh_expires_at': refresh_expires_at,  
                 'message': 'Login successful'
             }, status=status.HTTP_200_OK)
         
         return Response({'message': 'Invalid username or password'}, status=status.HTTP_401_UNAUTHORIZED)
-=======
-class LoginUser(APIView):
-    serializer_class = LoginSerializer
-    authentication_classes = [TokenAuthentication]
-    def post(self, request):
-        serializer = LoginSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            user = authenticate(username=serializer.data['username'], password=serializer.data['password'])
-            if user:
-                token, created = Token.objects.get_or_create(user=user)  
-                refresh_token = str(uuid.uuid4())                   
-                return Response({
-                    'token': token.key,
-                    'refresh_token': refresh_token,  
-                    "success": "Login Successfully"
-                }, status=status.HTTP_201_CREATED)
-                
-            return Response({'message': 'Invalid Username or Password'}, status=status.HTTP_401_UNAUTHORIZED)
->>>>>>> 4b84992a3bb4a8004b7c07c11fb2bf6aa098a322
             
 class LogoutUser(APIView):
     authentication_classes = [TokenAuthentication]
@@ -209,14 +184,12 @@ class TeacherSkillViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication] 
     serializer_class = TeacherSkillSerializer
 
-<<<<<<< HEAD
 
 #Subject GET ,CREATE ,DELETE 
 
 class SubjectViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     authentication_classes = [ExpiringTokenAuthentication] 
-=======
     @action(detail=False, methods=['get'])
     def count(self, request):
         count = self.get_queryset().count()
@@ -243,7 +216,6 @@ class SubjectViewSet(viewsets.ModelViewSet):
 class SubjectViewSet(viewsets.ModelViewSet):    
     permission_classes = [IsAuthenticated] 
     authentication_classes = [TokenAuthentication] 
->>>>>>> 4b84992a3bb4a8004b7c07c11fb2bf6aa098a322
     queryset = Subject.objects.all()
     serializer_class = SubjectSerializer
 
@@ -272,7 +244,7 @@ class SubjectViewSet(viewsets.ModelViewSet):
 #Teacher GET ,DELETE ,POST
 class TeacherViewSet(viewsets.ModelViewSet):    
     permission_classes = [IsAuthenticated]
-    authentication_classes = [TokenAuthentication] 
+    authentication_classes = [ExpiringTokenAuthentication] 
     queryset= Teacher.objects.all()
     serializer_class = TeacherSerializer
 
