@@ -154,15 +154,28 @@ class LevelViewSet(viewsets.ModelViewSet):
     queryset = Level.objects.all()
     serializer_class = LevelSerializer
 
-    @action(detail=False, methods=['gets'])
-    def count(self,request):
+    @action(detail=False, methods=['get'])
+    def count(self, request):
         count = self.get_queryset().count()
-        return Response({"Count": count})
+        return Response({"count": count})
     
-    def destroy(self,request,*args,**kwargs):
+    def create(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        name = serializer.validated_data.get('name')
+        if Level.objects.filter(name=name).exists():
+            return Response(
+                {'message': 'Duplicate entry: EducationalQualification already exists.'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.delete()
-        return Response({"Message":"Level Deleted Successfully!"})
+        return Response({"message": "Level deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
 
 #Subject GET ,CREATE ,DELETE  
 class SkillViewSet(viewsets.ModelViewSet):
@@ -372,4 +385,32 @@ class TeacherExperiencesViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         instance.delete()
         return Response({"message": "TeacherExperiences deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+    
+class QuestionViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication] 
+    queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
+
+    @action(detail=False, methods=['get'])
+    def count(self, request):
+        count = self.get_queryset().count()
+        return Response({"count": count})
+    
+    def create(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        institution = serializer.validated_data.get('institution')
+        if Question.objects.filter(institution=institution).exists():
+            return Response(
+                {'message': 'Duplicate entry: TeacherExperiences already exists.'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.delete()
+        return Response({"message": "Question deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
       

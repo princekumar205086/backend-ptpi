@@ -11,7 +11,9 @@ router.register(r"admin/teacherskill",TeacherSkillViewSet),
 router.register(r"admin/subject",SubjectViewSet),
 router.register(r"admin/classcategory",ClassCategoryViewSet),
 router.register(r"admin/teacher",TeacherViewSet),
-router.register(r'userprofiles', UserProfileViewSet)
+router.register(r'userprofiles', UserProfileViewSet),
+router.register(r'question', QuestionViewSet),
+router.register(r'level', LevelView),
 router.register(r'admin/educationalQulification', EducationalQulificationViewSet)
 router.register(r'admin/teachersAddress', TeachersAddressViewSet)
 router.register(r'admin/level', LevelViewSet)
