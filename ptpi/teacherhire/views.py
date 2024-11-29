@@ -397,7 +397,7 @@ class TeacherExperiencesViewSet(viewsets.ModelViewSet):
     
 class QuestionViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
-    authentication_classes = [TokenAuthentication] 
+    authentication_classes = [ExpiringTokenAuthentication] 
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
 
