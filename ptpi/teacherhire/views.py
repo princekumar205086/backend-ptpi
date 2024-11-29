@@ -49,6 +49,7 @@ class LoginUser(APIView):
             refresh_token = generate_refresh_token()
 
             return Response({
+                'username':user.username,
                 'access_token': token.key,   
                 'refresh_token': refresh_token,  
                 # 'refresh_expires_at': refresh_expires_at,  
@@ -147,7 +148,9 @@ class EducationalQulificationViewSet(viewsets.ModelViewSet):
 
 
 
-class LevelView(viewsets.ModelViewSet):
+class LevelViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]    
+    authentication_classes = [ExpiringTokenAuthentication]     
     queryset = Level.objects.all()
     serializer_class = LevelSerializer
 
@@ -186,6 +189,10 @@ class SkillViewSet(viewsets.ModelViewSet):
         count = self.get_queryset().count()
         return Response({"count": count})
 
+    def destroy(self,request,*args,**kwargs):
+        instance = self.get_object()
+        instance.delete()
+        return Response({"Message": "Level deleted Successfully"}, status=status.HTTP_204_NO_CONTENT)
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)

@@ -16,6 +16,7 @@ router.register(r'question', QuestionViewSet),
 router.register(r'level', LevelView),
 router.register(r'admin/educationalQulification', EducationalQulificationViewSet)
 router.register(r'admin/teachersAddress', TeachersAddressViewSet)
+router.register(r'admin/level', LevelViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
