@@ -8,6 +8,8 @@ from teacherhire.models import *
 import re
 from .models import UserProfile
 from django.contrib.auth.models import User
+from rest_framework.exceptions import ValidationError
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -36,18 +38,20 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         email = validated_data['email']
-        base_username = email.split('@')[0]  # Extract base username from email
+        base_username = email.split('@')[0] 
         username = base_username
-
-        # Ensure the username is unique
+        if User.objects.filter(email=email).exists():
+            raise ValidationError({'email': 'Email is already in use.'})
         while User.objects.filter(username=username).exists():
-            username = f"{base_username}{random.randint(1000, 9999)}"  # Append a random number
-
-        user = User.objects.create_user(
-            username=username,
-            email=email,
-            password=validated_data['password']
-        )
+            username = f"{base_username}{random.randint(1000, 9999)}"  
+        try:
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=validated_data['password']
+            )
+        except Exception as e:
+            raise ValidationError({'error': str(e)})
         return user
     
 class LoginSerializer(serializers.Serializer):
@@ -130,8 +134,22 @@ class LevelSerializer(serializers.ModelSerializer):
         model = Level
         fields = '__all__'
 
+class TeachersAddressSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)    
+
+    class Meta:
+        model = TeachersAddress
+        fields = '__all__'
+
+    def to_representation(self, instance):      
+        representation = super().to_representation(instance)
+        representation['user'] = UserSerializer(instance.user).data                
+        return representation
+
 class TeacherSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(),required=True) 
+    teachers_address = TeachersAddressSerializer(many=False, read_only=True)
+
     class Meta:
         model = Teacher
         fields = "__all__"
@@ -167,17 +185,6 @@ class TeacherSkillSerializer(serializers.ModelSerializer):
         representation['skill'] = SkillSerializer(instance.skill).data
         return representation
         
-class TeachersAddressSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)    
-
-    class Meta:
-        model = TeachersAddress
-        fields = '__all__'
-
-    def to_representation(self, instance):      
-        representation = super().to_representation(instance)
-        representation['user'] = UserSerializer(instance.user).data                
-        return representation
     
 class EducationalQualificationSerializer(serializers.ModelSerializer):
     class Meta:
