@@ -4,11 +4,11 @@ from django.contrib.auth import authenticate
 from rest_framework import serializers
 import re
 from teacherhire.models import Subject,UserProfile,Teacher,ClassCategory, Skill, TeacherSkill, TeacherQualification, TeacherExperiences
-
 from teacherhire.models import *
 import re
 from .models import UserProfile
 from django.contrib.auth.models import User
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -24,18 +24,28 @@ class UserSerializer(serializers.ModelSerializer):
          user.save()
          return user
     
+import random
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password']
+        fields = ['email', 'password']
 
     def create(self, validated_data):
+        email = validated_data['email']
+        base_username = email.split('@')[0]  # Extract base username from email
+        username = base_username
+
+        # Ensure the username is unique
+        while User.objects.filter(username=username).exists():
+            username = f"{base_username}{random.randint(1000, 9999)}"  # Append a random number
+
         user = User.objects.create_user(
-            username=validated_data['username'],
-            email=validated_data['email'],
+            username=username,
+            email=email,
             password=validated_data['password']
         )
         return user

@@ -11,7 +11,10 @@ class ExpiringTokenAuthentication(TokenAuthentication):
             token = model.objects.get(key=key)
         except model.DoesNotExist:
             raise AuthenticationFailed('Invalid token.')
-        expiration_time = timedelta(seconds=getattr(settings, 'TOKEN_EXPIRATION_TIME', 7200))  
-        if timezone.now() - token.created > expiration_time:
+
+        # Calculate token expiration
+        expiration_time = timedelta(seconds=getattr(settings, 'TOKEN_EXPIRATION_TIME', 30))  
+        if timezone.now() > (token.created + expiration_time):
             raise AuthenticationFailed('Access token has expired. Please log in again.')
+
         return (token.user, token)
