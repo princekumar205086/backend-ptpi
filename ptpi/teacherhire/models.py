@@ -1,7 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
+from django.utils import timezone
+from datetime import timedelta
+import uuid  
 
-# Create your models here.   
+
 class TeachersAddress(models.Model):
     ADDRESS_TYPE_CHOICES = [
         ('current', 'Current'),
@@ -76,7 +80,7 @@ class EducationalQualification(models.Model):
    name = models.CharField(max_length=255, unique=True)
    description = models.TextField(null=True, blank=True)
 
-   def _str_(self):
+   def __str__(self):
         return self.name
 
 class TeacherQualification(models.Model):
@@ -86,7 +90,7 @@ class TeacherQualification(models.Model):
     year_of_passing = models.PositiveIntegerField()  
     grade_or_percentage = models.CharField(max_length=50, null=True, blank=True)
 
-    def _str_(self):
+    def __str__(self):
         return self.user
 
 class TeacherExperiences(models.Model):
@@ -98,15 +102,42 @@ class TeacherExperiences(models.Model):
     description = models.TextField(null=True, blank=True)
     achievements = models.TextField(null=True, blank=True)
 
-    def _str_(self):
+    def __str__(self):
         return self.user
 
 class Skill(models.Model):
    name = models.CharField(max_length=255, unique=True)
    description = models.TextField(null=True, blank=True)
 
-   def _str_(self):
+   def __str__(self):
         return self.name
+
+class Level(models.Model):
+    name = models.CharField(max_length=100)
+    description =models.CharField(max_length=2000)
+    def __str__(self):
+        return self.name
+    
+class Question(models.Model):
+    subject = models.ForeignKey(Subject,on_delete=models.CASCADE)
+    level = models.ForeignKey(Level,on_delete=models.CASCADE)
+    text = models.CharField(max_length=2000)
+    options = models.JSONField()
+    correct_options = models.PositiveBigIntegerField()
+    explanations = models.TextField(null=True,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    def clean(self):
+        super().clean()
+        if self.correct_option < 1 or self.correct_option > len(self.options):
+            raise models.ValidationError({
+                'correct_option': f'Correct option must be between 1 and {len(self.options)}.'
+            })
+    class Meta:
+        ordering = ['created_at']
+        
+    def __str__(self):
+        return f"{self.subject.name} - {self.level.name} - {self.text[:50]}"
+
 
 class TeacherSkill(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -114,7 +145,7 @@ class TeacherSkill(models.Model):
     proficiency_level = models.CharField(max_length=100, null=True, blank=True)
     years_of_experience = models.PositiveIntegerField(default=0)
     
-    def _str_(self):
+    def __str__(self):
         return self.user
 class UserProfile(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="profile")

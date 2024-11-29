@@ -27,7 +27,15 @@ SECRET_KEY = 'django-insecure-rpw44z)9)m*q3x#ehomw)cogsm_2*hlz1s8g81f78^2)ykhr#w
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+<<<<<<< HEAD
+    "192.168.29.2",
+    "127.0.0.1",
+=======
+    '127.0.0.1',
+    "192.168.29.2"
+>>>>>>> e2d5d84a50060522e66758f435400eb5a3dd9467
+]
 
 
 # Application definition
@@ -138,15 +146,17 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),    
-    'ROTATE_REFRESH_TOKENS': False,
-    'BLACKLIST_AFTER_ROTATION': False,
-}
+
+# SIMPLE_JWT = {
+#     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+#     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),    
+#     'ROTATE_REFRESH_TOKENS': False,
+#     'BLACKLIST_AFTER_ROTATION': False,
+# }
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:8000',
-    'http://localhost:5173',
-
+    'http://localhost:8000',      # Localhost Django server
+    'http://localhost:5173',      # Localhost frontend (e.g., React/Vue/Vite)
+    'http://192.168.29.2:8000',   # Django server on the local network
 ]
+
