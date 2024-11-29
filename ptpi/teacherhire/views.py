@@ -46,7 +46,7 @@ class LoginUser(APIView):
             Token.objects.filter(user=user).delete()  
             token = Token.objects.create(user=user) 
 
-            refresh_token, refresh_expires_at = generate_refresh_token()
+            refresh_token = generate_refresh_token()
 
             return Response({
                 'access_token': token.key,   
