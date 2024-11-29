@@ -114,11 +114,6 @@ class ClassCategorySerializer(serializers.ModelSerializer):
         model = ClassCategory
         fields = ['id','name']
 
-class LevelSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Level
-        fields = '__all__'
-
 class TeacherSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(),required=True) 
     class Meta:
@@ -132,6 +127,10 @@ class TeacherSerializer(serializers.ModelSerializer):
 class SkillSerializer(serializers.ModelSerializer):
     class Meta:
         model = Skill
+        fields = "__all__"
+class LevelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Level
         fields = "__all__"
 
 class QuestionSerializer(serializers.ModelSerializer):
