@@ -115,6 +115,7 @@ class ClassCategorySerializer(serializers.ModelSerializer):
         fields = ['id','name']
 
 class LevelSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(max_length=100, required=True)
     class Meta:
         model = Level
         fields = '__all__'
