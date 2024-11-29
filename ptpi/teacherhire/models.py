@@ -1,6 +1,29 @@
 from django.db import models
 from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
+from django.utils import timezone
+from datetime import timedelta
+import uuid  
 
+
+class RefreshToken(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=255, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+
+    @classmethod
+    def generate_token(cls, user):
+        token = str(uuid.uuid4())
+        expires_at = timezone.now() + timedelta(seconds=10)  # Set expiration (e.g., 1 day)
+        refresh_token, created = cls.objects.update_or_create(
+            user=user, defaults={'token': token, 'expires_at': expires_at}
+        )
+        return refresh_token
+
+    def is_expired(self):
+        return timezone.now() > self.expires_at
+    
 # Create your models here.   
 class TeachersAddress(models.Model):
     ADDRESS_TYPE_CHOICES = [
