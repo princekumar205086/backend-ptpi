@@ -124,7 +124,6 @@ class Question(models.Model):
     text = models.CharField(max_length=2000,)
     options = models.JSONField()
     correct_options = models.PositiveBigIntegerField()
-    option = models.TextField(null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     def clean(self):
         super().clean()
