@@ -16,47 +16,60 @@ from rest_framework.decorators import action
 
 import uuid  
 
-class  RegisterUser(APIView):
+class RegisterUser(APIView):
     def post(self, request):
-        serializers = UserSerializer(data = request.data)
+        serializer = RegisterSerializer(data=request.data)
 
-        if not serializers.is_valid():
-            return Response({'status': 403, 'error': serializers.errors,'message':'something went worng'})
+        if not serializer.is_valid():
+            return Response({
+                'status': 403,
+                'error': serializer.errors,
+                'message': 'Something went wrong'
+            })
         
-        serializers.save()
-        user = User.objects.get(username = serializers.data['username'])
-        token_obj , __ = Token.objects.get_or_create(user=user)
+        serializer.save()
+        user = User.objects.get(email=serializer.data['email'])
+        token_obj, __ = Token.objects.get_or_create(user=user)
 
-        return Response({'status': 200, 'payload': serializers.data,'token':str(token_obj),'message':'your data is save'})
+        return Response({
+            'status': 200,
+            'payload': serializer.data,
+            'token': str(token_obj),
+            'message': 'Your data is saved'
+        })
     
 
 def generate_refresh_token():
-    refresh_token = str(uuid.uuid4())  
-    # refresh_expires_at = datetime.now() + timedelta(minutes=10)  
-    return refresh_token
+    return str(uuid.uuid4())
 
 class LoginUser(APIView):
     def post(self, request):
-        username = request.data.get('username')
+        email = request.data.get('email')
         password = request.data.get('password')
 
-        user = authenticate(username=username, password=password)
-        if user:
+        try:
+            # Find the user by email
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'message': 'Invalid email or password'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        # Check if the password is correct
+        if user.check_password(password):
             # Delete old token if it exists
-            Token.objects.filter(user=user).delete()  
-            token = Token.objects.create(user=user) 
+            Token.objects.filter(user=user).delete()
+            token = Token.objects.create(user=user)
 
             refresh_token = generate_refresh_token()
 
             return Response({
-                'username':user.username,
-                'access_token': token.key,   
-                'refresh_token': refresh_token,  
+                'access_token': token.key,
+                'refresh_token': refresh_token,
+                'username':user.username, 
                 # 'refresh_expires_at': refresh_expires_at,  
                 'message': 'Login successful'
             }, status=status.HTTP_200_OK)
-        
-        return Response({'message': 'Invalid username or password'}, status=status.HTTP_401_UNAUTHORIZED)
+        else:
+            return Response({'message': 'Invalid email or password'}, status=status.HTTP_401_UNAUTHORIZED)
             
 class LogoutUser(APIView):
     authentication_classes = [ExpiringTokenAuthentication]
@@ -216,13 +229,6 @@ class TeacherSkillViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     authentication_classes = [ExpiringTokenAuthentication] 
     serializer_class = TeacherSkillSerializer
-
-
-#Subject GET ,CREATE ,DELETE 
-
-class SubjectViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [ExpiringTokenAuthentication] 
     @action(detail=False, methods=['get'])
     def count(self, request):
         count = self.get_queryset().count()
@@ -245,6 +251,9 @@ class SubjectViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         instance.delete()
         return Response({"message": "TeacherSkill deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
+#Subject GET ,CREATE ,DELETE 
+
 
 class SubjectViewSet(viewsets.ModelViewSet):    
     permission_classes = [IsAuthenticated] 
@@ -388,7 +397,7 @@ class TeacherExperiencesViewSet(viewsets.ModelViewSet):
     
 class QuestionViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
-    authentication_classes = [TokenAuthentication] 
+    authentication_classes = [ExpiringTokenAuthentication] 
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
 

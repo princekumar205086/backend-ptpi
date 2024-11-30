@@ -4,11 +4,13 @@ from django.contrib.auth import authenticate
 from rest_framework import serializers
 import re
 from teacherhire.models import Subject,UserProfile,Teacher,ClassCategory, Skill, TeacherSkill, TeacherQualification, TeacherExperiences
-
 from teacherhire.models import *
 import re
 from .models import UserProfile
 from django.contrib.auth.models import User
+from rest_framework.exceptions import ValidationError
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -24,24 +26,36 @@ class UserSerializer(serializers.ModelSerializer):
          user.save()
          return user
     
+import random
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password']
+        fields = ['email', 'password']
 
     def create(self, validated_data):
-        user = User.objects.create_user(
-            username=validated_data['username'],
-            email=validated_data['email'],
-            password=validated_data['password']
-        )
+        email = validated_data['email']
+        base_username = email.split('@')[0] 
+        username = base_username
+        if User.objects.filter(email=email).exists():
+            raise ValidationError({'email': 'Email is already in use.'})
+        while User.objects.filter(username=username).exists():
+            username = f"{base_username}{random.randint(1000, 9999)}"  
+        try:
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=validated_data['password']
+            )
+        except Exception as e:
+            raise ValidationError({'error': str(e)})
         return user
     
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=100)
+    email = serializers.EmailField(max_length=100)
     password = serializers.CharField(max_length=100)
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -120,8 +134,22 @@ class LevelSerializer(serializers.ModelSerializer):
         model = Level
         fields = '__all__'
 
+class TeachersAddressSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)    
+
+    class Meta:
+        model = TeachersAddress
+        fields = '__all__'
+
+    def to_representation(self, instance):      
+        representation = super().to_representation(instance)
+        representation['user'] = UserSerializer(instance.user).data                
+        return representation
+
 class TeacherSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(),required=True) 
+    teachers_address = TeachersAddressSerializer(many=False, read_only=True)
+
     class Meta:
         model = Teacher
         fields = "__all__"
@@ -157,17 +185,6 @@ class TeacherSkillSerializer(serializers.ModelSerializer):
         representation['skill'] = SkillSerializer(instance.skill).data
         return representation
         
-class TeachersAddressSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)    
-
-    class Meta:
-        model = TeachersAddress
-        fields = '__all__'
-
-    def to_representation(self, instance):      
-        representation = super().to_representation(instance)
-        representation['user'] = UserSerializer(instance.user).data                
-        return representation
     
 class EducationalQualificationSerializer(serializers.ModelSerializer):
     class Meta:
