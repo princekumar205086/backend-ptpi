@@ -201,19 +201,52 @@ class TeacherSerializer(serializers.ModelSerializer):
     
     
 class SkillSerializer(serializers.ModelSerializer):
-    
+    name = serializers.CharField(max_length=20, required=False, allow_null=True)
     class Meta:
         model = Skill
         fields = "__all__"
-        
+    def validate_name(self,value):
+        if value is not None:
+            if len(value) < 3:
+                raise serializers.ValidationError("Skill name must be at least 3 characters.")
+        return value
     
 class QuestionSerializer(serializers.ModelSerializer):
     subject = serializers.PrimaryKeyRelatedField(queryset=Subject.objects.all(), required=True)
     level = serializers.PrimaryKeyRelatedField(queryset=Level.objects.all(), required=True)
+    text = serializers.CharField(max_length=2000,allow_null=True, required=False)
+    options = serializers.JSONField(required=False, allow_null=True)    
+    correct_options = serializers.ListField(
+        child=serializers.IntegerField(min_value=0), 
+        required=False,
+        allow_null=True
+    )  
     class Meta:
         model = Question
         fields = "__all__"
-    
+    def validate_text(self,value):
+        if value is not None:
+            if len(value) < 5:
+                raise serializers.ValidationError("Text must be at least 5 characters.")
+            return value
+    def validate_options(self, value):
+        if value is not None:
+            if not isinstance(value, list):
+                raise serializers.ValidationError("Options must be a list.")
+            if len(value) != 4:
+                raise serializers.ValidationError("Options must contain exactly 4 items.")
+        return value
+    def validate_correct_options(self, value):
+        if value is not None:
+            if not isinstance(value, list):
+                raise serializers.ValidationError("Correct options must be a list of indices.")
+            if len(value) == 0:
+                raise serializers.ValidationError("At least one correct option must be specified.")
+            if any(option >= len(self.initial_data.get('options', [])) for option in value):
+                raise serializers.ValidationError("Correct options must be valid indices of the options list.")
+            if len(value) != len(set(value)):
+                raise serializers.ValidationError("Correct options must contain unique indices.")
+        return value
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['subject'] = SubjectSerializer(instance.subject).data
@@ -221,6 +254,7 @@ class QuestionSerializer(serializers.ModelSerializer):
         return representation
         
 class TeacherSkillSerializer(serializers.ModelSerializer):
+    
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)
     skill = serializers.PrimaryKeyRelatedField(queryset=Skill.objects.all(), required=False)
 
