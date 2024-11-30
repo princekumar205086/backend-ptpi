@@ -13,21 +13,21 @@ class TeachersAddress(models.Model):
     ]
     
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    address_type = models.CharField(max_length=10, choices=ADDRESS_TYPE_CHOICES)
-    state = models.CharField(max_length=100, default='Bihar')
-    division = models.CharField(max_length=100)
-    district = models.CharField(max_length=100)
-    block = models.CharField(max_length=100)
-    village = models.CharField(max_length=100)
+    address_type = models.CharField(max_length=10, choices=ADDRESS_TYPE_CHOICES,null=True, blank=True)
+    state = models.CharField(max_length=100, default='Bihar',null=True, blank=True)
+    division = models.CharField(max_length=100,null=True, blank=True)
+    district = models.CharField(max_length=100,null=True, blank=True)
+    block = models.CharField(max_length=100,null=True, blank=True)
+    village = models.CharField(max_length=100,null=True, blank=True)
     area = models.TextField(null=True, blank=True)
-    pincode = models.CharField(max_length=6)
+    pincode = models.CharField(max_length=6,null=True, blank=True)
 
     def __str__(self):
         return f'{self.address_type} address of {self.user.username}'
 
 # Create your models here.
 class Subject(models.Model):
-    subject_name = models.CharField(max_length=100)
+    subject_name = models.CharField(max_length=100,null=True, blank=True)
     subject_description = models.TextField(null=True, blank=True)
     def __str__(self):
         return self.subject_name
@@ -35,7 +35,7 @@ class Subject(models.Model):
 class ClassCategory(models.Model):
     name = models.CharField(
         max_length=100,
-        unique=True,
+        unique=True,null=True, blank=True,
         choices=[
             ("Nursery to U.K.G","Nursery to U.K.G"),
             ("1 to 5","1 to 5"),
@@ -48,36 +48,36 @@ class ClassCategory(models.Model):
         return self.name
 class Teacher(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
-    fullname = models.	CharField(max_length=255)
+    fullname = models.	CharField(max_length=255,null=True, blank=True)
     gender	 = models.CharField(
-        max_length=10,
+        max_length=10,null=True, blank=True,
         choices=[
             ("Female","Female"),
             ("Male","Male"),
             ("other","other"),
         ])
-    religion = models.	CharField(max_length=100)
+    religion = models.	CharField(max_length=100,null=True, blank=True)
     nationality = models. CharField(
-        max_length=100,
+        max_length=100,null=True, blank=True,
         choices=[
             ("Indian","Indian"),
             ("other","other"),
         ]
         )
-    image = models.	ImageField(upload_to='images/',null=True)
-    aadhar_no = models.CharField(max_length=12, unique=True)
-    phone = models.	CharField(max_length=15)
+    image = models.	ImageField(upload_to='images/',null=True, blank=True)
+    aadhar_no = models.CharField(max_length=12, unique=True,null=True, blank=True)
+    phone = models.	CharField(max_length=15,null=True, blank=True)
     alternate_phone = models. CharField(max_length=15, null=True, blank=True)
     verified = models.	BooleanField(default=False)
-    class_categories = models.ForeignKey(ClassCategory, on_delete=models.CASCADE)
+    class_categories = models.ForeignKey(ClassCategory, on_delete=models.CASCADE,null=True, blank=True)
     rating = models. DecimalField(max_digits=3, decimal_places=2, null=True, blank=True)
-    date_of_birth = models.	DateField()
+    date_of_birth = models.	DateField(null=True, blank=True)
     availability_status = models.CharField(max_length=50, default='Available')
     def __str__(self):
         return self.user
 
 class EducationalQualification(models.Model):	
-   name = models.CharField(max_length=255, unique=True)
+   name = models.CharField(max_length=255, unique=True,null=True, blank=True)
    description = models.TextField(null=True, blank=True)
 
    def __str__(self):
@@ -85,9 +85,9 @@ class EducationalQualification(models.Model):
 
 class TeacherQualification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    qualification = models.ForeignKey(EducationalQualification, on_delete=models.CASCADE)
-    institution = models.CharField(max_length=225)  
-    year_of_passing = models.PositiveIntegerField()  
+    qualification = models.ForeignKey(EducationalQualification, on_delete=models.CASCADE,null=True, blank=True)
+    institution = models.CharField(max_length=225,null=True, blank=True)  
+    year_of_passing = models.PositiveIntegerField(null=True, blank=True)  
     grade_or_percentage = models.CharField(max_length=50, null=True, blank=True)
 
     def __str__(self):
@@ -95,9 +95,9 @@ class TeacherQualification(models.Model):
 
 class TeacherExperiences(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
-    institution = models.CharField(max_length=255)
-    role = models.CharField(max_length=255)
-    start_date	= models.DateField()
+    institution = models.CharField(max_length=255,null=True, blank=True)
+    role = models.CharField(max_length=255,null=True, blank=True)
+    start_date	= models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     achievements = models.TextField(null=True, blank=True)
@@ -106,22 +106,22 @@ class TeacherExperiences(models.Model):
         return self.user
 
 class Skill(models.Model):
-   name = models.CharField(max_length=255, unique=True)
+   name = models.CharField(max_length=255, unique=True,null=True, blank=True)
    description = models.TextField(null=True, blank=True)
 
    def __str__(self):
         return self.name
 
 class Level(models.Model):
-    name = models.CharField(max_length=100)
-    description =models.CharField(max_length=2000)
+    name = models.CharField(max_length=100,null=True, blank=True)
+    description =models.CharField(max_length=2000,null=True, blank=True)
     def __str__(self):
         return self.name
     
 class Question(models.Model):
     subject = models.ForeignKey(Subject,on_delete=models.CASCADE)
     level = models.ForeignKey(Level,on_delete=models.CASCADE)
-    text = models.CharField(max_length=2000)
+    text = models.CharField(max_length=2000,)
     options = models.JSONField()
     correct_options = models.PositiveBigIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
