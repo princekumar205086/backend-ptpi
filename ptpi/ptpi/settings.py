@@ -79,7 +79,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'ptpi.wsgi.application'
-TOKEN_EXPIRATION_TIME = 30 
+TOKEN_EXPIRATION_TIME = 7200
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'teacherhire.authentication.ExpiringTokenAuthentication',  # Update this with the correct import path
