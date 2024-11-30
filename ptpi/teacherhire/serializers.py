@@ -168,9 +168,18 @@ class LevelSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class QuestionSerializer(serializers.ModelSerializer):
+    subject = serializers.PrimaryKeyRelatedField(queryset=Subject.objects.all(), required=True)
+    level = serializers.PrimaryKeyRelatedField(queryset=Level.objects.all(), required=True)
     class Meta:
         model = Question
         fields = "__all__"
+    
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['subject'] = SubjectSerializer(instance.subject).data
+        representation['level'] = LevelSerializer(instance.level).data
+        return representation
+        
 class TeacherSkillSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)
     skill = serializers.PrimaryKeyRelatedField(queryset=Skill.objects.all(), required=False)
@@ -184,8 +193,7 @@ class TeacherSkillSerializer(serializers.ModelSerializer):
         representation['user'] = UserSerializer(instance.user).data
         representation['skill'] = SkillSerializer(instance.skill).data
         return representation
-        
-    
+            
 class EducationalQualificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = EducationalQualification

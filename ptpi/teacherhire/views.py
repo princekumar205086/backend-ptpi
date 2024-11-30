@@ -162,8 +162,8 @@ class EducationalQulificationViewSet(viewsets.ModelViewSet):
         return Response({"count": count})
     
 class LevelViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]    
-    authentication_classes = [ExpiringTokenAuthentication]     
+    # permission_classes = [IsAuthenticated]    
+    # authentication_classes = [ExpiringTokenAuthentication]     
     queryset = Level.objects.all()
     serializer_class = LevelSerializer
 
@@ -273,6 +273,7 @@ class TeacherQualificationViewSet(viewsets.ModelViewSet):
     def count(self,request):
         count = get_count(TeacherQualification)
         return Response({"count":count})
+    
 class TeacherExperiencesViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     authentication_classes = [ExpiringTokenAuthentication] 
@@ -282,37 +283,23 @@ class TeacherExperiencesViewSet(viewsets.ModelViewSet):
     def create(self,request):
         return create_object(TeacherExperiencesSerializer,request.data,TeacherExperiences)
     def destory(self,pk=None):
-        return delete_object(TeacherExperiences)
+        return delete_object(TeacherExperiences,pk)
     @action (detail=False,methods=['get'])
     def count(self,request):
         count = get_count(TeacherExperiences)
         return Response({"Count":count})
     
 class QuestionViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [ExpiringTokenAuthentication] 
-    queryset = Question.objects.all()
+    queryset = Question.objects.all().select_related('subject', 'level')
     serializer_class = QuestionSerializer
+    # permission_classes = [IsAuthenticated]
+    # authentication_classes = [ExpiringTokenAuthentication] 
 
-    @action(detail=False, methods=['get'])
-    def count(self, request):
-        count = self.get_queryset().count()
-        return Response({"count": count})
-    
-    def create(self, request):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        institution = serializer.validated_data.get('institution')
-        if Question.objects.filter(institution=institution).exists():
-            return Response(
-                {'message': 'Duplicate entry: TeacherExperiences already exists.'}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        self.perform_create(serializer)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.delete()
-        return Response({"message": "Question deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
-      
+    def create(self,request):
+        return create_object(QuestionSerializer,request.data,Question)
+    def destory(self,pk=None):
+        return delete_object(Question,pk)
+    @action (detail=False,methods=['get'])
+    def count(self,request):
+        count = get_count(Question)
+        return Response({"Count":count})
