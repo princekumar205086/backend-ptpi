@@ -147,11 +147,19 @@ class TeachersAddressSerializer(serializers.ModelSerializer):
 
 class TeacherSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(),required=True) 
-    teachers_address = TeachersAddressSerializer(many=False, read_only=True)
+    teachers_address = TeachersAddressSerializer(many=False, allow_null=True)
+    aadhar_no = serializers.CharField(max_length=12, required=False, allow_null=True)
+    aadhar_no = serializers.CharField(max_length=12, required=False, allow_null=True)
 
     class Meta:
         model = Teacher
-        fields = "__all__"
+        fields = "__all__"    
+    def validate_aadhar_no(self,value):
+        if value is not None:
+            if not re.match(r'^\d{12}$', value):
+                raise serializers.ValidationError("Aadhar number must be exactly 12 digits.")
+        return value
+            
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['user'] = UserSerializer(instance.user).data
