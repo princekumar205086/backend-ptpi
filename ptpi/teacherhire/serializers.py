@@ -6,6 +6,7 @@ import re
 from teacherhire.models import Subject,UserProfile,Teacher,ClassCategory, Skill, TeacherSkill, TeacherQualification, TeacherExperiences
 from teacherhire.models import *
 import re
+import random
 from .models import UserProfile
 from django.contrib.auth.models import User
 from rest_framework.exceptions import ValidationError
@@ -26,7 +27,6 @@ class UserSerializer(serializers.ModelSerializer):
          user.save()
          return user
     
-import random
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -133,7 +133,6 @@ class LevelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Level
         fields = '__all__'
-
 class TeachersAddressSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)    
 
@@ -162,11 +161,6 @@ class SkillSerializer(serializers.ModelSerializer):
     class Meta:
         model = Skill
         fields = "__all__"
-class LevelSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Level
-        fields = "__all__"
-
 class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
