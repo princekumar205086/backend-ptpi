@@ -6,6 +6,7 @@ import re
 from teacherhire.models import Subject,UserProfile,Teacher,ClassCategory, Skill, TeacherSkill, TeacherQualification, TeacherExperiences
 from teacherhire.models import *
 import re
+from datetime import date
 import random
 from .models import UserProfile
 from django.contrib.auth.models import User
@@ -145,30 +146,67 @@ class TeachersAddressSerializer(serializers.ModelSerializer):
         representation['user'] = UserSerializer(instance.user).data                
         return representation
 
+def validate_phone_number(value):
+    if value is not None:
+        if not re.match(r'^[6789]\d{9}$', value):
+            raise ValidationError("Phone number must be exactly 10 digits and start with 6, 7, 8, or 9.")
+    return value
+
+def validate_age(value):
+    if value is not None:
+        today = date.today()
+        age = today.year - value.year - ((today.month, today.day) < (value.month, value.day))
+        if age < 18:
+            raise ValidationError("User must be at least 18 years old.")
+    return value
+
 class TeacherSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(),required=True) 
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)
     teachers_address = TeachersAddressSerializer(many=False, allow_null=True)
     aadhar_no = serializers.CharField(max_length=12, required=False, allow_null=True)
-    aadhar_no = serializers.CharField(max_length=12, required=False, allow_null=True)
+    fullname = serializers.CharField(max_length=20, required=False, allow_null=True)
+    phone = serializers.CharField(max_length=10, required=False, allow_null=True)
+    alternate_phone = serializers.CharField(max_length=10, required=False, allow_null=True)
+    date_of_birth = serializers.DateField(required=False, allow_null=True)
 
     class Meta:
         model = Teacher
-        fields = "__all__"    
-    def validate_aadhar_no(self,value):
+        fields = "__all__"
+
+    def validate_fullname(self, value): 
+        if value is not None:
+            if len(value) < 3:
+                raise serializers.ValidationError("Full name must be at least 3 characters.")
+        return value
+
+    def validate_phone(self, value):       
+        return validate_phone_number(value)
+
+    def validate_alternate_phone(self, value):        
+        return validate_phone_number(value)
+    
+    def validate_aadhar_no(self, value):        
         if value is not None:
             if not re.match(r'^\d{12}$', value):
                 raise serializers.ValidationError("Aadhar number must be exactly 12 digits.")
         return value
-            
-    def to_representation(self, instance):
+    def validate_date_of_birth(self, value):        
+        return validate_age(value)
+    
+    def to_representation(self, instance):    
         representation = super().to_representation(instance)
         representation['user'] = UserSerializer(instance.user).data
         return representation
-
+    
+    
+    
 class SkillSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = Skill
         fields = "__all__"
+        
+    
 class QuestionSerializer(serializers.ModelSerializer):
     subject = serializers.PrimaryKeyRelatedField(queryset=Subject.objects.all(), required=True)
     level = serializers.PrimaryKeyRelatedField(queryset=Level.objects.all(), required=True)
