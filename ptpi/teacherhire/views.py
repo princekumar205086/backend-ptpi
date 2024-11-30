@@ -159,8 +159,6 @@ class EducationalQulificationViewSet(viewsets.ModelViewSet):
         instance.delete()
         return Response({"message": "EducationalQulification deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
-
-
 class LevelViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]    
     authentication_classes = [ExpiringTokenAuthentication]     
@@ -298,8 +296,8 @@ class TeacherViewSet(viewsets.ModelViewSet):
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        fullname = serializer.validated_data.get('fullname')
-        if Teacher.objects.filter(fullname=fullname).exists():
+        aadhar_no = serializer.validated_data.get('aadhar_no')
+        if Teacher.objects.filter(aadhar_no=aadhar_no).exists():
             return Response(
                 {'message': 'Duplicate entry: Teacher already exists.'}, 
                 status=status.HTTP_400_BAD_REQUEST
