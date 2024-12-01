@@ -146,16 +146,28 @@ class TeachersAddressSerializer(serializers.ModelSerializer):
         return representation
 
 class TeacherSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(),required=True) 
-    teachers_address = TeachersAddressSerializer(many=False, read_only=True)
-
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True) 
+    address = serializers.SerializerMethodField()  # Use SerializerMethodField instead of read_only=True
+    
     class Meta:
         model = Teacher
-        fields = "__all__"
+        fields = [
+            'id', 'user', 'fullname', 'gender', 'religion', 'nationality',
+            'aadhar_no', 'phone', 'alternate_phone', 'verified',
+            'class_categories', 'rating', 'date_of_birth',
+            'availability_status', 'address'
+        ]
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['user'] = UserSerializer(instance.user).data
+        representation['user'] = UserSerializer(instance.user).data  
         return representation
+    
+    def get_address(self, obj):
+        # Fetch address data related to the teacher's user
+        addresses = TeachersAddress.objects.filter(user=obj.user)
+        return TeachersAddressSerializer(addresses, many=True).data  
+
 
 class SkillSerializer(serializers.ModelSerializer):
     class Meta:

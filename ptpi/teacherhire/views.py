@@ -13,10 +13,9 @@ from teacherhire.serializers import *
 from .authentication import ExpiringTokenAuthentication  
 from datetime import timedelta, datetime
 from rest_framework.decorators import action
-
 import uuid  
 
-
+# fuctions
 def check_for_duplicate(model_class, **kwargs):
 
     return model_class.objects.filter(**kwargs).exists()
@@ -227,20 +226,34 @@ class SubjectViewSet(viewsets.ModelViewSet):
         count = get_count(Subject)
         return Response({"Count":count})
     
-class TeacherViewSet(viewsets.ModelViewSet):    
+class TeacherViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
-    authentication_classes = [ExpiringTokenAuthentication] 
-    queryset= Teacher.objects.all()
+    authentication_classes = [ExpiringTokenAuthentication]
+    queryset = Teacher.objects.all()
     serializer_class = TeacherSerializer
 
-    def create(self,request):
-        return create_object(TeacherSerializer,request.data,Teacher)
-    def destory(self,pk=None):
-        return delete_object(Teacher,pk)
-    @action (detail=False,methods=['get'])
-    def count(self,request):
-        count = get_count(Teacher)
-        return Response({"Count":count})
+    @action(detail=False, methods=['get'])
+    def count(self, request):
+        count = self.get_queryset().count()
+        return Response({"count": count})
+
+    def create(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        fullname = serializer.validated_data.get('fullname')
+        if Teacher.objects.filter(fullname=fullname).exists():
+            return Response(
+                {'message': 'Duplicate entry: Teacher already exists.'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.delete()
+        return Response({"message": "Teacher deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
     
     
 class ClassCategoryViewSet(viewsets.ModelViewSet):    
