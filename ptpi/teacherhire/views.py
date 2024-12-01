@@ -162,8 +162,8 @@ class EducationalQulificationViewSet(viewsets.ModelViewSet):
         return Response({"count": count})
     
 class LevelViewSet(viewsets.ModelViewSet):
-    # permission_classes = [IsAuthenticated]    
-    # authentication_classes = [ExpiringTokenAuthentication]     
+    permission_classes = [IsAuthenticated]    
+    authentication_classes = [ExpiringTokenAuthentication]     
     queryset = Level.objects.all()
     serializer_class = LevelSerializer
 
@@ -244,8 +244,8 @@ class TeacherViewSet(viewsets.ModelViewSet):
     
     
 class ClassCategoryViewSet(viewsets.ModelViewSet):    
-    # permission_classes = [IsAuthenticated]
-    # authentication_classes = [ExpiringTokenAuthentication] 
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [ExpiringTokenAuthentication] 
     queryset= ClassCategory.objects.all()
     serializer_class = ClassCategorySerializer
 
@@ -292,8 +292,8 @@ class TeacherExperiencesViewSet(viewsets.ModelViewSet):
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.all().select_related('subject', 'level')
     serializer_class = QuestionSerializer
-    # permission_classes = [IsAuthenticated]
-    # authentication_classes = [ExpiringTokenAuthentication] 
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [ExpiringTokenAuthentication] 
 
     def create(self,request):
         return create_object(QuestionSerializer,request.data,Question)
