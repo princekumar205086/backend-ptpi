@@ -71,7 +71,7 @@ class Teacher(models.Model):
     verified = models.	BooleanField(default=False)
     class_categories = models.ForeignKey(ClassCategory, on_delete=models.CASCADE,null=True, blank=True)
     rating = models. DecimalField(max_digits=3, decimal_places=2, null=True, blank=True)
-    date_of_birth = models.	DateField(null=True, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
     availability_status = models.CharField(max_length=50, default='Available')
     def __str__(self):
         return self.user
