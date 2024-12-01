@@ -179,10 +179,18 @@ class TeachersAddressSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Pincode must be exactly 6 digits.")
         return value
 
+# TeacherSerializer
 class TeacherSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True) 
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)
+    # teachers_address = TeachersAddressSerializer(many=False, allow_null=True)
+    aadhar_no = serializers.CharField(max_length=12, required=False, allow_null=True)
+    fullname = serializers.CharField(max_length=20, required=False, allow_null=True)
+    phone = serializers.CharField(max_length=10, required=False, allow_null=True)
+    alternate_phone = serializers.CharField(max_length=10, required=False, allow_null=True)
+    date_of_birth = serializers.DateField(required=False, allow_null=True)
+
     address = serializers.SerializerMethodField()  
-    
+
     class Meta:
         model = Teacher
         fields = [
@@ -191,29 +199,6 @@ class TeacherSerializer(serializers.ModelSerializer):
             'class_categories', 'rating', 'date_of_birth',
             'availability_status', 'address'
         ]
-
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        representation['user'] = UserSerializer(instance.user).data  
-        return representation
-    
-    def get_address(self, obj):
-        addresses = TeachersAddress.objects.filter(user=obj.user)
-        return TeachersAddressSerializer(addresses, many=True).data  
-
-
-class TeacherSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)
-    teachers_address = TeachersAddressSerializer(many=False, allow_null=True)
-    aadhar_no = serializers.CharField(max_length=12, required=False, allow_null=True)
-    fullname = serializers.CharField(max_length=20, required=False, allow_null=True)
-    phone = serializers.CharField(max_length=10, required=False, allow_null=True)
-    alternate_phone = serializers.CharField(max_length=10, required=False, allow_null=True)
-    date_of_birth = serializers.DateField(required=False, allow_null=True)
-
-    class Meta:
-        model = Teacher
-        fields = "__all__"
 
     def validate_fullname(self, value): 
         if value is not None:
@@ -249,6 +234,12 @@ class TeacherSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['user'] = UserSerializer(instance.user).data
         return representation
+    
+    def get_address(self, obj):
+        addresses = TeachersAddress.objects.filter(user=obj.user)
+        return TeachersAddressSerializer(addresses, many=True).data  
+    
+    
 
     
     
