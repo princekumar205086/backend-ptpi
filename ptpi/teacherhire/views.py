@@ -17,11 +17,8 @@ import uuid
 
 # fuctions
 def check_for_duplicate(model_class, **kwargs):
-
     return model_class.objects.filter(**kwargs).exists()
-
 def create_object(serializer_class, request_data, model_class):
-
     serializer = serializer_class(data=request_data)
     if serializer.is_valid():
         if check_for_duplicate(model_class, **serializer.validated_data):
@@ -43,7 +40,6 @@ def delete_object(model_class, pk):
 
 def get_count(model_class):
     return model_class.objects.count()
-
 
 class RegisterUser(APIView):
     def post(self, request):
@@ -212,8 +208,8 @@ class TeacherSkillViewSet(viewsets.ModelViewSet):
         return Response({"Count": count})
     
 class SubjectViewSet(viewsets.ModelViewSet):    
-    permission_classes = [IsAuthenticated] 
-    authentication_classes = [ExpiringTokenAuthentication] 
+    # permission_classes = [IsAuthenticated] 
+    # authentication_classes = [ExpiringTokenAuthentication] 
     queryset = Subject.objects.all()
     serializer_class = SubjectSerializer
 
@@ -288,8 +284,8 @@ class TeacherQualificationViewSet(viewsets.ModelViewSet):
         return Response({"count":count})
     
 class TeacherExperiencesViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [ExpiringTokenAuthentication] 
+    # permission_classes = [IsAuthenticated]
+    # authentication_classes = [ExpiringTokenAuthentication] 
     queryset = TeacherExperiences.objects.all()
     serializer_class = TeacherExperiencesSerializer
 

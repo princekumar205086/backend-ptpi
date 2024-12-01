@@ -6,6 +6,7 @@ import re
 from teacherhire.models import Subject,UserProfile,Teacher,ClassCategory, Skill, TeacherSkill, TeacherQualification, TeacherExperiences
 from teacherhire.models import *
 import re
+from datetime import date
 import random
 from .models import UserProfile
 from django.contrib.auth.models import User
@@ -110,44 +111,77 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return data
 
 class TeacherExperiencesSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(),required=True)
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)
+    institution = serializers.CharField(max_length=255, required=False, allow_null=True)
+    role = serializers.CharField(max_length=255, required=False, allow_null=True)
+    start_date = serializers.DateField(required=False, allow_null=True)
+    end_date = serializers.DateField(required=False, allow_null=True)
+    achievements = serializers.CharField(required=False, allow_null=True)
+
     class Meta:
         model = TeacherExperiences
         fields = "__all__"
+        
+    def validate_institution(self, value):
+        if value and len(value) < 3:
+            raise serializers.ValidationError("Institution name must be at least 3 characters long.")
+        return value
+    
+    def validate(self, data):
+        start_date = data.get('start_date')
+        end_date = data.get('end_date')
+
+        if start_date and end_date:
+            if start_date > end_date:
+                raise serializers.ValidationError("End date cannot be earlier than start date.")
+        
+        return data
+    def validate_achievements(self, value):        
+        if value:
+            value = value.strip()
+            if len(value) < 10:
+                raise serializers.ValidationError("Achievements must be at least 10 characters long.")
+        return value
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['user']=UserSerializer(instance.user).data
+        if instance.user:
+            representation['user'] = UserSerializer(instance.user).data
         return representation
+    
 class SubjectSerializer(serializers.ModelSerializer):
+    # subject_name = serializers.CharField(max_length=255, requirement=False, allow_null=True)
     class Meta:
         model = Subject
         fields = ['id','subject_name','subject_description']
-
+    # def validate_subject_name(value):
+    #     if len(value) < 2 or len(value) > 10:
+    #         raise serializers.ValidationError("Subject name must be between 2 and 10 characters long.")
+    #     return value
 class ClassCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ClassCategory
         fields = ['id','name']
 
 class LevelSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(max_length=100, required=True)
     class Meta:
         model = Level
         fields = '__all__'
 class TeachersAddressSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)    
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)
+    pincode = serializers.CharField(max_length=6, required=False, allow_null=True)
 
     class Meta:
         model = TeachersAddress
         fields = '__all__'
 
-    def to_representation(self, instance):      
-        representation = super().to_representation(instance)
-        representation['user'] = UserSerializer(instance.user).data                
-        return representation
+    def validate_pincode(self, value):
+        if value and (len(value) != 6 or not value.isdigit()):
+            raise serializers.ValidationError("Pincode must be exactly 6 digits.")
+        return value
 
 class TeacherSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True) 
-    address = serializers.SerializerMethodField()  # Use SerializerMethodField instead of read_only=True
+    address = serializers.SerializerMethodField()  
     
     class Meta:
         model = Teacher
@@ -164,22 +198,107 @@ class TeacherSerializer(serializers.ModelSerializer):
         return representation
     
     def get_address(self, obj):
-        # Fetch address data related to the teacher's user
         addresses = TeachersAddress.objects.filter(user=obj.user)
         return TeachersAddressSerializer(addresses, many=True).data  
 
 
+class TeacherSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)
+    teachers_address = TeachersAddressSerializer(many=False, allow_null=True)
+    aadhar_no = serializers.CharField(max_length=12, required=False, allow_null=True)
+    fullname = serializers.CharField(max_length=20, required=False, allow_null=True)
+    phone = serializers.CharField(max_length=10, required=False, allow_null=True)
+    alternate_phone = serializers.CharField(max_length=10, required=False, allow_null=True)
+    date_of_birth = serializers.DateField(required=False, allow_null=True)
+
+    class Meta:
+        model = Teacher
+        fields = "__all__"
+
+    def validate_fullname(self, value): 
+        if value is not None:
+            value = value.strip()
+            if len(value) < 3:
+                raise serializers.ValidationError("Full name must be at least 3 characters.")
+        return value
+
+    def validate_phone(self, value):       
+        return self.validate_phone_number(value)
+
+    def validate_alternate_phone(self, value):        
+        return self.validate_phone_number(value)
+
+    def validate_phone_number(self, value):
+        if value:
+            cleaned_value = re.sub(r'[^0-9]', '', value)  # Removing non-digit characters
+            if len(cleaned_value) != 10:
+                raise serializers.ValidationError("Phone number must be exactly 10 digits.")
+            if not cleaned_value.startswith(('6', '7', '8', '9')):
+                raise serializers.ValidationError("Phone number must start with 6, 7, 8, or 9.")
+            return cleaned_value
+        return value
+
+    def validate_aadhar_no(self, value):        
+        if value:
+            if not re.match(r'^\d{12}$', value):
+                raise serializers.ValidationError("Aadhar number must be exactly 12 digits.")
+        return value
+    
+    
+    def to_representation(self, instance):    
+        representation = super().to_representation(instance)
+        representation['user'] = UserSerializer(instance.user).data
+        return representation
+
+    
+    
 class SkillSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(max_length=20, required=False, allow_null=True)
     class Meta:
         model = Skill
         fields = "__all__"
+    def validate_name(self,value):
+        if value is not None:
+            if len(value) < 3:
+                raise serializers.ValidationError("Skill name must be at least 3 characters.")
+        return value
+    
 class QuestionSerializer(serializers.ModelSerializer):
     subject = serializers.PrimaryKeyRelatedField(queryset=Subject.objects.all(), required=True)
     level = serializers.PrimaryKeyRelatedField(queryset=Level.objects.all(), required=True)
+    text = serializers.CharField(max_length=2000,allow_null=True, required=False)
+    options = serializers.JSONField(required=False, allow_null=True)    
+    correct_options = serializers.ListField(
+        child=serializers.IntegerField(min_value=0), 
+        required=False,
+        allow_null=True
+    )  
     class Meta:
         model = Question
         fields = "__all__"
-    
+    def validate_text(self,value):
+        if value is not None:
+            if len(value) < 5:
+                raise serializers.ValidationError("Text must be at least 5 characters.")
+            return value
+    def validate_options(self, value):
+        if value is not None:
+            if not isinstance(value, list):
+                raise serializers.ValidationError("Options must be a list.")
+            if len(value) != 4:
+                raise serializers.ValidationError("Options must contain exactly 4 items.")
+        return value
+    def validate_correct_options(self, value):
+        if value is not None:
+            if not isinstance(value, list):
+                raise serializers.ValidationError("Correct options must be a list of indices.")
+            if len(value) == 0:
+                raise serializers.ValidationError("At least one correct option must be specified.")
+            if any(option >= len(self.initial_data.get('options', [])) for option in value):
+                raise serializers.ValidationError("Correct options must be valid indices of the options list.")
+            if len(value) != len(set(value)):
+                raise serializers.ValidationError("Correct options must contain unique indices.")
+        return value
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['subject'] = SubjectSerializer(instance.subject).data
@@ -187,6 +306,7 @@ class QuestionSerializer(serializers.ModelSerializer):
         return representation
         
 class TeacherSkillSerializer(serializers.ModelSerializer):
+    
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)
     skill = serializers.PrimaryKeyRelatedField(queryset=Skill.objects.all(), required=False)
 
