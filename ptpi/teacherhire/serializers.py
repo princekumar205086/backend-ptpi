@@ -191,6 +191,7 @@ class TeacherSerializer(serializers.ModelSerializer):
 
     address = serializers.SerializerMethodField()  
     teacher_experience = serializers.SerializerMethodField()
+    teacherQualification = serializers.SerializerMethodField()
 
     class Meta:
         model = Teacher
@@ -198,7 +199,7 @@ class TeacherSerializer(serializers.ModelSerializer):
             'id', 'user', 'fullname', 'gender', 'religion', 'nationality',
             'aadhar_no', 'phone', 'alternate_phone', 'verified',
             'class_categories', 'rating', 'date_of_birth',
-            'availability_status', 'address','teacher_experience'
+            'availability_status', 'address','teacher_experience', 'teacherQualification'
         ]
 
     def validate_fullname(self, value): 
@@ -244,6 +245,9 @@ class TeacherSerializer(serializers.ModelSerializer):
         teacher_experiences = TeacherExperiences.objects.filter(user=obj.user)
         return TeacherExperiencesSerializer(teacher_experiences, many=True).data
     
+    def get_teacherQualification(self, obj):
+        teacherQualifications = TeacherQualification.objects.filter(user=obj.user)
+        return TeacherQualificationSerializer(teacherQualifications, many=True).data
 
     
     
