@@ -111,35 +111,72 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return data
 
 class TeacherExperiencesSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(),required=True)
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)
+    institution = serializers.CharField(max_length=255, required=False, allow_null=True)
+    role = serializers.CharField(max_length=255, required=False, allow_null=True)
+    start_date = serializers.DateField(required=False, allow_null=True)
+    end_date = serializers.DateField(required=False, allow_null=True)
+    achievements = serializers.CharField(required=False, allow_null=True)
+
     class Meta:
         model = TeacherExperiences
         fields = "__all__"
+        
+    def validate_institution(self, value):
+        if value and len(value) < 3:
+            raise serializers.ValidationError("Institution name must be at least 3 characters long.")
+        return value
+    
+    def validate(self, data):
+        start_date = data.get('start_date')
+        end_date = data.get('end_date')
+
+        if start_date and end_date:
+            if start_date > end_date:
+                raise serializers.ValidationError("End date cannot be earlier than start date.")
+        
+        return data
+    def validate_achievements(self, value):        
+        if value:
+            value = value.strip()
+            if len(value) < 10:
+                raise serializers.ValidationError("Achievements must be at least 10 characters long.")
+        return value
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['user']=UserSerializer(instance.user).data
+        if instance.user:
+            representation['user'] = UserSerializer(instance.user).data
         return representation
+    
 class SubjectSerializer(serializers.ModelSerializer):
+    subject_name = serializers.CharField(max_length=255, requirement=False, allow_null=True)
     class Meta:
         model = Subject
         fields = ['id','subject_name','subject_description']
-
+    def validate_subject_name(value):
+        if len(value) < 2 or len(value) > 10:
+            raise serializers.ValidationError("Subject name must be between 2 and 10 characters long.")
+        return value
 class ClassCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ClassCategory
         fields = ['id','name']
 
 class LevelSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(max_length=100, required=True)
     class Meta:
         model = Level
         fields = '__all__'
 class TeachersAddressSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)    
-
+    pincode = serializers.CharField(max_length=6,requirement=False,allow_null=True)
     class Meta:
         model = TeachersAddress
         fields = '__all__'
+    def validate_pincode(self, value):
+            if value is not None:
+                if len(value) != 6 or not value.isdigit():
+                    raise serializers.ValidationError("Pincode must be exactly 6 digits.")
+            return value
 
     def to_representation(self, instance):      
         representation = super().to_representation(instance)
