@@ -149,14 +149,14 @@ class TeacherExperiencesSerializer(serializers.ModelSerializer):
         return representation
     
 class SubjectSerializer(serializers.ModelSerializer):
-    subject_name = serializers.CharField(max_length=255, requirement=False, allow_null=True)
+    # subject_name = serializers.CharField(max_length=255, requirement=False, allow_null=True)
     class Meta:
         model = Subject
         fields = ['id','subject_name','subject_description']
-    def validate_subject_name(value):
-        if len(value) < 2 or len(value) > 10:
-            raise serializers.ValidationError("Subject name must be between 2 and 10 characters long.")
-        return value
+    # def validate_subject_name(value):
+    #     if len(value) < 2 or len(value) > 10:
+    #         raise serializers.ValidationError("Subject name must be between 2 and 10 characters long.")
+    #     return value
 class ClassCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ClassCategory
@@ -167,35 +167,22 @@ class LevelSerializer(serializers.ModelSerializer):
         model = Level
         fields = '__all__'
 class TeachersAddressSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)    
-    pincode = serializers.CharField(max_length=6,requirement=False,allow_null=True)
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)
+    pincode = serializers.CharField(max_length=6, required=False, allow_null=True)
+
     class Meta:
         model = TeachersAddress
         fields = '__all__'
+
     def validate_pincode(self, value):
-            if value is not None:
-                if len(value) != 6 or not value.isdigit():
-                    raise serializers.ValidationError("Pincode must be exactly 6 digits.")
-            return value
+        if value and (len(value) != 6 or not value.isdigit()):
+            raise serializers.ValidationError("Pincode must be exactly 6 digits.")
+        return value
 
-    def to_representation(self, instance):      
+    def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['user'] = UserSerializer(instance.user).data                
+        representation['user'] = UserSerializer(instance.user).data
         return representation
-
-def validate_phone_number(value):
-    if value is not None:
-        if not re.match(r'^[6789]\d{9}$', value):
-            raise ValidationError("Phone number must be exactly 10 digits and start with 6, 7, 8, or 9.")
-    return value
-
-def validate_age(value):
-    if value is not None:
-        today = date.today()
-        age = today.year - value.year - ((today.month, today.day) < (value.month, value.day))
-        if age < 18:
-            raise ValidationError("User must be at least 18 years old.")
-    return value
 
 class TeacherSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)
@@ -212,29 +199,39 @@ class TeacherSerializer(serializers.ModelSerializer):
 
     def validate_fullname(self, value): 
         if value is not None:
+            value = value.strip()
             if len(value) < 3:
                 raise serializers.ValidationError("Full name must be at least 3 characters.")
         return value
 
     def validate_phone(self, value):       
-        return validate_phone_number(value)
+        return self.validate_phone_number(value)
 
     def validate_alternate_phone(self, value):        
-        return validate_phone_number(value)
-    
+        return self.validate_phone_number(value)
+
+    def validate_phone_number(self, value):
+        if value:
+            cleaned_value = re.sub(r'[^0-9]', '', value)  # Removing non-digit characters
+            if len(cleaned_value) != 10:
+                raise serializers.ValidationError("Phone number must be exactly 10 digits.")
+            if not cleaned_value.startswith(('6', '7', '8', '9')):
+                raise serializers.ValidationError("Phone number must start with 6, 7, 8, or 9.")
+            return cleaned_value
+        return value
+
     def validate_aadhar_no(self, value):        
-        if value is not None:
+        if value:
             if not re.match(r'^\d{12}$', value):
                 raise serializers.ValidationError("Aadhar number must be exactly 12 digits.")
         return value
-    def validate_date_of_birth(self, value):        
-        return validate_age(value)
+    
     
     def to_representation(self, instance):    
         representation = super().to_representation(instance)
         representation['user'] = UserSerializer(instance.user).data
         return representation
-    
+
     
     
 class SkillSerializer(serializers.ModelSerializer):
