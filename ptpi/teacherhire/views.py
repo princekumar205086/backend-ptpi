@@ -13,9 +13,7 @@ from teacherhire.serializers import *
 from .authentication import ExpiringTokenAuthentication  
 from datetime import timedelta, datetime
 from rest_framework.decorators import action
-
 import uuid  
-
 
 def check_for_duplicate(model_class, **kwargs):
     return model_class.objects.filter(**kwargs).exists()
@@ -158,8 +156,8 @@ class EducationalQulificationViewSet(viewsets.ModelViewSet):
         return Response({"count": count})
     
 class LevelViewSet(viewsets.ModelViewSet):
-    # permission_classes = [IsAuthenticated]    
-    # authentication_classes = [ExpiringTokenAuthentication]     
+    permission_classes = [IsAuthenticated]    
+    authentication_classes = [ExpiringTokenAuthentication]     
     queryset = Level.objects.all()
     serializer_class = LevelSerializer
 
@@ -174,13 +172,45 @@ class LevelViewSet(viewsets.ModelViewSet):
         count = get_count(Level)
         return Response({"Count":count})
     
-    @action(detail=True, methods=['get'], url_path='questions')
-    def get_questions(self, request, pk=None):
-        level = self.get_object()
-        questions = Question.objects.filter(level=level)
-        question_serializer = QuestionSerializer(questions, many=True)
-        return Response(question_serializer.data)
+
+# class SubjectQuestionsView(APIView):
+#     def get(self, request, pk, subject_id):
+#         try:
+#             level = Level.objects.get(pk=pk)
+#         except Level.DoesNotExist:
+#             return Response({"error": "Level not found"}, status=404)
+
+#         try:
+#             subject = Subject.objects.get(pk=subject_id)
+#         except Subject.DoesNotExist:
+#             return Response({"error": "Subject not found"}, status=404)
+
+#         questions = Question.objects.filter(level=level, subject=subject)
+#         serializer = QuestionSerializer(questions, many=True)
+#         return Response(serializer.data)
+
     
+    @action(detail=True, methods=['get'], url_path='subject/(?P<subject_id>[^/.]+)/questions')
+    def subject_questions(self, request, pk=None, subject_id=None):
+        """
+        Custom action to fetch questions by level and subject.
+        """
+        try:
+            level = Level.objects.get(pk=pk)
+        except Level.DoesNotExist:
+            return Response({"error": "Level not found"}, status=404)
+
+        try:
+            subject = Subject.objects.get(pk=subject_id)
+        except Subject.DoesNotExist:
+            return Response({"error": "Subject not found"}, status=404)
+
+        # Filter questions by level and subject
+        questions = Question.objects.filter(level=level, subject=subject)
+        serializer = QuestionSerializer(questions, many=True)
+        return Response(serializer.data)
+
+   
 class SkillViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     authentication_classes = [ExpiringTokenAuthentication] 

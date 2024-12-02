@@ -2,6 +2,8 @@ from django.contrib import admin
 from django.urls import path, include
 from teacherhire.views import *
 from rest_framework import routers
+#from .views import SubjectQuestionsView
+
 
 router = routers.DefaultRouter()
 router.register(r"admin/teacherexperience",TeacherExperiencesViewSet)
@@ -18,9 +20,10 @@ router.register(r'admin/teachersAddress', TeachersAddressViewSet)
 router.register(r'admin/level', LevelViewSet)
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('',include(router.urls)),
     path('auth/',include('rest_framework.urls',namespace='rest_framework')),
     path('register/', RegisterUser.as_view(), name='register'),
     path('login/', LoginUser.as_view()),
     path('logout/', LogoutUser.as_view()),
+    #path('levels/<int:pk>/<int:subject_id>/questions/', SubjectQuestionsView.as_view(), name='subject-questions'),
 ]
