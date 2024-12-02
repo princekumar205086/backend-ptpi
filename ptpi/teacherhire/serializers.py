@@ -92,10 +92,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
         if value:
             cleaned_value = re.sub(r'[^0-9]', '', value)
             if len(cleaned_value) < 10:
-                raise serializers.ValidationError("Phone number must have at least 10 digits.")
-            
+                raise serializers.ValidationError("Phone number must have at least 10 digits.")  
             return cleaned_value
-        
         return value
 
     def validate_profile_picture(self, value):        
