@@ -265,11 +265,11 @@ class QuestionSerializer(serializers.ModelSerializer):
     level = serializers.PrimaryKeyRelatedField(queryset=Level.objects.all(), required=True)
     text = serializers.CharField(max_length=2000,allow_null=True, required=False)
     options = serializers.JSONField(required=False, allow_null=True)    
-    correct_options = serializers.ListField(
-        child=serializers.IntegerField(min_value=0), 
-        required=False,
-        allow_null=True
-    )  
+    # correct_options = serializers.ListField(
+    #     child=serializers.IntegerField(min_value=0), 
+    #     required=False,
+    #     allow_null=True
+    # )  
     class Meta:
         model = Question
         fields = "__all__"
@@ -285,17 +285,17 @@ class QuestionSerializer(serializers.ModelSerializer):
             if len(value) != 4:
                 raise serializers.ValidationError("Options must contain exactly 4 items.")
         return value
-    def validate_correct_options(self, value):
-        if value is not None:
-            if not isinstance(value, list):
-                raise serializers.ValidationError("Correct options must be a list of indices.")
-            if len(value) == 0:
-                raise serializers.ValidationError("At least one correct option must be specified.")
-            if any(option >= len(self.initial_data.get('options', [])) for option in value):
-                raise serializers.ValidationError("Correct options must be valid indices of the options list.")
-            if len(value) != len(set(value)):
-                raise serializers.ValidationError("Correct options must contain unique indices.")
-        return value
+    # def validate_correct_options(self, value):
+    #     if value is not None:
+    #         if not isinstance(value, list):
+    #             raise serializers.ValidationError("Correct options must be a list of indices.")
+    #         if len(value) == 0:
+    #             raise serializers.ValidationError("At least one correct option must be specified.")
+    #         if any(option >= len(self.initial_data.get('options', [])) for option in value):
+    #             raise serializers.ValidationError("Correct options must be valid indices of the options list.")
+    #         if len(value) != len(set(value)):
+    #             raise serializers.ValidationError("Correct options must contain unique indices.")
+    #     return value
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['subject'] = SubjectSerializer(instance.subject).data
