@@ -6,17 +6,17 @@ from rest_framework import routers
 
 
 router = routers.DefaultRouter()
-router.register(r"admin/teacherexperience",TeacherExperiencesViewSet)
-router.register(r"admin/teacherqualification",TeacherQualificationViewSet)
+router.register(r"teacher/teacherexperience",TeacherExperiencesViewSet)
+router.register(r"teacher/teacherqualification",TeacherQualificationViewSet)
 router.register(r"admin/skill",SkillViewSet)
-router.register(r"admin/teacherskill",TeacherSkillViewSet),
+router.register(r"teacher/teacherskill",TeacherSkillViewSet),
 router.register(r"admin/subject",SubjectViewSet),
 router.register(r"admin/classcategory",ClassCategoryViewSet),
 router.register(r"admin/teacher",TeacherViewSet),
 router.register(r'userprofiles', UserProfileViewSet),
 router.register(r'admin/question', QuestionViewSet),
 router.register(r'admin/educationalQulification', EducationalQulificationViewSet)
-router.register(r'admin/teachersAddress', TeachersAddressViewSet)
+router.register(r'teacher/teachersAddress', TeachersAddressViewSet)
 router.register(r'admin/level', LevelViewSet)
 
 urlpatterns = [
