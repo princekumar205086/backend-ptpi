@@ -13,7 +13,6 @@ from teacherhire.serializers import *
 from .authentication import ExpiringTokenAuthentication  
 from datetime import timedelta, datetime
 from rest_framework.decorators import action
-
 import uuid  
 
 
@@ -30,6 +29,24 @@ def create_object(serializer_class, request_data, model_class):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# for authenticated teacher
+def create_auth_data(self, serializer_class, request_data, model_class, *args, **kwargs):
+    # if not self.request.user.is_authenticated:
+    #     return Response(
+    #         {'message': 'Authentication required to perform this action.'},
+    #         status=status.HTTP_401_UNAUTHORIZED
+    #     )
+    serializer = serializer_class(data=request_data)
+    if serializer.is_valid():
+        if check_for_duplicate(model_class, **serializer.validated_data):
+            return Response(
+                {'message': f'Duplicate entry: {model_class.__name__} already exists.'},
+                status=status.HTTP_400_BAD_REQUEST
+        )
+        serializer.save(user=self.request.user)  
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
 
 def delete_object(model_class, pk):
     try:
@@ -128,11 +145,13 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
 #TeacerAddress GET ,CREATE ,DELETE 
 class TeachersAddressViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [ExpiringTokenAuthentication] 
     serializer_class = TeachersAddressSerializer 
     queryset = TeachersAddress.objects.all().select_related('user')
 
-    def create(self, request):
-        return create_object(TeachersAddressSerializer, request.data, TeachersAddress)
+    def create(self, request, *args, **kwargs):
+        return create_auth_data(self, TeachersAddressSerializer, request.data, TeachersAddress)
 
     def destroy(self, request, pk=None):
         return delete_object(TeachersAddress, pk)
@@ -204,9 +223,9 @@ class TeacherSkillViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     authentication_classes = [ExpiringTokenAuthentication] 
     serializer_class = TeacherSkillSerializer
-      
-    def create(self,request):
-        return create_object(TeacherSkillSerializer,request.data,Teacher)
+    
+    def create(self, request, *args, **kwargs):
+        return create_auth_data(self, TeacherSkillSerializer, request.data, TeacherSkill)
     
     def destroy(self,pk=None):
         return delete_object(TeacherSkill,pk)

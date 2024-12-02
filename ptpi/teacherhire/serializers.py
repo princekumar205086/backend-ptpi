@@ -165,7 +165,7 @@ class LevelSerializer(serializers.ModelSerializer):
         model = Level
         fields = '__all__'
 class TeachersAddressSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False)
     pincode = serializers.CharField(max_length=6, required=False, allow_null=True)
 
     class Meta:
@@ -304,12 +304,12 @@ class QuestionSerializer(serializers.ModelSerializer):
         
 class TeacherSkillSerializer(serializers.ModelSerializer):
     
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False)
     skill = serializers.PrimaryKeyRelatedField(queryset=Skill.objects.all(), required=False)
 
     class Meta:
         model = TeacherSkill
-        fields = ['id', 'user', 'skill', 'proficiency_level']  
+        fields = ['id', 'user', 'skill', 'proficiency_level', 'years_of_experience']  
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
