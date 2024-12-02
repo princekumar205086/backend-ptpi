@@ -13,9 +13,10 @@ from teacherhire.serializers import *
 from .authentication import ExpiringTokenAuthentication  
 from datetime import timedelta, datetime
 from rest_framework.decorators import action
+
 import uuid  
 
-# fuctions
+
 def check_for_duplicate(model_class, **kwargs):
     return model_class.objects.filter(**kwargs).exists()
 def create_object(serializer_class, request_data, model_class):
@@ -172,7 +173,14 @@ class LevelViewSet(viewsets.ModelViewSet):
     def count(self):
         count = get_count(Level)
         return Response({"Count":count})
-
+    
+    @action(detail=True, methods=['get'], url_path='questions')
+    def get_questions(self, request, pk=None):
+        level = self.get_object()
+        questions = Question.objects.filter(level=level)
+        question_serializer = QuestionSerializer(questions, many=True)
+        return Response(question_serializer.data)
+    
 class SkillViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     authentication_classes = [ExpiringTokenAuthentication] 
@@ -222,34 +230,20 @@ class SubjectViewSet(viewsets.ModelViewSet):
         count = get_count(Subject)
         return Response({"Count":count})
     
-class TeacherViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [ExpiringTokenAuthentication]
-    queryset = Teacher.objects.all()
+class TeacherViewSet(viewsets.ModelViewSet):    
+    # permission_classes = [IsAuthenticated]
+    # authentication_classes = [ExpiringTokenAuthentication] 
+    queryset= Teacher.objects.all().select_related('user')
     serializer_class = TeacherSerializer
 
-    @action(detail=False, methods=['get'])
-    def count(self, request):
-        count = self.get_queryset().count()
-        return Response({"count": count})
-
-    def create(self, request):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        fullname = serializer.validated_data.get('fullname')
-        if Teacher.objects.filter(fullname=fullname).exists():
-            return Response(
-                {'message': 'Duplicate entry: Teacher already exists.'}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        self.perform_create(serializer)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.delete()
-        return Response({"message": "Teacher deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
-
+    def create(self,request):
+        return create_object(TeacherSerializer,request.data,Teacher)
+    def destory(self,pk=None):
+        return delete_object(Teacher,pk)
+    @action (detail=False,methods=['get'])
+    def count(self,request):
+        count = get_count(Teacher)
+        return Response({"Count":count})
     
     
 class ClassCategoryViewSet(viewsets.ModelViewSet):    
@@ -300,7 +294,7 @@ class TeacherExperiencesViewSet(viewsets.ModelViewSet):
     @action (detail=False,methods=['get'])
     def count(self,request):
         count = get_count(TeacherExperiences)
-        return Response({"Count":count})
+        return Response({"Count":count})    
     
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.all().select_related('subject', 'level')
@@ -316,3 +310,13 @@ class QuestionViewSet(viewsets.ModelViewSet):
     def count(self,request):
         count = get_count(Question)
         return Response({"Count":count})
+    # def get_queryset(self):
+    #     queryset = Level.objects.all()
+    #     level_filter = self.request.query_params.get('level', None)
+    #     if level_filter is not None:
+    #         level_filter = int(level_filter)
+    #         if level_filter == 1:
+    #             queryset = queryset.filter(question__level=1)
+    #         else:
+    #             queryset = queryset.filter(question__level=level_filter)
+    #     return queryset
