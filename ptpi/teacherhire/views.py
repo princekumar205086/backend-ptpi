@@ -270,18 +270,22 @@ class ClassCategoryViewSet(viewsets.ModelViewSet):
     
 class TeacherQualificationViewSet(viewsets.ModelViewSet): 
     permission_classes = [IsAuthenticated]
-    authentication_classes = [ExpiringTokenAuthentication] 
+    authentication_classes = [ExpiringTokenAuthentication]
     queryset = TeacherQualification.objects.all()
     serializer_class = TeacherQualificationSerializer
 
-    def create(self,request):
-        return create_object(TeacherQualificationSerializer,request.data,TeacherQualification)
-    def destroy(self,pk=None):
-        return delete_object(TeacherQualification,pk)
-    @action (detail=False,methods=['get'])
-    def count(self,request):
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    @action(detail=False, methods=['get'])
+    def count(self, request):
         count = get_count(TeacherQualification)
-        return Response({"count":count})
+        return Response({"count": count})
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=self.request.user)  
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
     
 class TeacherExperiencesViewSet(viewsets.ModelViewSet):
     # permission_classes = [IsAuthenticated]

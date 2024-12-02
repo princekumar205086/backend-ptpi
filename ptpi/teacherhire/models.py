@@ -84,7 +84,7 @@ class EducationalQualification(models.Model):
         return self.name
 
 class TeacherQualification(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     qualification = models.ForeignKey(EducationalQualification, on_delete=models.CASCADE,null=True, blank=True)
     institution = models.CharField(max_length=225,null=True, blank=True)  
     year_of_passing = models.PositiveIntegerField(null=True, blank=True)  
