@@ -249,6 +249,21 @@ class TeacherSkillViewSet(viewsets.ModelViewSet):
         count = get_count(TeacherSkill)
         return Response({"Count": count})
     
+class SingleTeacherSkillViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [ExpiringTokenAuthentication] 
+    serializer_class = TeacherSkillSerializer
+    
+    def create(self, request, *args, **kwargs):
+        return create_auth_data(self, TeacherSkillSerializer, request.data, TeacherSkill)
+    
+    def get_queryset(self):
+        return TeacherSkill.objects.filter(user=self.request.user)
+    
+    def destroy(self, request, pk=None):
+        return delete_object(TeacherSkill, pk)
+
+    
 class SubjectViewSet(viewsets.ModelViewSet):    
     # permission_classes = [IsAuthenticated] 
     # authentication_classes = [ExpiringTokenAuthentication] 
@@ -292,7 +307,7 @@ class SingleTeacherViewSet(viewsets.ModelViewSet):
             return Teacher.objects.filter(user=self.request.user)
         else:
             return Teacher.objects.none()
-    def destory(self,pk=None):
+    def destory(self, request, pk=None):
         return delete_object(Teacher,pk)
     
     
