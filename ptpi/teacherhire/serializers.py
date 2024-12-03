@@ -59,6 +59,21 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=100)
     password = serializers.CharField(max_length=100)
 
+    def validate(self, data):
+        email = data.get("email")
+        password = data.get("password")
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise ValidationError({'email': 'Email not found.'})
+
+        if not user.check_password(password):
+            raise ValidationError({'password': 'Incorrect password.'})        
+        data["is_admin"] = True if user.is_staff else False            
+        data["user"] = user
+        return data
+
 class UserProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     profile_picture = serializers.ImageField(required=False, allow_null=True)

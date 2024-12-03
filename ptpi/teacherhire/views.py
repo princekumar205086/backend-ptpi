@@ -102,11 +102,16 @@ class LoginUser(APIView):
             token = Token.objects.create(user=user)
 
             refresh_token = generate_refresh_token()
-
+            roles = {
+                        'is_admin': user.is_staff,                    
+                        'is_user': True
+                    }    
             return Response({
                 'access_token': token.key,
                 'refresh_token': refresh_token,
                 'username':user.username, 
+                'email':user.email, 
+                'roles': roles,
                 # 'refresh_expires_at': refresh_expires_at,  
                 'message': 'Login successful'
             }, status=status.HTTP_200_OK)
