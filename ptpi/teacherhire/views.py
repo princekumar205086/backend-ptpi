@@ -211,7 +211,7 @@ class LevelViewSet(viewsets.ModelViewSet):
         count = get_count(Level)
         return Response({"Count":count})
     
-    from rest_framework.decorators import action
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Level, Subject, Question, ClassCategory
@@ -249,28 +249,6 @@ class LevelViewSet(viewsets.ModelViewSet):
             
         serializer = QuestionSerializer(questions, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-    
-    # @action(detail=True, methods=['get'], url_path='(subject/(?P<subject_id>[^/.]+)/)?questions')
-    # def level_questions(self, request, pk=None, subject_id=None):       
-    #     try:
-    #         level = Level.objects.get(pk=pk)
-    #     except Level.DoesNotExist:
-    #         return Response({"error": "Level not found"}, status=status.HTTP_404_NOT_FOUND)
-    #     if subject_id:
-    #         try:
-    #             subject = Subject.objects.get(pk=subject_id)
-    #         except Subject.DoesNotExist:
-    #             return Response({"error": "Subject not found"}, status=status.HTTP_404_NOT_FOUND)
-
-    #         questions = Question.objects.filter(level=level, subject=subject)
-    #     else:
-    #         questions = Question.objects.filter(level=level)
-
-    #     serializer = QuestionSerializer(questions, many=True)
-    #     return Response(serializer.data)
-    
 class SkillViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     authentication_classes = [ExpiringTokenAuthentication] 
