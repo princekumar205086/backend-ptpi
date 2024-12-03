@@ -45,7 +45,7 @@ def create_auth_data(self, serializer_class, request_data, model_class, *args, *
         )
         serializer.save(user=self.request.user)  
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 def delete_object(model_class, pk):
     try:
@@ -329,8 +329,8 @@ class TeacherExperiencesViewSet(viewsets.ModelViewSet):
     queryset = TeacherExperiences.objects.all()
     serializer_class = TeacherExperiencesSerializer
 
-    def create(self,request):
-        return create_object(TeacherExperiencesSerializer,request.data,TeacherExperiences)
+    def create(self,request,*args, **kwargs):
+        return create_auth_data(self, TeacherExperiencesSerializer,request.data,TeacherExperiences)
     def destory(self,pk=None):
         return delete_object(TeacherExperiences,pk)
     @action (detail=False,methods=['get'])
