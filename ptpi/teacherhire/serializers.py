@@ -6,7 +6,6 @@ import re
 from teacherhire.models import Subject,UserProfile,Teacher,ClassCategory, Skill, TeacherSkill, TeacherQualification, TeacherExperiences
 from teacherhire.models import *
 import re
-from datetime import date
 import random
 from .models import UserProfile
 from django.contrib.auth.models import User
@@ -124,7 +123,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return data
 
 class TeacherExperiencesSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False)
     institution = serializers.CharField(max_length=255, required=False, allow_null=True)
     role = serializers.CharField(max_length=255, required=False, allow_null=True)
     start_date = serializers.DateField(required=False, allow_null=True)
@@ -205,6 +204,7 @@ class TeacherSerializer(serializers.ModelSerializer):
     address = serializers.SerializerMethodField()  
     teacher_experience = serializers.SerializerMethodField()
     teacherQualification = serializers.SerializerMethodField()
+    teacherSkill = serializers.SerializerMethodField()
 
     class Meta:
         model = Teacher
@@ -212,7 +212,7 @@ class TeacherSerializer(serializers.ModelSerializer):
             'id', 'user', 'fullname', 'gender', 'religion', 'nationality',
             'aadhar_no', 'phone', 'alternate_phone', 'verified',
             'class_categories', 'rating', 'date_of_birth',
-            'availability_status', 'address','teacher_experience', 'teacherQualification'
+            'availability_status', 'address','teacher_experience', 'teacherQualification', 'teacherSkill'
         ]
 
     def validate_fullname(self, value): 
@@ -261,6 +261,10 @@ class TeacherSerializer(serializers.ModelSerializer):
     def get_teacherQualification(self, obj):
         teacherQualifications = TeacherQualification.objects.filter(user=obj.user)
         return TeacherQualificationSerializer(teacherQualifications, many=True).data
+    
+    def get_teacherSkill(self, obj):
+        teacherSkills = TeacherSkill.objects.filter(user=obj.user)
+        return TeacherSkillSerializer(teacherSkills, many=True).data
 
     
     
