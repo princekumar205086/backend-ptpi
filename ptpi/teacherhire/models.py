@@ -1,10 +1,12 @@
 from django.db import models
-from django.contrib.auth.models import User
-from rest_framework.authtoken.models import Token
-from django.utils import timezone
-from datetime import timedelta
-import uuid  
+from django.contrib.auth.models import User, AbstractBaseUser
 
+class CustomUser(AbstractBaseUser):
+    ROLE_CHOICES = [
+        ("Admin", "Admin"),
+        ("Teacher", "Teacher"),
+    ]
+    role = models.CharField(max_length=100, choices=ROLE_CHOICES, default="Teacher")
 
 class TeachersAddress(models.Model):
     ADDRESS_TYPE_CHOICES = [

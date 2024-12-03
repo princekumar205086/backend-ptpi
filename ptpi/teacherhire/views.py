@@ -310,8 +310,8 @@ class TeacherQualificationViewSet(viewsets.ModelViewSet):
         return create_auth_data(self, TeacherQualificationSerializer, request.data, TeacherQualification)
     
 class TeacherExperiencesViewSet(viewsets.ModelViewSet):
-    # permission_classes = [IsAuthenticated]
-    # authentication_classes = [ExpiringTokenAuthentication] 
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [ExpiringTokenAuthentication] 
     queryset = TeacherExperiences.objects.all()
     serializer_class = TeacherExperiencesSerializer
 
