@@ -356,6 +356,19 @@ class TeacherQualificationViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         return create_auth_data(self, TeacherQualificationSerializer, request.data, TeacherQualification)
     
+class SingleTeacherQualificationViewSet(viewsets.ModelViewSet): 
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [ExpiringTokenAuthentication]
+    queryset = TeacherQualification.objects.all()
+    serializer_class = TeacherQualificationSerializer
+
+    def create(self, request, *args, **kwargs):
+        return create_auth_data(self, TeacherQualificationSerializer, request.data, TeacherQualification)
+    def get_queryset(self):
+        return TeacherQualification.objects.filter(user=self.request.user)
+    def destroy(self, request, pk=None):
+        return delete_object(TeacherQualification, pk)
+    
 class TeacherExperiencesViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     authentication_classes = [ExpiringTokenAuthentication] 
