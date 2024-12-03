@@ -45,7 +45,7 @@ def create_auth_data(self, serializer_class, request_data, model_class, *args, *
         )
         serializer.save(user=self.request.user)  
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 def delete_object(model_class, pk):
     try:
@@ -90,12 +90,10 @@ class LoginUser(APIView):
         password = request.data.get('password')
 
         try:
-            # Find the user by email
             user = User.objects.get(email=email)
         except User.DoesNotExist:
             return Response({'message': 'Invalid email or password'}, status=status.HTTP_401_UNAUTHORIZED)
 
-        # Check if the password is correct
         if user.check_password(password):
             # Delete old token if it exists
             Token.objects.filter(user=user).delete()
@@ -323,18 +321,12 @@ class TeacherQualificationViewSet(viewsets.ModelViewSet):
     queryset = TeacherQualification.objects.all()
     serializer_class = TeacherQualificationSerializer
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
     @action(detail=False, methods=['get'])
     def count(self, request):
         count = get_count(TeacherQualification)
         return Response({"count": count})
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(user=self.request.user)  
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return create_auth_data(self, TeacherQualificationSerializer, request.data, TeacherQualification)
     
 class TeacherExperiencesViewSet(viewsets.ModelViewSet):
     # permission_classes = [IsAuthenticated]
@@ -342,8 +334,8 @@ class TeacherExperiencesViewSet(viewsets.ModelViewSet):
     queryset = TeacherExperiences.objects.all()
     serializer_class = TeacherExperiencesSerializer
 
-    def create(self,request):
-        return create_object(TeacherExperiencesSerializer,request.data,TeacherExperiences)
+    def create(self,request,*args, **kwargs):
+        return create_auth_data(self, TeacherExperiencesSerializer,request.data,TeacherExperiences)
     def destory(self,pk=None):
         return delete_object(TeacherExperiences,pk)
     @action (detail=False,methods=['get'])

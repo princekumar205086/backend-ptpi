@@ -347,11 +347,4 @@ class TeacherQualificationSerializer(serializers.ModelSerializer):
         representation['user'] = UserSerializer(instance.user).data
         representation['qualification'] = EducationalQualificationSerializer(instance.qualification).data
         return representation
-    def create(self, validated_data):
-        request = self.context.get('request')  # Safely get 'request'
-        if request and request.user:  # Ensure 'request' and 'user' exist
-            validated_data['user'] = request.user
-        else:
-            raise serializers.ValidationError({"user": "User must be authenticated."})
-        return super().create(validated_data)
 
