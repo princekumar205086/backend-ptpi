@@ -179,8 +179,8 @@ class EducationalQulificationViewSet(viewsets.ModelViewSet):
         return Response({"count": count})
     
 class LevelViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]    
-    authentication_classes = [ExpiringTokenAuthentication]     
+    # permission_classes = [IsAuthenticated]    
+    # authentication_classes = [ExpiringTokenAuthentication]     
     queryset = Level.objects.all()
     serializer_class = LevelSerializer
 
@@ -194,46 +194,27 @@ class LevelViewSet(viewsets.ModelViewSet):
     def count(self):
         count = get_count(Level)
         return Response({"Count":count})
-    
-
-# class SubjectQuestionsView(APIView):
-#     def get(self, request, pk, subject_id):
-#         try:
-#             level = Level.objects.get(pk=pk)
-#         except Level.DoesNotExist:
-#             return Response({"error": "Level not found"}, status=404)
-
-#         try:
-#             subject = Subject.objects.get(pk=subject_id)
-#         except Subject.DoesNotExist:
-#             return Response({"error": "Subject not found"}, status=404)
-
-#         questions = Question.objects.filter(level=level, subject=subject)
-#         serializer = QuestionSerializer(questions, many=True)
-#         return Response(serializer.data)
 
     
-    @action(detail=True, methods=['get'], url_path='subject/(?P<subject_id>[^/.]+)/questions')
-    def subject_questions(self, request, pk=None, subject_id=None):
-        """
-        Custom action to fetch questions by level and subject.
-        """
+    @action(detail=True, methods=['get'], url_path='(subject/(?P<subject_id>[^/.]+)/)?questions')
+    def level_questions(self, request, pk=None, subject_id=None):       
         try:
             level = Level.objects.get(pk=pk)
         except Level.DoesNotExist:
-            return Response({"error": "Level not found"}, status=404)
+            return Response({"error": "Level not found"}, status=status.HTTP_404_NOT_FOUND)
+        if subject_id:
+            try:
+                subject = Subject.objects.get(pk=subject_id)
+            except Subject.DoesNotExist:
+                return Response({"error": "Subject not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        try:
-            subject = Subject.objects.get(pk=subject_id)
-        except Subject.DoesNotExist:
-            return Response({"error": "Subject not found"}, status=404)
+            questions = Question.objects.filter(level=level, subject=subject)
+        else:
+            questions = Question.objects.filter(level=level)
 
-        # Filter questions by level and subject
-        questions = Question.objects.filter(level=level, subject=subject)
         serializer = QuestionSerializer(questions, many=True)
         return Response(serializer.data)
-
-   
+    
 class SkillViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     authentication_classes = [ExpiringTokenAuthentication] 
