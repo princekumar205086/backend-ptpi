@@ -162,6 +162,22 @@ class TeachersAddressViewSet(viewsets.ModelViewSet):
     def count(self, request):
         count = get_count(TeachersAddress)
         return Response({"count": count})
+    
+class SingleTeachersAddressViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [ExpiringTokenAuthentication] 
+    serializer_class = TeachersAddressSerializer 
+    queryset = TeachersAddress.objects.all().select_related('user')
+
+    def create(self, request, *args, **kwargs):
+        return create_auth_data(self, TeachersAddressSerializer, request.data, TeachersAddress)
+    
+    def get_queryset(self):
+        return TeachersAddress.objects.filter(user=self.request.user)
+
+    def destroy(self, request, pk=None):
+        return delete_object(TeachersAddress, pk)
+
 
 class EducationalQulificationViewSet(viewsets.ModelViewSet):    
     serializer_class = EducationalQualificationSerializer 

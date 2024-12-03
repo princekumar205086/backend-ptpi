@@ -21,6 +21,7 @@ router.register(r'admin/level', LevelViewSet)
 
 router.register(r'self/teacher', SingleTeacherViewSet, basename='self-teacher')
 router.register(r'self/teacherskill', SingleTeacherSkillViewSet, basename='self-teacherskill')
+router.register(r'self/teacherAddress', SingleTeachersAddressViewSet, basename='self-teacherAddress')
 
 urlpatterns = [
     path('',include(router.urls)),
