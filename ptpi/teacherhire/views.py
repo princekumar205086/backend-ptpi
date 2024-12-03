@@ -194,26 +194,66 @@ class LevelViewSet(viewsets.ModelViewSet):
     def count(self):
         count = get_count(Level)
         return Response({"Count":count})
-
     
-    @action(detail=True, methods=['get'], url_path='(subject/(?P<subject_id>[^/.]+)/)?questions')
-    def level_questions(self, request, pk=None, subject_id=None):       
+    from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Level, Subject, Question, ClassCategory
+from .serializers import QuestionSerializer
+
+class LevelViewSet(viewsets.ModelViewSet):
+    queryset = Level.objects.all()
+    serializer_class = LevelSerializer
+
+    @action(detail=True, methods=['get'], url_path='(subject/(?P<subject_id>[^/.]+)/)?(class-category/(?P<class_category_id>[^/.]+)/)?questions')
+    def level_questions(self, request, pk=None, subject_id=None, class_category_id=None):
+        """
+        Custom action to fetch questions by level, optional subject, and optional class category.
+        """
         try:
             level = Level.objects.get(pk=pk)
         except Level.DoesNotExist:
             return Response({"error": "Level not found"}, status=status.HTTP_404_NOT_FOUND)
+
         if subject_id:
             try:
                 subject = Subject.objects.get(pk=subject_id)
             except Subject.DoesNotExist:
                 return Response({"error": "Subject not found"}, status=status.HTTP_404_NOT_FOUND)
-
             questions = Question.objects.filter(level=level, subject=subject)
         else:
             questions = Question.objects.filter(level=level)
 
+        if class_category_id:
+            try:
+                class_category = ClassCategory.objects.get(pk=class_category_id)
+            except ClassCategory.DoesNotExist:
+                return Response({"error": "Class Category not found"}, status=status.HTTP_404_NOT_FOUND)
+            questions = questions.filter(class_category=class_category)
+            
         serializer = QuestionSerializer(questions, many=True)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    
+    # @action(detail=True, methods=['get'], url_path='(subject/(?P<subject_id>[^/.]+)/)?questions')
+    # def level_questions(self, request, pk=None, subject_id=None):       
+    #     try:
+    #         level = Level.objects.get(pk=pk)
+    #     except Level.DoesNotExist:
+    #         return Response({"error": "Level not found"}, status=status.HTTP_404_NOT_FOUND)
+    #     if subject_id:
+    #         try:
+    #             subject = Subject.objects.get(pk=subject_id)
+    #         except Subject.DoesNotExist:
+    #             return Response({"error": "Subject not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    #         questions = Question.objects.filter(level=level, subject=subject)
+    #     else:
+    #         questions = Question.objects.filter(level=level)
+
+    #     serializer = QuestionSerializer(questions, many=True)
+    #     return Response(serializer.data)
     
 class SkillViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
