@@ -193,7 +193,7 @@ class TeachersAddressSerializer(serializers.ModelSerializer):
 
 # TeacherSerializer
 class TeacherSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False)
     # teachers_address = TeachersAddressSerializer(many=False, allow_null=True)
     aadhar_no = serializers.CharField(max_length=12, required=False, allow_null=True)
     fullname = serializers.CharField(max_length=20, required=False, allow_null=True)

@@ -279,6 +279,22 @@ class TeacherViewSet(viewsets.ModelViewSet):
         count = get_count(Teacher)
         return Response({"Count":count})
     
+class SingleTeacherViewSet(viewsets.ModelViewSet):    
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [ExpiringTokenAuthentication] 
+    serializer_class = TeacherSerializer
+
+    def create(self,request,*args, **kwargs):
+        return create_auth_data(self, TeacherSerializer, request.data, Teacher)
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated:
+            return Teacher.objects.filter(user=self.request.user)
+        else:
+            return Teacher.objects.none()
+    def destory(self,pk=None):
+        return delete_object(Teacher,pk)
+    
     
 class ClassCategoryViewSet(viewsets.ModelViewSet):    
     # permission_classes = [IsAuthenticated]
