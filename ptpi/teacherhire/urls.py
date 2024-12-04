@@ -19,6 +19,8 @@ router.register(r'admin/educationalQulification', EducationalQulificationViewSet
 router.register(r'teacher/teachersAddress', TeachersAddressViewSet)
 router.register(r'admin/level', LevelViewSet)
 
+router.register(r'self/teacherclasscategory', TeacherClassCategoryViewSet, basename='self-teacherclasscategory')
+router.register(r'self/teachersubject', TeacherSubjectViewSet, basename='self-teachersubject')
 router.register(r'self/teacher', SingleTeacherViewSet, basename='self-teacher')
 router.register(r'self/teacherskill', SingleTeacherSkillViewSet, basename='self-teacherskill')
 router.register(r'self/teacherAddress', SingleTeachersAddressViewSet, basename='self-teacherAddress')

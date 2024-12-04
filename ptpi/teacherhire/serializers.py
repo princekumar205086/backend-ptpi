@@ -31,6 +31,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
+    email = serializers.EmailField(required=True)
 
     class Meta:
         model = User
@@ -339,6 +340,15 @@ class TeacherSkillSerializer(serializers.ModelSerializer):
 class EducationalQualificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = EducationalQualification
+        fields = '__all__'
+
+class TeacherSubjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TeacherSubject
+        fields = '__all__'
+class TeacherClassCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TeacherClassCategory
         fields = '__all__'
 class TeacherQualificationSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(),required=False)
