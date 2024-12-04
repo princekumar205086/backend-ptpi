@@ -173,3 +173,12 @@ class TeacherClassCategory(models.Model):
 
     def __str__(self):
         return self.user
+
+class Role(models.Model):
+    role_name = models.CharField(max_length=400, null=True, blank=True)
+
+class Preference(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    job_role = models.ForeignKey(Role, on_delete=models.CASCADE)
+    class_category = models.ForeignKey(ClassCategory, on_delete=models.CASCADE)
+    prefered_subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
