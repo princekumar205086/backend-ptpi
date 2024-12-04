@@ -160,3 +160,16 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"Profile of {self.user.username}"
+    
+class TeacherSubject(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.user
+class TeacherClassCategory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    class_category = models.ForeignKey(ClassCategory, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.user
