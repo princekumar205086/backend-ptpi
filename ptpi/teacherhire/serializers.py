@@ -24,6 +24,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
+    # email = serializers.EmailField(write_only=True, required=True)
 
     class Meta:
         model = CustomUser
@@ -357,8 +358,10 @@ class RoleSerializer(serializers.ModelSerializer):
         fields = ['id','jobrole_name']
 
 class PreferenceSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(), required=False)
     class Meta:
         model = Preference
+        fields = '__all__'
 class TeacherSubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = TeacherSubject
