@@ -2,12 +2,10 @@ from django.db import models
 from django.contrib.auth.models import User, AbstractBaseUser
 
 class CustomUser(AbstractBaseUser):
-    ROLE_CHOICES = [
-        ("Admin", "Admin"),
-        ("Teacher", "Teacher"),
-    ]
-    role = models.CharField(max_length=100, choices=ROLE_CHOICES, default="Teacher")
-
+    is_recruiter = models.BooleanField(default=False)
+    def __str__(self):
+        return self.is_recruiter    
+    
 class TeachersAddress(models.Model):
     ADDRESS_TYPE_CHOICES = [
         ('current', 'Current'),

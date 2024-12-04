@@ -13,7 +13,22 @@ from teacherhire.serializers import *
 from .authentication import ExpiringTokenAuthentication  
 from datetime import timedelta, datetime
 from rest_framework.decorators import action
+from .permissions import IsRecruiterPermission, IsAdminPermission 
 import uuid  
+
+
+
+class RecruiterView(APIView):
+    permission_classes = [IsRecruiterPermission]
+    def get(self, request):
+        return Response({"message": "You are a recruiter!"}, status=status.HTTP_200_OK)
+
+class AdminView(APIView):
+    permission_classes = [IsAdminPermission]
+
+    def get(self, request):
+        return Response({"message": "You are an admin!"}, status=status.HTTP_200_OK)
+
 
 def check_for_duplicate(model_class, **kwargs):
     return model_class.objects.filter(**kwargs).exists()
@@ -101,9 +116,10 @@ class LoginUser(APIView):
 
             refresh_token = generate_refresh_token()
             roles = {
-                        'is_admin': user.is_staff,                    
-                        'is_user': True
-                    }    
+                'is_admin': user.is_staff,
+                'is_recruiter': user.is_recruiter,
+                'is_user': True
+            }
             return Response({
                 'access_token': token.key,
                 'refresh_token': refresh_token,
