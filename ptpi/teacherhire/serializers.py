@@ -341,3 +341,12 @@ class TeacherQualificationSerializer(serializers.ModelSerializer):
         representation['user'] = UserSerializer(instance.user).data
         representation['qualification'] = EducationalQualificationSerializer(instance.qualification).data
         return representation
+    
+class TeacherSubjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TeacherSubject
+        fields = '__all__'
+class TeacherClassCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TeacherClassCategory
+        fields = '__all__'
