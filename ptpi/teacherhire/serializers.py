@@ -340,6 +340,15 @@ class EducationalQualificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = EducationalQualification
         fields = '__all__'
+
+class TeacherSubjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TeacherSubject
+        fields = '__all__'
+class TeacherClassCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TeacherClassCategory
+        fields = '__all__'
 class TeacherQualificationSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(),required=False)
     qualification = serializers.PrimaryKeyRelatedField(queryset=EducationalQualification.objects.all(),required=True)
