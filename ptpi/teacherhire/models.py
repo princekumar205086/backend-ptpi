@@ -158,6 +158,7 @@ class Question(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     level = models.ForeignKey(Level, on_delete=models.CASCADE)
     classCategory = models.ForeignKey(ClassCategory, on_delete=models.CASCADE, default=1)
+    time = models.FloatField(default=2.5)
     text = models.CharField(max_length=2000)
     options = models.JSONField()
     correct_option = models.PositiveIntegerField(default=1)
