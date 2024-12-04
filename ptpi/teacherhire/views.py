@@ -15,6 +15,8 @@ from datetime import timedelta, datetime
 from rest_framework.decorators import action
 from .permissions import IsRecruiterPermission, IsAdminPermission 
 import uuid  
+from .models import Level, Subject, Question, ClassCategory
+from .serializers import QuestionSerializer
 
 
 
@@ -85,7 +87,7 @@ class RegisterUser(APIView):
             })
         
         serializer.save()
-        user = User.objects.get(email=serializer.data['email'])
+        user = CustomUser.objects.get(email=serializer.data['email'])
         token_obj, __ = Token.objects.get_or_create(user=user)
 
         return Response({
@@ -227,12 +229,6 @@ class LevelViewSet(viewsets.ModelViewSet):
         count = get_count(Level)
         return Response({"Count":count})
     
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework import status
-from .models import Level, Subject, Question, ClassCategory
-from .serializers import QuestionSerializer
-
 class LevelViewSet(viewsets.ModelViewSet):
     queryset = Level.objects.all()
     serializer_class = LevelSerializer
