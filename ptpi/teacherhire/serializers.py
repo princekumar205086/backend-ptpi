@@ -342,6 +342,14 @@ class TeacherQualificationSerializer(serializers.ModelSerializer):
         representation['qualification'] = EducationalQualificationSerializer(instance.qualification).data
         return representation
     
+class RoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Role
+        fields = ['id','jobrole_name']
+
+class PreferenceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Preference
 class TeacherSubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = TeacherSubject

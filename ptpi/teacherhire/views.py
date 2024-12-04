@@ -439,6 +439,17 @@ class QuestionViewSet(viewsets.ModelViewSet):
     #             queryset = queryset.filter(question__level=level_filter)
     #     return queryset
 
+class RoleViewSet(viewsets.ModelViewSet):    
+    # permission_classes = [IsAuthenticated]
+    # authentication_classes = [ExpiringTokenAuthentication] 
+    queryset= Role.objects.all()
+    serializer_class = RoleSerializer
+
+class PreferenceViewSet(viewsets.ModelViewSet):    
+    # permission_classes = [IsAuthenticated]
+    # authentication_classes = [ExpiringTokenAuthentication] 
+    queryset= Preference.objects.all()
+    serializer_class = PreferenceSerializer
 
 class TeacherSubjectViewSet(viewsets.ModelViewSet):
     # permission_classes = [IsAuthenticated]    

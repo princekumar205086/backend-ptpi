@@ -199,6 +199,20 @@ class UserProfile(models.Model):
     def __str__(self):
         return f"Profile of {self.user.username}"
     
+class Role(models.Model):
+    jobrole_name = models.CharField(max_length=400, null=True, blank=True)
+
+    def __str__(self):
+        return self.jobrole_name
+
+class Preference(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    job_role = models.ForeignKey(Role, on_delete=models.CASCADE,default=1)
+    class_category = models.ForeignKey(ClassCategory, on_delete=models.CASCADE,default=1)
+    prefered_subject = models.ForeignKey(Subject, on_delete=models.CASCADE,default=1)
+
+    def __str__(self):
+        return self.user.username
 class TeacherSubject(models.Model):	
    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)	
    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
