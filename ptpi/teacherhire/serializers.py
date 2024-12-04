@@ -350,4 +350,11 @@ class RoleSerializer(serializers.ModelSerializer):
 class PreferenceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Preference
+class TeacherSubjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TeacherSubject
+        fields = '__all__'
+class TeacherClassCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TeacherClassCategory
         fields = '__all__'

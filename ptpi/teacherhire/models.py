@@ -158,6 +158,7 @@ class Question(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     level = models.ForeignKey(Level, on_delete=models.CASCADE)
     classCategory = models.ForeignKey(ClassCategory, on_delete=models.CASCADE, default=1)
+    time = models.FloatField(default=2.5)
     text = models.CharField(max_length=2000)
     options = models.JSONField()
     correct_option = models.PositiveIntegerField(default=1)
@@ -212,3 +213,16 @@ class Preference(models.Model):
 
     def __str__(self):
         return self.user.username
+class TeacherSubject(models.Model):	
+   user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)	
+   subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+
+   def __str__(self):
+        return self.user.username	
+   
+class TeacherClassCategory(models.Model):	
+  user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)	
+  class_category = models.ForeignKey(ClassCategory, on_delete=models.CASCADE)
+
+  def __str__(self):
+        return self.user.username	

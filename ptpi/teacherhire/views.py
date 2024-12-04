@@ -454,3 +454,15 @@ class PreferenceViewSet(viewsets.ModelViewSet):
     # authentication_classes = [ExpiringTokenAuthentication] 
     queryset= Preference.objects.all()
     serializer_class = PreferenceSerializer
+
+class TeacherSubjectViewSet(viewsets.ModelViewSet):
+    # permission_classes = [IsAuthenticated]    
+    # authentication_classes = [ExpiringTokenAuthentication]     
+    queryset = TeacherSubject.objects.all()
+    serializer_class = TeacherSubjectSerializer
+
+class TeacherClassCategoryViewSet(viewsets.ModelViewSet):
+    # permission_classes = [IsAuthenticated]    
+    # authentication_classes = [ExpiringTokenAuthentication]     
+    queryset = TeacherClassCategory.objects.all()
+    serializer_class = TeacherClassCategorySerializer
