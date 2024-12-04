@@ -209,7 +209,7 @@ class Preference(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     job_role = models.ForeignKey(Role, on_delete=models.CASCADE,default=1)
     class_category = models.ForeignKey(ClassCategory, on_delete=models.CASCADE,default=1)
-    prefered_subject = models.ForeignKey(Subject, on_delete=models.CASCADE,default=1)
+    prefered_subject = models.ManyToManyField(Subject)
 
     def __str__(self):
         return self.user.username

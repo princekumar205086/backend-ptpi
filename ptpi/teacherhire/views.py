@@ -446,10 +446,15 @@ class RoleViewSet(viewsets.ModelViewSet):
     serializer_class = RoleSerializer
 
 class PreferenceViewSet(viewsets.ModelViewSet):    
-    # permission_classes = [IsAuthenticated]
-    # authentication_classes = [ExpiringTokenAuthentication] 
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [ExpiringTokenAuthentication] 
     queryset= Preference.objects.all()
     serializer_class = PreferenceSerializer
+    def create(self, request, *args, **kwargs):
+        request.data['user'] = request.user.id
+        return super().create(request, *args, **kwargs)
+    def get_queryset(self):
+        return Preference.objects.filter(user=self.request.user)
 
 class TeacherSubjectViewSet(viewsets.ModelViewSet):
     # permission_classes = [IsAuthenticated]    
