@@ -107,8 +107,8 @@ class LoginUser(APIView):
         password = request.data.get('password')
 
         try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
+            user = CustomUser.objects.get(email=email)
+        except CustomUser.DoesNotExist:
             return Response({'message': 'Invalid email or password'}, status=status.HTTP_401_UNAUTHORIZED)
 
         if user.check_password(password):
