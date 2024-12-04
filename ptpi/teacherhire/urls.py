@@ -4,7 +4,7 @@ from teacherhire.views import *
 from rest_framework import routers
 #from .views import SubjectQuestionsView
 
-
+#access admin 
 router = routers.DefaultRouter()
 router.register(r"teacher/teacherexperience",TeacherExperiencesViewSet)
 router.register(r"teacher/teacherqualification",TeacherQualificationViewSet)
@@ -18,11 +18,15 @@ router.register(r'admin/question', QuestionViewSet),
 router.register(r'admin/educationalQulification', EducationalQulificationViewSet)
 router.register(r'teacher/teachersAddress', TeachersAddressViewSet)
 router.register(r'admin/level', LevelViewSet)
+router.register(r'admin/role', RoleViewSet, basename='role')
 
+#access OnlyTeacher   
 router.register(r'self/teacher', SingleTeacherViewSet, basename='self-teacher')
 router.register(r'self/teacherskill', SingleTeacherSkillViewSet, basename='self-teacherskill')
 router.register(r'self/teacherAddress', SingleTeachersAddressViewSet, basename='self-teacherAddress')
 router.register(r'self/teacherqualification', SingleTeacherQualificationViewSet, basename='self-teacherqualification')
+router.register(r'self/teacherpreference', PreferenceViewSet, basename='teacher-preference')
+
 
 urlpatterns = [
     path('',include(router.urls)),
