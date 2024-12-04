@@ -63,7 +63,15 @@ class LoginSerializer(serializers.Serializer):
 
         if not user.check_password(password):
             raise ValidationError({'password': 'Incorrect password.'})
+        
+        
+        is_admin = user.is_staff
+        is_recruiter = user.is_recruiter
+        if is_admin and is_recruiter:
+            is_admin = True
+            
         data["is_admin"] = True if user.is_staff else False
+        data["is_recruiter"] = True if user.is_recruiter else False
         data["user"] = user
         return data
 
@@ -178,14 +186,15 @@ class LevelSerializer(serializers.ModelSerializer):
 class TeachersAddressSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(), required=False)
     pincode = serializers.CharField(max_length=6, required=False, allow_null=True)
-
     class Meta:
         model = TeachersAddress
         fields = '__all__'
-
     def validate_pincode(self, value):
+        user = self.context.get('request').user
+        if user and not user.is_recruiter:
+            raise serializers.ValidationError("Only recruiters can set the pincode.")        
         if value and (len(value) != 6 or not value.isdigit()):
-            raise serializers.ValidationError("Pincode must be exactly 6 digits.")
+            raise serializers.ValidationError("Pincode must be exactly 6 digits.")        
         return value
 
 

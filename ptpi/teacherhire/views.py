@@ -18,8 +18,7 @@ import uuid
 from .models import Level, Subject, Question, ClassCategory
 from .serializers import QuestionSerializer
 
-
-
+    
 class RecruiterView(APIView):
     permission_classes = [IsRecruiterPermission]
     def get(self, request):
@@ -48,11 +47,11 @@ def create_object(serializer_class, request_data, model_class):
 
 # for authenticated teacher
 def create_auth_data(self, serializer_class, request_data, model_class, *args, **kwargs):
-    # if not self.request.user.is_authenticated:
-    #     return Response(
-    #         {'message': 'Authentication required to perform this action.'},
-    #         status=status.HTTP_401_UNAUTHORIZED
-    #     )
+    if not self.request.user.is_authenticated:
+        return Response(
+            {'message': 'Authentication required to perform this action.'},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
     serializer = serializer_class(data=request_data)
     if serializer.is_valid():
         if check_for_duplicate(model_class, **serializer.validated_data):
@@ -165,22 +164,25 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
 #TeacerAddress GET ,CREATE ,DELETE 
 class TeachersAddressViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [ExpiringTokenAuthentication] 
-    serializer_class = TeachersAddressSerializer 
+    permission_classes = [IsAuthenticated,IsRecruiterPermission]
+    authentication_classes = [ExpiringTokenAuthentication]
+    serializer_class = TeachersAddressSerializer
     queryset = TeachersAddress.objects.all().select_related('user')
 
     def create(self, request, *args, **kwargs):
+        print(f"User: {request.user}")
         return create_auth_data(self, TeachersAddressSerializer, request.data, TeachersAddress)
 
     def destroy(self, request, pk=None):
+        print(f"User: {request.user}")
         return delete_object(TeachersAddress, pk)
 
     @action(detail=False, methods=['get'])
     def count(self, request):
+        print(f"User: {request.user}")
         count = get_count(TeachersAddress)
         return Response({"count": count})
-    
+        
 class SingleTeachersAddressViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     authentication_classes = [ExpiringTokenAuthentication] 
