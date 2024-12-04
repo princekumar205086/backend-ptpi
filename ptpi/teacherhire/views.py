@@ -442,15 +442,3 @@ class QuestionViewSet(viewsets.ModelViewSet):
     #         else:
     #             queryset = queryset.filter(question__level=level_filter)
     #     return queryset
-
-class TeacherClassCategoryViewSet(viewsets.ModelViewSet):    
-    # permission_classes = [IsAuthenticated]
-    # authentication_classes = [ExpiringTokenAuthentication] 
-    queryset= TeacherClassCategory.objects.all()
-    serializer_class = TeacherClassCategorySerializer
-
-class TeacherSubjectViewSet(viewsets.ModelViewSet):    
-    # permission_classes = [IsAuthenticated]
-    # authentication_classes = [ExpiringTokenAuthentication] 
-    queryset= TeacherSubject.objects.all()
-    serializer_class = TeacherSubjectSerializer
