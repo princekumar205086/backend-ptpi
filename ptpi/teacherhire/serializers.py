@@ -370,3 +370,8 @@ class TeacherClassCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = TeacherClassCategory
         fields = '__all__'
+
+class TeacherExamResultSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TeacherExamResult
+        fields = '__all__'

@@ -217,7 +217,7 @@ class TeacherSubject(models.Model):
    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)	
    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
 
-   def __str__(self):
+   def __str__(self): 
         return self.user.username	
    
 class TeacherClassCategory(models.Model):	
@@ -226,3 +226,14 @@ class TeacherClassCategory(models.Model):
 
   def __str__(self):
         return self.user.username	
+  
+class TeacherExamResult(models.Model):
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    correct_answer = models.IntegerField(default=0, null=True, blank=True)
+    incorrect_answer = models.IntegerField(default=0, null=True, blank=True)
+    isqulified = models.BooleanField(default=False)
+    level = models.ForeignKey(Level, on_delete=models.CASCADE)
+    attempt = models.IntegerField(default=3)
+
+    def __str__(self):
+        return self.subject.subject_name

@@ -485,3 +485,9 @@ class TeacherClassCategoryViewSet(viewsets.ModelViewSet):
     def count(self,request):
         count = get_count(TeacherClassCategory)
         return Response({"Count":count})
+    
+class TeacherExamResultViewSet(viewsets.ModelViewSet):
+    # permission_classes = [IsAuthenticated]    
+    # authentication_classes = [ExpiringTokenAuthentication]     
+    queryset = TeacherExamResult.objects.all()
+    serializer_class = TeacherExamResultSerializer
