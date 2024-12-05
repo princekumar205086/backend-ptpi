@@ -228,6 +228,7 @@ class TeacherClassCategory(models.Model):
         return self.user.username	
   
 class TeacherExamResult(models.Model):
+    user = models.ForeignKey(CustomUser,on_delete=models.CASCADE)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     correct_answer = models.IntegerField(default=0, null=True, blank=True)
     incorrect_answer = models.IntegerField(default=0, null=True, blank=True)
@@ -236,4 +237,4 @@ class TeacherExamResult(models.Model):
     attempt = models.IntegerField(default=3)
 
     def __str__(self):
-        return self.subject.subject_name
+        return self.correct_answer
