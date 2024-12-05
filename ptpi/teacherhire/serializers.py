@@ -359,9 +359,21 @@ class RoleSerializer(serializers.ModelSerializer):
 
 class PreferenceSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(), required=False)
+    class_category = serializers.PrimaryKeyRelatedField(queryset=ClassCategory.objects.all(), required=False)
+    job_role = serializers.PrimaryKeyRelatedField(queryset=Role.objects.all(), required=False)
+    prefered_subject = serializers.PrimaryKeyRelatedField(queryset=Subject.objects.all(), required=False, many=True)
     class Meta:
         model = Preference
         fields = '__all__'
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['user'] = UserSerializer(instance.user).data
+        representation['job_role'] = RoleSerializer(instance.job_role).data
+        representation['class_category'] = ClassCategorySerializer(instance.class_category).data
+        representation['prefered_subject'] = SubjectSerializer(instance.prefered_subject.all(), many=True).data
+        return representation
+    
 class TeacherSubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = TeacherSubject
