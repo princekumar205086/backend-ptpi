@@ -499,7 +499,15 @@ class TeacherClassCategoryViewSet(viewsets.ModelViewSet):
         return Response({"Count":count})
     
 class TeacherExamResultViewSet(viewsets.ModelViewSet):
-    # permission_classes = [IsAuthenticated]    
-    # authentication_classes = [ExpiringTokenAuthentication]     
+    permission_classes = [IsAuthenticated]    
+    authentication_classes = [ExpiringTokenAuthentication]     
     queryset = TeacherExamResult.objects.all()
     serializer_class = TeacherExamResultSerializer
+    def create(self,request):
+        return create_object(TeacherExamResultSerializer,request.data,TeacherExamResult)
+    def destory(self,pk=None):
+        return delete_object(TeacherExamResult,pk)
+    @action (detail=False,methods=['get'])
+    def count(self,request):
+        count = get_count(TeacherExamResult)
+        return Response({"Count":count})
