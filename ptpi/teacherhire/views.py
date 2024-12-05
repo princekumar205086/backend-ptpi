@@ -459,13 +459,22 @@ class PreferenceViewSet(viewsets.ModelViewSet):
         return Preference.objects.filter(user=self.request.user)
 
 class TeacherSubjectViewSet(viewsets.ModelViewSet):
-    # permission_classes = [IsAuthenticated]    
-    # authentication_classes = [ExpiringTokenAuthentication]     
+    permission_classes = [IsAuthenticated]    
+    authentication_classes = [ExpiringTokenAuthentication]     
     queryset = TeacherSubject.objects.all()
     serializer_class = TeacherSubjectSerializer
+    def create(self,request):
+        return create_object(TeacherSubjectSerializer,request.data,TeacherSubject)
+    def destory(self,pk=None):
+        return delete_object(TeacherSubject,pk)
+    @action (detail=False,methods=['get'])
+    def count(self,request):
+        count = get_count(TeacherSubject)
+        return Response({"Count":count})
 
 class TeacherClassCategoryViewSet(viewsets.ModelViewSet):
-    # permission_classes = [IsAuthenticated]    
-    # authentication_classes = [ExpiringTokenAuthentication]     
+    permission_classes = [IsAuthenticated]    
+    authentication_classes = [ExpiringTokenAuthentication]     
     queryset = TeacherClassCategory.objects.all()
     serializer_class = TeacherClassCategorySerializer
+    
