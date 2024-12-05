@@ -18,8 +18,7 @@ import uuid
 from .models import Level, Subject, Question, ClassCategory
 from .serializers import QuestionSerializer
 
-
-
+    
 class RecruiterView(APIView):
     permission_classes = [IsRecruiterPermission]
     def get(self, request):
@@ -34,6 +33,7 @@ class AdminView(APIView):
 
 def check_for_duplicate(model_class, **kwargs):
     return model_class.objects.filter(**kwargs).exists()
+
 def create_object(serializer_class, request_data, model_class):
     serializer = serializer_class(data=request_data)
     if serializer.is_valid():
@@ -48,11 +48,11 @@ def create_object(serializer_class, request_data, model_class):
 
 # for authenticated teacher
 def create_auth_data(self, serializer_class, request_data, model_class, *args, **kwargs):
-    # if not self.request.user.is_authenticated:
-    #     return Response(
-    #         {'message': 'Authentication required to perform this action.'},
-    #         status=status.HTTP_401_UNAUTHORIZED
-    #     )
+    if not self.request.user.is_authenticated:
+        return Response(
+            {'message': 'Authentication required to perform this action.'},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
     serializer = serializer_class(data=request_data)
     if serializer.is_valid():
         if check_for_duplicate(model_class, **serializer.validated_data):
@@ -165,22 +165,25 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
 #TeacerAddress GET ,CREATE ,DELETE 
 class TeachersAddressViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [ExpiringTokenAuthentication] 
-    serializer_class = TeachersAddressSerializer 
+    permission_classes = [IsAuthenticated,IsRecruiterPermission]
+    authentication_classes = [ExpiringTokenAuthentication]
+    serializer_class = TeachersAddressSerializer
     queryset = TeachersAddress.objects.all().select_related('user')
 
     def create(self, request, *args, **kwargs):
+        print(f"User: {request.user}")
         return create_auth_data(self, TeachersAddressSerializer, request.data, TeachersAddress)
 
     def destroy(self, request, pk=None):
+        print(f"User: {request.user}")
         return delete_object(TeachersAddress, pk)
 
     @action(detail=False, methods=['get'])
     def count(self, request):
+        print(f"User: {request.user}")
         count = get_count(TeachersAddress)
         return Response({"count": count})
-    
+        
 class SingleTeachersAddressViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     authentication_classes = [ExpiringTokenAuthentication] 
@@ -197,7 +200,9 @@ class SingleTeachersAddressViewSet(viewsets.ModelViewSet):
         return delete_object(TeachersAddress, pk)
 
 
-class EducationalQulificationViewSet(viewsets.ModelViewSet):    
+class EducationalQulificationViewSet(viewsets.ModelViewSet):   
+    permission_classes = [IsAuthenticated]    
+    authentication_classes = [ExpiringTokenAuthentication] 
     serializer_class = EducationalQualificationSerializer 
     queryset = EducationalQualification.objects.all()
 
@@ -213,8 +218,8 @@ class EducationalQulificationViewSet(viewsets.ModelViewSet):
         return Response({"count": count})
     
 class LevelViewSet(viewsets.ModelViewSet):
-    # permission_classes = [IsAuthenticated]    
-    # authentication_classes = [ExpiringTokenAuthentication]     
+    permission_classes = [IsAuthenticated]    
+    authentication_classes = [ExpiringTokenAuthentication]     
     queryset = Level.objects.all()
     serializer_class = LevelSerializer
 
@@ -229,10 +234,6 @@ class LevelViewSet(viewsets.ModelViewSet):
         count = get_count(Level)
         return Response({"Count":count})
     
-class LevelViewSet(viewsets.ModelViewSet):
-    queryset = Level.objects.all()
-    serializer_class = LevelSerializer
-
     @action(detail=True, methods=['get'], url_path='(subject/(?P<subject_id>[^/.]+)/)?(class-category/(?P<class_category_id>[^/.]+)/)?questions')
     def level_questions(self, request, pk=None, subject_id=None, class_category_id=None):
         """
@@ -261,6 +262,8 @@ class LevelViewSet(viewsets.ModelViewSet):
             
         serializer = QuestionSerializer(questions, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    
 class SkillViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     authentication_classes = [ExpiringTokenAuthentication] 
@@ -311,8 +314,8 @@ class SingleTeacherSkillViewSet(viewsets.ModelViewSet):
 
     
 class SubjectViewSet(viewsets.ModelViewSet):    
-    # permission_classes = [IsAuthenticated] 
-    # authentication_classes = [ExpiringTokenAuthentication] 
+    permission_classes = [IsAuthenticated] 
+    authentication_classes = [ExpiringTokenAuthentication] 
     queryset = Subject.objects.all()
     serializer_class = SubjectSerializer
 
@@ -326,8 +329,8 @@ class SubjectViewSet(viewsets.ModelViewSet):
         return Response({"Count":count})
     
 class TeacherViewSet(viewsets.ModelViewSet):    
-    # permission_classes = [IsAuthenticated]
-    # authentication_classes = [ExpiringTokenAuthentication] 
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [ExpiringTokenAuthentication] 
     queryset= Teacher.objects.all().select_related('user')
     serializer_class = TeacherSerializer
 
@@ -358,8 +361,8 @@ class SingleTeacherViewSet(viewsets.ModelViewSet):
     
     
 class ClassCategoryViewSet(viewsets.ModelViewSet):    
-    # permission_classes = [IsAuthenticated]
-    # authentication_classes = [ExpiringTokenAuthentication] 
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [ExpiringTokenAuthentication] 
     queryset= ClassCategory.objects.all()
     serializer_class = ClassCategorySerializer
 
@@ -417,8 +420,8 @@ class TeacherExperiencesViewSet(viewsets.ModelViewSet):
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.all().select_related('subject', 'level')
     serializer_class = QuestionSerializer
-    # permission_classes = [IsAuthenticated]
-    # authentication_classes = [ExpiringTokenAuthentication] 
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [ExpiringTokenAuthentication] 
 
     def create(self,request):
         return create_object(QuestionSerializer,request.data,Question)
@@ -429,7 +432,9 @@ class QuestionViewSet(viewsets.ModelViewSet):
         count = get_count(Question)
         return Response({"Count":count})
     # def get_queryset(self):
-    #     queryset = Level.objects.all()
+    #     queryset = Level.objects.all() def create(self, request, *args, **kwargs):
+        request.data['user'] = request.user.id
+        return super().create(request, *args, **kwargs)
     #     level_filter = self.request.query_params.get('level', None)
     #     if level_filter is not None:
     #         level_filter = int(level_filter)
@@ -440,10 +445,19 @@ class QuestionViewSet(viewsets.ModelViewSet):
     #     return queryset
 
 class RoleViewSet(viewsets.ModelViewSet):    
-    # permission_classes = [IsAuthenticated]
-    # authentication_classes = [ExpiringTokenAuthentication] 
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [ExpiringTokenAuthentication] 
     queryset= Role.objects.all()
     serializer_class = RoleSerializer
+    def create(self,request):
+        return create_object(RoleSerializer,request.data,Role)
+    
+    def destory(self,pk=None):
+        return delete_object(Role,pk)
+    @action (detail=False,methods=['get'])
+    def count(self,request):
+        count = get_count(Role)
+        return Response({"Count":count})
 
 class PreferenceViewSet(viewsets.ModelViewSet):    
     permission_classes = [IsAuthenticated]
@@ -457,13 +471,29 @@ class PreferenceViewSet(viewsets.ModelViewSet):
         return Preference.objects.filter(user=self.request.user)
 
 class TeacherSubjectViewSet(viewsets.ModelViewSet):
-    # permission_classes = [IsAuthenticated]    
-    # authentication_classes = [ExpiringTokenAuthentication]     
+    permission_classes = [IsAuthenticated]    
+    authentication_classes = [ExpiringTokenAuthentication]     
     queryset = TeacherSubject.objects.all()
     serializer_class = TeacherSubjectSerializer
+    def create(self,request):
+        return create_object(TeacherSubjectSerializer,request.data,TeacherSubject)
+    def destory(self,pk=None):
+        return delete_object(TeacherSubject,pk)
+    @action (detail=False,methods=['get'])
+    def count(self,request):
+        count = get_count(TeacherSubject)
+        return Response({"Count":count})
 
 class TeacherClassCategoryViewSet(viewsets.ModelViewSet):
-    # permission_classes = [IsAuthenticated]    
-    # authentication_classes = [ExpiringTokenAuthentication]     
+    permission_classes = [IsAuthenticated]    
+    authentication_classes = [ExpiringTokenAuthentication]     
     queryset = TeacherClassCategory.objects.all()
     serializer_class = TeacherClassCategorySerializer
+    def create(self,request):
+        return create_object(TeacherClassCategorySerializer,request.data,TeacherClassCategory)
+    def destory(self,pk=None):
+        return delete_object(TeacherClassCategory,pk)
+    @action (detail=False,methods=['get'])
+    def count(self,request):
+        count = get_count(TeacherClassCategory)
+        return Response({"Count":count})
