@@ -374,6 +374,12 @@ class PreferenceSerializer(serializers.ModelSerializer):
         representation['prefered_subject'] = SubjectSerializer(instance.prefered_subject.all(), many=True).data
         return representation
     
+    def validate(self, data):
+        user = data.get('user')
+        if user and Preference.objects.filter(user=user).exists():
+            raise serializers.ValidationError({"user": "A preference entry for this user already exists."})
+        return data 
+    
 class TeacherSubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = TeacherSubject
