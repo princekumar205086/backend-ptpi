@@ -394,6 +394,17 @@ class TeacherExamResultSerializer(serializers.ModelSerializer):
         model = TeacherExamResult
         fields = '__all__'
         
+class JobPreferenceLocationSerializer(serializers.ModelSerializer):
+    preference = serializers.PrimaryKeyRelatedField(queryset=Preference.objects.all(), required=False)
+    class Meta:
+        model = JobPreferenceLocation
+        fields = '__all__'
+    
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['preference'] = PreferenceSerializer(instance.preference).data
+        return representation
+        
 
 class BasicProfileSerializer(serializers.ModelSerializer):
     class Meta:

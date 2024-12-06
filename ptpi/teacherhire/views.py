@@ -273,13 +273,15 @@ class SkillViewSet(viewsets.ModelViewSet):
     def create(self, request):
         return create_object(SkillSerializer, request.data, Skill)
 
-    def destroy(self, pk=None):
-        return delete_object(Skill, pk)
-
     @action(detail=False, methods=['get'])
     def count(self, request):
         count = get_count(Skill)
         return Response({"Count": count})
+    
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.delete()
+        return Response({"message": "Skill deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
   
     
 class TeacherSkillViewSet(viewsets.ModelViewSet):
@@ -321,12 +323,15 @@ class SubjectViewSet(viewsets.ModelViewSet):
 
     def create(self,request):
         return create_object(SubjectSerializer,request.data,Subject)
-    def destory(self,pk=None):
-        return delete_object(Subject,pk)
+    
     @action (detail=False,methods=['get'])
     def count(self,request):
         count = get_count(Subject)
         return Response({"Count":count})
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.delete()
+        return Response({"message": "subject deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
     
 class TeacherViewSet(viewsets.ModelViewSet):    
     permission_classes = [IsAuthenticated]
@@ -534,6 +539,14 @@ class TeacherExamResultViewSet(viewsets.ModelViewSet):
     def count(self,request):
         count = get_count(TeacherExamResult)
         return Response({"Count":count})    
+
+class JobPreferenceLocationViewSet(viewsets.ModelViewSet):    
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [ExpiringTokenAuthentication] 
+    queryset= JobPreferenceLocation.objects.all()
+    serializer_class = JobPreferenceLocationSerializer
+    
+    
     
 class BasicProfileViewSet(viewsets.ModelViewSet):
     queryset = BasicProfile.objects.all()
