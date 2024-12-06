@@ -217,6 +217,16 @@ class TeacherSubject(models.Model):
    def __str__(self): 
         return self.user.username	
    
+class BasicProfile(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
+    name = models.CharField(max_length=120, null=True)
+    email = models.EmailField(null=True)
+    mobile = models.CharField(max_length=15, blank=True, null=True)
+    profileDp = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    location = models.CharField(max_length=12, null=True,blank=True)
+    def _str_(self):
+        return f"Basic Profile of {self.user.username}"
+   
 class TeacherClassCategory(models.Model):	
   user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)	
   class_category = models.ForeignKey(ClassCategory, on_delete=models.CASCADE)
