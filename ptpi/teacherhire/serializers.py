@@ -128,7 +128,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class TeacherExperiencesSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(), required=False)
     institution = serializers.CharField(max_length=255, required=False, allow_null=True)
-    role = serializers.CharField(max_length=255, required=False, allow_null=True)
+    role = serializers.PrimaryKeyRelatedField(queryset=Role.objects.all(), required=False, allow_null=True)
     start_date = serializers.DateField(required=False, allow_null=True)
     end_date = serializers.DateField(required=False, allow_null=True)
     achievements = serializers.CharField(required=False, allow_null=True)
@@ -163,6 +163,7 @@ class TeacherExperiencesSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         if instance.user:
             representation['user'] = UserSerializer(instance.user).data
+            representation['role'] = RoleSerializer(instance.role).data
         return representation
 
 
@@ -249,6 +250,12 @@ class TeacherSerializer(serializers.ModelSerializer):
             if not re.match(r'^\d{12}$', value):
                 raise serializers.ValidationError("Aadhar number must be exactly 12 digits.")
         return value
+    
+    def validate(self, data):
+        user = data.get('user')
+        if user and Teacher.objects.filter(user=user).exists():
+            raise serializers.ValidationError({"user": "A teacher entry for this user already exists."})
+        return data 
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)

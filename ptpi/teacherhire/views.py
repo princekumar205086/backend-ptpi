@@ -37,11 +37,11 @@ def check_for_duplicate(model_class, **kwargs):
 def create_object(serializer_class, request_data, model_class):
     serializer = serializer_class(data=request_data)
     if serializer.is_valid():
-        if check_for_duplicate(model_class, **serializer.validated_data):
-            return Response(
-                {'message': f'Duplicate entry: {model_class.__name__} already exists.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        # if check_for_duplicate(model_class, **serializer.validated_data):
+        #     return Response(
+        #         {'message': f'Duplicate entry: {model_class.__name__} already exists.'},
+        #         status=status.HTTP_400_BAD_REQUEST
+        #     )
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
