@@ -529,3 +529,7 @@ class JobPreferenceLocationViewSet(viewsets.ModelViewSet):
     serializer_class = JobPreferenceLocationSerializer
     
     
+    
+class BasicProfileViewSet(viewsets.ModelViewSet):
+    queryset = BasicProfile.objects.all()
+    serializer_class = BasicProfileSerializer
