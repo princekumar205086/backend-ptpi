@@ -421,7 +421,20 @@ class TeacherExperiencesViewSet(viewsets.ModelViewSet):
     @action (detail=False,methods=['get'])
     def count(self,request):
         count = get_count(TeacherExperiences)
-        return Response({"Count":count})    
+        return Response({"Count":count})   
+
+class SingleTeacherExperiencesViewSet(viewsets.ModelViewSet): 
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [ExpiringTokenAuthentication]
+    queryset = TeacherExperiences.objects.all()
+    serializer_class = TeacherExperiencesSerializer
+
+    def create(self, request, *args, **kwargs):
+        return create_auth_data(self, TeacherExperiencesSerializer, request.data, TeacherExperiences)
+    def get_queryset(self):
+        return TeacherExperiences.objects.filter(user=self.request.user)
+    def destroy(self, request, pk=None):
+        return delete_object(TeacherExperiences, pk) 
     
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.all().select_related('subject', 'level')

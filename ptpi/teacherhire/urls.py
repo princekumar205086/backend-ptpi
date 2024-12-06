@@ -28,6 +28,7 @@ router.register(r'self/teacherskill', SingleTeacherSkillViewSet, basename='self-
 router.register(r'self/teacherAddress', SingleTeachersAddressViewSet, basename='self-teacherAddress')
 router.register(r'self/teacherqualification', SingleTeacherQualificationViewSet, basename='self-teacherqualification')
 router.register(r'self/teacherpreference', PreferenceViewSet, basename='teacher-preference')
+router.register(r'self/teacherexperience', TeacherExperiencesViewSet, basename='teacher-experience')
 router.register(r'self/teacherjobpreferencelocation', JobPreferenceLocationViewSet, basename='teacher-jobpreferencelocation')
 
 urlpatterns = [
