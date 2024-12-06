@@ -13,6 +13,7 @@ from teacherhire.serializers import *
 from .authentication import ExpiringTokenAuthentication  
 from datetime import timedelta, datetime
 from rest_framework.decorators import action
+from rest_framework.exceptions import AuthenticationFailed
 from .permissions import IsRecruiterPermission, IsAdminPermission 
 import uuid  
 from .models import Level, Subject, Question, ClassCategory
@@ -152,17 +153,16 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     authentication_classes = [ExpiringTokenAuthentication]   
     queryset = UserProfile.objects.all().select_related('user')
     serializer_class = UserProfileSerializer
-
-    @action(detail=False, methods=['get'])
-    def count(self, request):
-        count = self.get_queryset().count()
-        return Response({"count": count})
-
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.delete()
-        return Response({"message": "UserProfile deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
-
+    def create(self,request,*args, **kwargs):
+        return create_auth_data(self, UserProfileSerializer, request.data,UserProfile)
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated:
+            return UserProfile.objects.filter(user=self.request.user)
+        else:
+            return UserProfile.objects.none()
+    def destory(self, request, pk=None):
+        return delete_object(BasicProfile,pk)
 #TeacerAddress GET ,CREATE ,DELETE 
 class TeachersAddressViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated,IsRecruiterPermission]
@@ -549,11 +549,18 @@ class JobPreferenceLocationViewSet(viewsets.ModelViewSet):
     
     
 class BasicProfileViewSet(viewsets.ModelViewSet):
-    # permission_classes = [IsAuthenticated]
-    # authentication_classes = [ExpiringTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [ExpiringTokenAuthentication]
     queryset = BasicProfile.objects.all()
     serializer_class = BasicProfileSerializer
-    def create(self, request, *args, **kwargs):
-        print(f"User: {request.user}")
-        return create_auth_data(self, BasicProfileSerializer, request.data, BasicProfile)
-
+    def create(self,request,*args, **kwargs):
+        return create_auth_data(self, BasicProfileSerializer, request.data,BasicProfile)
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated:
+            return BasicProfile.objects.filter(user=self.request.user)
+        else:
+            return BasicProfile.objects.none()
+    def destory(self, request, pk=None):
+        return delete_object(BasicProfile,pk)
+    

@@ -77,10 +77,8 @@ class LoginSerializer(serializers.Serializer):
         return data
 
 
-class UserProfileSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
-    profile_picture = serializers.ImageField(required=False, allow_null=True)
-
+class UserProfileSerializer(serializers.ModelSerializer):    
+    user = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(), required=False)    
     class Meta:
         model = UserProfile
         fields = '__all__'
@@ -108,11 +106,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     def validate_phone_number(self, value):
         if value:
-            cleaned_value = re.sub(r'[^0-9]', '', value)
-            if len(cleaned_value) < 10:
-                raise serializers.ValidationError("Phone number must have at least 10 digits.")
+            cleaned_value = re.sub(r'[^0-9]', '', value)  # Remove non-numeric characters
+            if len(cleaned_value) != 10:
+                raise serializers.ValidationError("Phone number must be exactly 10 digits.")
+            if not cleaned_value.startswith(('6', '7', '8', '9')):
+                raise serializers.ValidationError("Phone number must start with 6, 7, 8, or 9.")
             return cleaned_value
         return value
+
 
     def validate_profile_picture(self, value):
         if value and value.size > 5 * 1024 * 1024:

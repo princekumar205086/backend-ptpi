@@ -257,16 +257,3 @@ class JobPreferenceLocation(models.Model):
     pincode = models.CharField(max_length=6, null=True, blank=True)
     def __str__(self):
         return self.preference.user.username
-
-class UserProfile(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="profile")
-    bio = models.TextField(blank=True, null=True)
-    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
-    phone_number = models.CharField(max_length=15, blank=True, null=True)
-    address = models.TextField(blank=True, null=True)
-    is_teacher = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def _str_(self):
-        return f"Profile of {self.user.username}"
