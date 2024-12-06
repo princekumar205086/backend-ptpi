@@ -549,5 +549,11 @@ class JobPreferenceLocationViewSet(viewsets.ModelViewSet):
     
     
 class BasicProfileViewSet(viewsets.ModelViewSet):
+    # permission_classes = [IsAuthenticated]
+    # authentication_classes = [ExpiringTokenAuthentication]
     queryset = BasicProfile.objects.all()
     serializer_class = BasicProfileSerializer
+    def create(self, request, *args, **kwargs):
+        print(f"User: {request.user}")
+        return create_auth_data(self, BasicProfileSerializer, request.data, BasicProfile)
+

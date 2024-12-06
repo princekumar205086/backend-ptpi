@@ -30,6 +30,7 @@ router.register(r'self/teacherqualification', SingleTeacherQualificationViewSet,
 router.register(r'self/teacherpreference', PreferenceViewSet, basename='teacher-preference')
 router.register(r'self/teacherexperience', TeacherExperiencesViewSet, basename='teacher-experience')
 router.register(r'self/teacherjobpreferencelocation', JobPreferenceLocationViewSet, basename='teacher-jobpreferencelocation')
+router.register(r'self/basicProfile', BasicProfileViewSet, basename='teacher-basicProfile')
 
 urlpatterns = [
     path('', include(router.urls)),

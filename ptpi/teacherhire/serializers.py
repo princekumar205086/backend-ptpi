@@ -309,13 +309,13 @@ class QuestionSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("Text must be at least 5 characters.")
             return value
 
-    def validate_options(self, value):
-        if value is not None:
-            if not isinstance(value, list):
-                raise serializers.ValidationError("Options must be a list.")
-            if len(value) != 4:
-                raise serializers.ValidationError("Options must contain exactly 4 items.")
-        return value
+    # def validate_options(self, value):
+    #     if value is not None:
+    #         if not isinstance(value, list):
+    #             raise serializers.ValidationError("Options must be a list.")
+    #         if len(value) != 4:
+    #             raise serializers.ValidationError("Options must contain exactly 4 items.")
+    #     return value
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -417,3 +417,23 @@ class BasicProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = BasicProfile
         fields = '__all__'
+
+    def __str__(self):
+        return f"Basic Profile of {self.user.username}"
+
+    
+    def validate_email(self, value):        
+        if BasicProfile.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Email is already in use.")
+        return value
+
+    def validate_mobile(self, value):
+        if value:
+            cleaned_value = re.sub(r'[^0-9]', '', value)
+            if len(cleaned_value) != 10:
+                raise serializers.ValidationError("Phone number must be exactly 10 digits.")
+            if not cleaned_value.startswith(('6', '7', '8', '9')):
+                raise serializers.ValidationError("Phone number must start with 6, 7, 8, or 9.")
+            return cleaned_value
+        return value
+
