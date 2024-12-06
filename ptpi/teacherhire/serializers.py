@@ -83,7 +83,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ['user', 'bio', 'profile_picture', 'phone_number', 'address', 'is_teacher', 'created_at', 'updated_at']
+        fields = '__all__'
 
     def create(self, validated_data):
         return UserProfile.objects.create(**validated_data)
@@ -389,3 +389,7 @@ class TeacherExamResultSerializer(serializers.ModelSerializer):
         fields = '__all__'
         
 
+class BasicProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BasicProfile
+        fields = '__all__'
