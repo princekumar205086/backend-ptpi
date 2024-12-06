@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.urls import path, include
 from teacherhire.views import *
 from rest_framework import routers
-#from .views import SubjectQuestionsView
 
 #access admin
 router = routers.DefaultRouter()
@@ -29,6 +28,7 @@ router.register(r'self/teacherskill', SingleTeacherSkillViewSet, basename='self-
 router.register(r'self/teacherAddress', SingleTeachersAddressViewSet, basename='self-teacherAddress')
 router.register(r'self/teacherqualification', SingleTeacherQualificationViewSet, basename='self-teacherqualification')
 router.register(r'self/teacherpreference', PreferenceViewSet, basename='teacher-preference')
+router.register(r'self/teacherjobpreferencelocation', JobPreferenceLocationViewSet, basename='teacher-jobpreferencelocation')
 
 urlpatterns = [
     path('', include(router.urls)),
