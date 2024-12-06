@@ -83,7 +83,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ['user', 'bio', 'profile_picture', 'phone_number', 'address', 'is_teacher', 'created_at', 'updated_at']
+        fields = '__all__'
 
     def create(self, validated_data):
         return UserProfile.objects.create(**validated_data)
@@ -374,6 +374,12 @@ class PreferenceSerializer(serializers.ModelSerializer):
         representation['prefered_subject'] = SubjectSerializer(instance.prefered_subject.all(), many=True).data
         return representation
     
+    def validate(self, data):
+        user = data.get('user')
+        if user and Preference.objects.filter(user=user).exists():
+            raise serializers.ValidationError({"user": "A preference entry for this user already exists."})
+        return data 
+    
 class TeacherSubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = TeacherSubject
@@ -389,3 +395,7 @@ class TeacherExamResultSerializer(serializers.ModelSerializer):
         fields = '__all__'
         
 
+class BasicProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BasicProfile
+        fields = '__all__'

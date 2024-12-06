@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
@@ -185,19 +184,6 @@ class TeacherSkill(models.Model):
 
     def __str__(self):
         return self.user.username
-
-class UserProfile(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="profile")
-    bio = models.TextField(blank=True, null=True)
-    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
-    phone_number = models.CharField(max_length=15, blank=True, null=True)
-    address = models.TextField(blank=True, null=True)
-    is_teacher = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"Profile of {self.user.username}"
     
 class Role(models.Model):
     jobrole_name = models.CharField(max_length=400, null=True, blank=True)
@@ -238,3 +224,52 @@ class TeacherExamResult(models.Model):
 
     def __str__(self):
         return self.correct_answer
+    
+class UserProfile(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="profile")
+    bio = models.TextField(blank=True, null=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
+    address = models.TextField(blank=True, null=True)
+    religion = models.CharField(max_length=100, blank=True, null=True)  
+    hometown = models.CharField(max_length=100, blank=True, null=True)  
+    pincode = models.CharField(max_length=10, blank=True, null=True) 
+    date_of_birth = models.DateField(blank=True, null=True)
+    marital_status = models.CharField(
+        max_length=20,
+        choices=[
+            ('single', 'Single'),
+            ('married', 'Married'),
+            ('unmarried', 'unmarried')
+        ],
+        blank=True,
+        null=True
+    ) 
+    gender = models.CharField(
+        max_length=10,
+        choices=[
+            ('male', 'Male'),
+            ('female', 'Female'),
+            ('other', 'Other')
+        ],
+        blank=True,
+        null=True
+    ) 
+    language = models.CharField(max_length=100, blank=True, null=True)
+    preferences = models.JSONField(blank=True, null=True) 
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Profile of {self.user.username}"
+
+class BasicProfile(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
+    name = models.CharField(max_length=120, null=True)
+    email = models.EmailField(null=True)
+    mobile = models.CharField(max_length=15, blank=True, null=True)
+    profileDp = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    location = models.CharField(max_length=12, null=True,blank=True)
+    def __str__(self):
+        return f"Basic Profile of {self.user.username}"
