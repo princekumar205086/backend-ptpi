@@ -218,8 +218,8 @@ class EducationalQulificationViewSet(viewsets.ModelViewSet):
         return Response({"count": count})
     
 class LevelViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]    
-    authentication_classes = [ExpiringTokenAuthentication]     
+    # permission_classes = [IsAuthenticated]    
+    # authentication_classes = [ExpiringTokenAuthentication]     
     queryset = Level.objects.all()
     serializer_class = LevelSerializer
 
@@ -314,8 +314,8 @@ class SingleTeacherSkillViewSet(viewsets.ModelViewSet):
 
     
 class SubjectViewSet(viewsets.ModelViewSet):    
-    permission_classes = [IsAuthenticated] 
-    authentication_classes = [ExpiringTokenAuthentication] 
+    # permission_classes = [IsAuthenticated] 
+    # authentication_classes = [ExpiringTokenAuthentication] 
     queryset = Subject.objects.all()
     serializer_class = SubjectSerializer
 
@@ -338,6 +338,7 @@ class TeacherViewSet(viewsets.ModelViewSet):
         return create_object(TeacherSerializer,request.data,Teacher)
     def destory(self,pk=None):
         return delete_object(Teacher,pk)
+    
     @action (detail=False,methods=['get'])
     def count(self,request):
         count = get_count(Teacher)
@@ -497,3 +498,30 @@ class TeacherClassCategoryViewSet(viewsets.ModelViewSet):
     def count(self,request):
         count = get_count(TeacherClassCategory)
         return Response({"Count":count})
+
+class TeacherExamResultViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]    
+    authentication_classes = [ExpiringTokenAuthentication]     
+    queryset = TeacherExamResult.objects.all()
+    serializer_class = TeacherExamResultSerializer
+
+    def create(self, request, *args, **kwargs):
+        # Add the authenticated user to the request data
+        data = request.data.copy()
+        data['user'] = request.user.id  # Set user to the currently authenticated user
+
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+    def destory(self,pk=None):
+        return delete_object(TeacherExamResult,pk)
+    @action (detail=False,methods=['get'])
+    def count(self,request):
+        count = get_count(TeacherExamResult)
+        return Response({"Count":count})    
+    
+class BasicProfileViewSet(viewsets.ModelViewSet):
+    queryset = BasicProfile.objects.all()
+    serializer_class = BasicProfileSerializer
