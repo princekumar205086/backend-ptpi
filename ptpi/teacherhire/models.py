@@ -1,7 +1,4 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
-
-from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 class CustomUserManager(BaseUserManager):
@@ -238,3 +235,14 @@ class TeacherExamResult(models.Model):
 
     def __str__(self):
         return self.correct_answer
+    
+class JobPreferenceLocation(models.Model):
+    preference = models.ForeignKey(Preference, on_delete=models.CASCADE)
+    state = models.CharField(max_length=200,null=True, blank=True)
+    city = models.CharField(max_length=200,null=True, blank=True)
+    sub_division = models.CharField(max_length=200,null=True, blank=True)
+    block = models.CharField(max_length=200,null=True, blank=True)
+    area = models.TextField(null=True, blank=True)
+    pincode = models.CharField(max_length=6, null=True, blank=True)
+    def __str__(self):
+        return self.preference.user.username

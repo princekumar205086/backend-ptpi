@@ -521,3 +521,11 @@ class TeacherExamResultViewSet(viewsets.ModelViewSet):
     def count(self,request):
         count = get_count(TeacherExamResult)
         return Response({"Count":count})    
+
+class JobPreferenceLocationViewSet(viewsets.ModelViewSet):    
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [ExpiringTokenAuthentication] 
+    queryset= JobPreferenceLocation.objects.all()
+    serializer_class = JobPreferenceLocationSerializer
+    
+    
