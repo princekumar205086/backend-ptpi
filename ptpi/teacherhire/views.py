@@ -38,11 +38,6 @@ def check_for_duplicate(model_class, **kwargs):
 def create_object(serializer_class, request_data, model_class):
     serializer = serializer_class(data=request_data)
     if serializer.is_valid():
-        # if check_for_duplicate(model_class, **serializer.validated_data):
-        #     return Response(
-        #         {'message': f'Duplicate entry: {model_class.__name__} already exists.'},
-        #         status=status.HTTP_400_BAD_REQUEST
-        #     )
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -56,11 +51,6 @@ def create_auth_data(self, serializer_class, request_data, model_class, *args, *
         )
     serializer = serializer_class(data=request_data)
     if serializer.is_valid():
-        if check_for_duplicate(model_class, **serializer.validated_data):
-            return Response(
-                {'message': f'Duplicate entry: {model_class.__name__} already exists.'},
-                status=status.HTTP_400_BAD_REQUEST
-        )
         serializer.save(user=self.request.user)  
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -218,13 +208,10 @@ class EducationalQulificationViewSet(viewsets.ModelViewSet):
         return Response({"count": count})
     
 class LevelViewSet(viewsets.ModelViewSet):
-    # permission_classes = [IsAuthenticated]    
-    # authentication_classes = [ExpiringTokenAuthentication]     
+    permission_classes = [IsAuthenticated]    
+    authentication_classes = [ExpiringTokenAuthentication]     
     queryset = Level.objects.all()
     serializer_class = LevelSerializer
-
-    def create(self,request):
-        return create_object(LevelSerializer,request.data,Level)
     
     def destroy(self,request, pk=None):
         return delete_object(Level,pk)
@@ -270,9 +257,6 @@ class SkillViewSet(viewsets.ModelViewSet):
     queryset = Skill.objects.all()
     serializer_class = SkillSerializer
 
-    def create(self, request):
-        return create_object(SkillSerializer, request.data, Skill)
-
     @action(detail=False, methods=['get'])
     def count(self, request):
         count = get_count(Skill)
@@ -316,13 +300,10 @@ class SingleTeacherSkillViewSet(viewsets.ModelViewSet):
 
     
 class SubjectViewSet(viewsets.ModelViewSet):    
-    # permission_classes = [IsAuthenticated] 
-    # authentication_classes = [ExpiringTokenAuthentication] 
+    permission_classes = [IsAuthenticated] 
+    authentication_classes = [ExpiringTokenAuthentication] 
     queryset = Subject.objects.all()
     serializer_class = SubjectSerializer
-
-    def create(self,request):
-        return create_object(SubjectSerializer,request.data,Subject)
     
     @action (detail=False,methods=['get'])
     def count(self,request):
@@ -372,8 +353,6 @@ class ClassCategoryViewSet(viewsets.ModelViewSet):
     queryset= ClassCategory.objects.all()
     serializer_class = ClassCategorySerializer
 
-    def create(self,request):
-        return create_object(ClassCategorySerializer,request.data,ClassCategory)
     def destroy(self,pk=None):
         return delete_object(ClassCategory,pk)
     @action (detail=False,methods=['get'])

@@ -173,17 +173,50 @@ class SubjectSerializer(serializers.ModelSerializer):
         model = Subject
         fields = ['id', 'subject_name', 'subject_description']
 
+    def validate_subject_name(self, value):
+        if Subject.objects.filter(subject_name=value).exists():
+            raise serializers.ValidationError("A subject with this name already exists.")
+        return value
+
+
 class ClassCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ClassCategory
         fields = ['id', 'name']
 
+    def validate_name(self, value):
+        if ClassCategory.objects.filter(name=value).exists():
+            raise serializers.ValidationError("A classcategory with this name already exists.")
+        return value
 
 class LevelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Level
-        fields = '__all__'
+        fields = ['name','description']
+    
+    def validate_name(self, value):
+        if Level.objects.filter(name=value).exists():
+            raise serializers.ValidationError("A level with this name already exists.")
+        return value
 
+class SkillSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(max_length=20, required=False, allow_null=True)
+
+    class Meta:
+        model = Skill
+        fields = "__all__"
+
+    def validate_name(self, value):
+        if value is not None:
+            if len(value) < 3:
+                raise serializers.ValidationError("Skill name must be at least 3 characters.")
+        return value
+    
+    def validate_name(self, value):
+        if Skill.objects.filter(name=value).exists():
+            raise serializers.ValidationError("A skil with this name already exists.")
+        return value
+    
 
 class TeachersAddressSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(), required=False)
@@ -278,19 +311,6 @@ class TeacherSerializer(serializers.ModelSerializer):
         teacherSkills = TeacherSkill.objects.filter(user=obj.user)
         return TeacherSkillSerializer(teacherSkills, many=True).data
 
-
-class SkillSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(max_length=20, required=False, allow_null=True)
-
-    class Meta:
-        model = Skill
-        fields = "__all__"
-
-    def validate_name(self, value):
-        if value is not None:
-            if len(value) < 3:
-                raise serializers.ValidationError("Skill name must be at least 3 characters.")
-        return value
 
 
 class QuestionSerializer(serializers.ModelSerializer):
@@ -397,6 +417,8 @@ class TeacherSubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = TeacherSubject
         fields = '__all__'
+
+        
 class TeacherClassCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = TeacherClassCategory
