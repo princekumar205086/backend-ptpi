@@ -347,8 +347,7 @@ class ClassCategoryViewSet(viewsets.ModelViewSet):
 
     def create(self,request):
         return create_object(ClassCategorySerializer,request.data,ClassCategory)
-    def destroy(self,pk=None):
-        return delete_object(ClassCategory,pk)
+    
     @action (detail=False,methods=['get'])
     def count(self,request):
         count = get_count(ClassCategory)
@@ -511,8 +510,7 @@ class SingleTeacherSubjectViewSet(viewsets.ModelViewSet):
         return create_auth_data(self, TeacherSubjectSerializer, request.data, TeacherSubject)
     def get_queryset(self):
         return TeacherSubject.objects.filter(user=self.request.user)
-    def destroy(self, request, pk=None):
-        return delete_object(TeacherSubject, pk) 
+   
 
 class TeacherClassCategoryViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]    
