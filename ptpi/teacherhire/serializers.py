@@ -173,7 +173,6 @@ class SubjectSerializer(serializers.ModelSerializer):
         model = Subject
         fields = ['id', 'subject_name', 'subject_description']
 
-
 class ClassCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ClassCategory
@@ -200,7 +199,7 @@ class TeachersAddressSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Pincode must be exactly 6 digits.")        
         return value
 
-
+   
 class TeacherSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(), required=False)
     aadhar_no = serializers.CharField(max_length=12, required=False, allow_null=True)
@@ -338,7 +337,7 @@ class TeacherSkillSerializer(serializers.ModelSerializer):
         representation['user'] = UserSerializer(instance.user).data
         representation['skill'] = SkillSerializer(instance.skill).data
         return representation
-
+    
 
 class EducationalQualificationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -359,6 +358,12 @@ class TeacherQualificationSerializer(serializers.ModelSerializer):
         representation['user'] = UserSerializer(instance.user).data
         representation['qualification'] = EducationalQualificationSerializer(instance.qualification).data
         return representation
+    
+    def validate(self, data):
+        user = data.get('user')
+        if user and TeacherQualification.objects.filter(user=user).exists():
+            raise serializers.ValidationError({"user": "A teacher  pqualification entry for this user already exists."})
+        return data 
     
 class RoleSerializer(serializers.ModelSerializer):
     class Meta:
@@ -407,7 +412,6 @@ class TeacherExamResultSerializer(serializers.ModelSerializer):
         if user and TeacherExamResult.objects.filter(user=user).exists():
             raise serializers.ValidationError({"user": "A teacherexamresult entry for this user already exists."})
         return data 
-    
         
 class JobPreferenceLocationSerializer(serializers.ModelSerializer):
     preference = serializers.PrimaryKeyRelatedField(queryset=Preference.objects.all(), required=False)
