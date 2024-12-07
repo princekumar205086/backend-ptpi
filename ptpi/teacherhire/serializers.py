@@ -394,9 +394,18 @@ class PreferenceSerializer(serializers.ModelSerializer):
         return data 
     
 class TeacherSubjectSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(), required=False)
+    subject = serializers.PrimaryKeyRelatedField(queryset=Subject.objects.all(), required=True)
     class Meta:
         model = TeacherSubject
         fields = '__all__'
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['user'] = UserSerializer(instance.user).data
+        representation['subject'] = SubjectSerializer(instance.subject).data
+        return representation
+    
 class TeacherClassCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = TeacherClassCategory

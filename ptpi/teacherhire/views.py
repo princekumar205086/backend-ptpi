@@ -42,7 +42,7 @@ def create_object(serializer_class, request_data, model_class):
         #     return Response(
         #         {'message': f'Duplicate entry: {model_class.__name__} already exists.'},
         #         status=status.HTTP_400_BAD_REQUEST
-        #     )
+            # )
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -56,11 +56,11 @@ def create_auth_data(self, serializer_class, request_data, model_class, *args, *
         )
     serializer = serializer_class(data=request_data)
     if serializer.is_valid():
-        if check_for_duplicate(model_class, **serializer.validated_data):
-            return Response(
-                {'message': f'Duplicate entry: {model_class.__name__} already exists.'},
-                status=status.HTTP_400_BAD_REQUEST
-        )
+        # if check_for_duplicate(model_class, **serializer.validated_data):
+        #     return Response(
+        #         {'message': f'Duplicate entry: {model_class.__name__} already exists.'},
+        #         status=status.HTTP_400_BAD_REQUEST
+        # )
         serializer.save(user=self.request.user)  
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -502,6 +502,19 @@ class TeacherSubjectViewSet(viewsets.ModelViewSet):
     def count(self,request):
         count = get_count(TeacherSubject)
         return Response({"Count":count})
+    
+class SingleTeacherSubjectViewSet(viewsets.ModelViewSet): 
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [ExpiringTokenAuthentication]
+    queryset = TeacherSubject.objects.all()
+    serializer_class = TeacherSubjectSerializer
+
+    def create(self, request, *args, **kwargs):
+        return create_auth_data(self, TeacherSubjectSerializer, request.data, TeacherSubject)
+    def get_queryset(self):
+        return TeacherSubject.objects.filter(user=self.request.user)
+    def destroy(self, request, pk=None):
+        return delete_object(TeacherSubject, pk) 
 
 class TeacherClassCategoryViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]    
