@@ -189,20 +189,6 @@ class TeacherSkill(models.Model):
     def __str__(self):
         return self.user.username
 
-class UserProfile(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="profile")
-    bio = models.TextField(blank=True, null=True)
-    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
-    phone_number = models.CharField(max_length=15, blank=True, null=True)
-    address = models.TextField(blank=True, null=True)
-    is_teacher = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"Profile of {self.user.username}"
-    
-
 class Preference(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     job_role = models.ForeignKey(Role, on_delete=models.CASCADE,default=1)
@@ -257,3 +243,43 @@ class JobPreferenceLocation(models.Model):
     pincode = models.CharField(max_length=6, null=True, blank=True)
     def __str__(self):
         return self.preference.user.username
+    
+    
+    
+class UserProfile(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="profile", null=True)
+    bio = models.TextField(blank=True, null=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
+    address = models.TextField(blank=True, null=True)
+    religion = models.CharField(max_length=100, blank=True, null=True)  
+    hometown = models.CharField(max_length=100, blank=True, null=True)  
+    pincode = models.CharField(max_length=10, blank=True, null=True) 
+    date_of_birth = models.DateField(blank=True, null=True)
+    marital_status = models.CharField(
+        max_length=20,
+        choices=[
+            ('single', 'Single'),
+            ('married', 'Married'),
+            ('unmarried', 'unmarried')
+        ],
+        blank=True,
+        null=True
+    ) 
+    gender = models.CharField(
+        max_length=10,
+        choices=[
+            ('male', 'Male'),
+            ('female', 'Female'),
+            ('other', 'Other')
+        ],
+        blank=True,
+        null=True
+    ) 
+    language = models.CharField(max_length=100, blank=True, null=True)
+    preferences = models.JSONField(blank=True, null=True) 
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    def __str__(self):
+        return f"Profile of {self.user.username}"
