@@ -430,22 +430,18 @@ class BasicProfileSerializer(serializers.ModelSerializer):
         model = BasicProfile
         fields = '__all__'
 
-    def __str__(self):
-        return f"Basic Profile of {self.user.username}"
+    # def validate_email(self, value):        
+    #     if BasicProfile.objects.filter(email=value).exists():
+    #         raise serializers.ValidationError("Email is already in use.")
+    #     return value
 
-    
-    def validate_email(self, value):        
-        if BasicProfile.objects.filter(email=value).exists():
-            raise serializers.ValidationError("Email is already in use.")
-        return value
-
-    def validate_mobile(self, value):
-        if value:
-            cleaned_value = re.sub(r'[^0-9]', '', value)
-            if len(cleaned_value) != 10:
-                raise serializers.ValidationError("Phone number must be exactly 10 digits.")
-            if not cleaned_value.startswith(('6', '7', '8', '9')):
-                raise serializers.ValidationError("Phone number must start with 6, 7, 8, or 9.")
-            return cleaned_value
-        return value
+    # def validate_mobile(self, value):
+    #     if value:
+    #         cleaned_value = re.sub(r'[^0-9]', '', value)
+    #         if len(cleaned_value) != 10:
+    #             raise serializers.ValidationError("Phone number must be exactly 10 digits.")
+    #         if not cleaned_value.startswith(('6', '7', '8', '9')):
+    #             raise serializers.ValidationError("Phone number must start with 6, 7, 8, or 9.")
+    #         return cleaned_value
+    #     return value
 
