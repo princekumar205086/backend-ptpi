@@ -84,6 +84,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
+        if 'user' not in validated_data:
+            validated_data['user'] = self.context['request'].user
         return UserProfile.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
