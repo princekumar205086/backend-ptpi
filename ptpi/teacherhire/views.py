@@ -135,8 +135,17 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     authentication_classes = [ExpiringTokenAuthentication]   
     queryset = UserProfile.objects.all().select_related('user')
     serializer_class = UserProfileSerializer
-    def create(self,request,*args, **kwargs):
-        return create_auth_data(self, UserProfileSerializer, request.data,UserProfile)
+    
+    def create(self, request, *args, **kwargs):
+        data = request.data.copy()
+        data['user'] = request.user.id
+        serializer = self.get_serializer(data=data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
     def get_queryset(self):
         user = self.request.user
         if user.is_authenticated:
