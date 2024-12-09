@@ -1,20 +1,13 @@
-from django.shortcuts import render, get_object_or_404, redirect
 from rest_framework.response import Response
 from rest_framework import viewsets
 from rest_framework.authtoken.models import Token
-from django.contrib.auth.models import User
 from rest_framework.views import APIView
-from django.contrib.auth import authenticate,login
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.authentication import TokenAuthentication
 from rest_framework import status
 from teacherhire.models import *
 from teacherhire.serializers import *
-from rest_framework.exceptions import NotFound, ValidationError
 from .authentication import ExpiringTokenAuthentication  
-from datetime import timedelta, datetime
 from rest_framework.decorators import action
-from rest_framework.exceptions import AuthenticationFailed
 from .permissions import IsRecruiterPermission, IsAdminPermission 
 import uuid  
 from .models import Level, Subject, Question, ClassCategory

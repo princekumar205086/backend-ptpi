@@ -1,7 +1,5 @@
-from django.contrib.auth import authenticate
 from rest_framework import serializers
 import re
-from teacherhire.models import Subject, UserProfile, Teacher, ClassCategory, Skill, TeacherSkill, TeacherQualification, TeacherExperiences, CustomUser
 from teacherhire.models import *
 import random
 from rest_framework.exceptions import ValidationError
