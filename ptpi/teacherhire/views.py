@@ -10,6 +10,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework import status
 from teacherhire.models import *
 from teacherhire.serializers import *
+from rest_framework.exceptions import NotFound, ValidationError
 from .authentication import ExpiringTokenAuthentication  
 from datetime import timedelta, datetime
 from rest_framework.decorators import action
@@ -135,15 +136,63 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     authentication_classes = [ExpiringTokenAuthentication]   
     queryset = UserProfile.objects.all().select_related('user')
     serializer_class = UserProfileSerializer
-    def create(self,request,*args, **kwargs):
-        return create_auth_data(self, UserProfileSerializer, request.data,UserProfile)
-    def get_queryset(self):
-        user = self.request.user
-        if user.is_authenticated:
-            return UserProfile.objects.filter(user=self.request.user)
-        else:
-            return UserProfile.objects.none()
     
+    def create(self, request, *args, **kwargs):        
+        try:
+            data = request.data.copy()
+            data['user'] = request.user.id 
+            serializer = self.get_serializer(data=data)
+
+            if serializer.is_valid():
+                self.perform_create(serializer)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        except Exception as e:
+            return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def update(self, request, *args, **kwargs):        
+        try:
+            partial = kwargs.pop('partial', False)
+            instance = self.get_object()
+            serializer = self.get_serializer(instance, data=request.data, partial=partial)
+            
+            if serializer.is_valid():
+                self.perform_update(serializer)
+                return Response(serializer.data)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except NotFound:
+            return Response({'detail': 'Profile not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def destroy(self, request, *args, **kwargs):       
+        try:
+            instance = self.get_object()
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        except NotFound:
+            return Response({'detail': 'Profile not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def get_queryset(self):        
+        try:
+            user = self.request.user
+            if user.is_authenticated:
+                return UserProfile.objects.filter(user=user)
+            else:
+                return UserProfile.objects.none()
+
+        except Exception as e:
+            return UserProfile.objects.none()
+
 #TeacerAddress GET ,CREATE ,DELETE 
 class TeachersAddressViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated,IsRecruiterPermission]
@@ -573,13 +622,20 @@ class BasicProfileViewSet(viewsets.ModelViewSet):
     authentication_classes = [ExpiringTokenAuthentication]
     queryset = BasicProfile.objects.all()
     serializer_class = BasicProfileSerializer
-    def create(self,request,*args, **kwargs):
-        return create_auth_data(self, BasicProfileSerializer, request.data,BasicProfile)
+
+    def create(self, request, *args, **kwargs):
+        data = request.data.copy()
+        data['user'] = request.user.id
+        serializer = self.get_serializer(data=data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
     def get_queryset(self):
         user = self.request.user
         if user.is_authenticated:
-            return BasicProfile.objects.filter(user=self.request.user)
+            return BasicProfile.objects.filter(user=user)
         else:
             return BasicProfile.objects.none()
-    
-    
