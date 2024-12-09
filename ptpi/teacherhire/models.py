@@ -179,7 +179,11 @@ class Question(models.Model):
         ordering = ['created_at']
 
     def __str__(self):
-        return f"{self.subject.subject_name} - {self.level.name} - {self.text[:50]}"
+        subject_name = getattr(self.subject, 'subject_name', 'Unknown Subject')
+        level_name = getattr(self.level, 'name', 'Unknown Level')
+        text_preview = self.text[:50] if self.text else "No text"
+        return f"{subject_name} - {level_name} - {text_preview}"
+
 
 class TeacherSkill(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
