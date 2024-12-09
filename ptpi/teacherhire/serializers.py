@@ -458,22 +458,18 @@ class JobPreferenceLocationSerializer(serializers.ModelSerializer):
         
 
 class BasicProfileSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(queryset=BasicProfile.objects.all(), required=False)
     class Meta:
         model = BasicProfile
         fields = '__all__'
 
-    # def validate_email(self, value):        
-    #     if BasicProfile.objects.filter(email=value).exists():
-    #         raise serializers.ValidationError("Email is already in use.")
-    #     return value
-
-    # def validate_mobile(self, value):
-    #     if value:
-    #         cleaned_value = re.sub(r'[^0-9]', '', value)
-    #         if len(cleaned_value) != 10:
-    #             raise serializers.ValidationError("Phone number must be exactly 10 digits.")
-    #         if not cleaned_value.startswith(('6', '7', '8', '9')):
-    #             raise serializers.ValidationError("Phone number must start with 6, 7, 8, or 9.")
-    #         return cleaned_value
-    #     return value
+    def validate_mobile(self, value):
+        if value:
+            cleaned_value = re.sub(r'[^0-9]', '', value)
+            if len(cleaned_value) != 10:
+                raise serializers.ValidationError("Phone number must be exactly 10 digits.")
+            if not cleaned_value.startswith(('6', '7', '8', '9')):
+                raise serializers.ValidationError("Phone number must start with 6, 7, 8, or 9.")
+            return cleaned_value
+        return value
 
