@@ -78,7 +78,6 @@ class LoginSerializer(serializers.Serializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):    
-    user = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(), required=False)    
     class Meta:
         model = UserProfile
         fields = '__all__'
