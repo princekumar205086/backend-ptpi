@@ -463,11 +463,6 @@ class BasicProfileSerializer(serializers.ModelSerializer):
         model = BasicProfile
         fields = '__all__'
 
-    def validate_email(self, value):        
-        if BasicProfile.objects.filter(email=value).exists():
-            raise serializers.ValidationError("Email is already in use.")
-        return value
-
     def validate_mobile(self, value):
         if value:
             cleaned_value = re.sub(r'[^0-9]', '', value)

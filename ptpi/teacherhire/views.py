@@ -629,7 +629,6 @@ class BasicProfileViewSet(viewsets.ModelViewSet):
         
         if BasicProfile.objects.filter(user=request.user).exists():
             return Response({"detail": "Profile already exists."}, status=status.HTTP_400_BAD_REQUEST)
-
         serializer = self.get_serializer(data=data)
         if serializer.is_valid():
             self.perform_create(serializer)
