@@ -455,7 +455,11 @@ class JobPreferenceLocationSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['preference'] = PreferenceSerializer(instance.preference).data
         return representation
-        
+    
+    def validate_area(self, value):
+        if JobPreferenceLocation.objects.filter(area=value).exists():
+            raise serializers.ValidationError("A area with this name already exists.")
+        return value   
 
 class BasicProfileSerializer(serializers.ModelSerializer):
     class Meta:
