@@ -637,4 +637,12 @@ class BasicProfileViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return BasicProfile.objects.filter(user=self.request.user)
+    
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        profile = queryset.first()
+        if profile:
+            serializer = self.get_serializer(profile)
+            return Response(serializer.data)
+        return Response({"detail": "profile not found"}, status=status.HTTP_404_NOT_FOUND)
         
