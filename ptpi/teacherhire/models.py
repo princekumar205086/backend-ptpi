@@ -252,25 +252,25 @@ class JobPreferenceLocation(models.Model):
     
     
 class UserProfile(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="profile", null=True)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="user_profile", null=True)
     bio = models.TextField(blank=True, null=True)
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
-    religion = models.CharField(max_length=100, blank=True, null=True)  
-    hometown = models.CharField(max_length=100, blank=True, null=True)  
-    pincode = models.CharField(max_length=10, blank=True, null=True) 
+    religion = models.CharField(max_length=100, blank=True, null=True)
+    hometown = models.CharField(max_length=100, blank=True, null=True)
+    pincode = models.CharField(max_length=10, blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
     marital_status = models.CharField(
         max_length=20,
         choices=[
             ('single', 'Single'),
             ('married', 'Married'),
-            ('unmarried', 'unmarried')
+            ('unmarried', 'Unmarried')
         ],
         blank=True,
         null=True
-    ) 
+    )
     gender = models.CharField(
         max_length=10,
         choices=[
@@ -280,11 +280,21 @@ class UserProfile(models.Model):
         ],
         blank=True,
         null=True
-    ) 
+    )
     language = models.CharField(max_length=100, blank=True, null=True)
-    preferences = models.JSONField(blank=True, null=True) 
-    
+    preferences = models.JSONField(blank=True, null=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
     def __str__(self):
         return f"Profile of {self.user.username}"
+
+
+class Report(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="user_reports", null=True)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Report by {self.user.username} on {self.question.id}"
