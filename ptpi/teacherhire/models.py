@@ -164,7 +164,6 @@ class Question(models.Model):
     time = models.FloatField(default=2.5)
     text = models.CharField(max_length=2000)
     options = models.JSONField()
-    report = models.CharField(max_length=200, default=1, blank=True,null=True)
     correct_option = models.PositiveIntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -230,6 +229,7 @@ class TeacherExamResult(models.Model):
     user = models.ForeignKey(CustomUser,on_delete=models.CASCADE)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     correct_answer = models.IntegerField(default=0, null=True, blank=True)
+    is_unanswered = models.IntegerField(null=True, blank=True)
     incorrect_answer = models.IntegerField(default=0, null=True, blank=True)
     isqulified = models.BooleanField(default=False)
     level = models.ForeignKey(Level, on_delete=models.CASCADE)
