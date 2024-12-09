@@ -626,13 +626,17 @@ class BasicProfileViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         data = request.data.copy()
         data['user'] = request.user.id
+        
+        if BasicProfile.objects.filter(user=request.user).exists():
+            return Response({"detail": "Profile already exists."}, status=status.HTTP_400_BAD_REQUEST)
+
         serializer = self.get_serializer(data=data)
         if serializer.is_valid():
             self.perform_create(serializer)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({"Message":"Basic Profile Insert Successfully"},serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
     def get_queryset(self):
         return BasicProfile.objects.filter(user=self.request.user)
         
