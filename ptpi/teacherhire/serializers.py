@@ -458,7 +458,6 @@ class JobPreferenceLocationSerializer(serializers.ModelSerializer):
         
 
 class BasicProfileSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=BasicProfile.objects.all(), required=False)
     class Meta:
         model = BasicProfile
         fields = '__all__'
