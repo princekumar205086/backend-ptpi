@@ -56,6 +56,14 @@ def create_auth_data(self, serializer_class, request_data, model_class, *args, *
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+def get_single_object(viewset):
+    queryset = viewset.get_queryset()
+    profile = queryset.first()
+    if profile:
+        serializer = viewset.get_serializer(profile)
+        return Response(serializer.data)
+    return Response({"detail": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
+
 def get_count(model_class):
     return model_class.objects.count()
 
@@ -153,12 +161,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         return UserProfile.objects.filter(user=self.request.user)
     
     def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        profile = queryset.first()
-        if profile:
-            serializer = self.get_serializer(profile)
-            return Response(serializer.data)
-        return Response({"detail": "Userprofile not found"}, status=status.HTTP_404_NOT_FOUND)
+        return get_single_object(self, request)
         
 
 #TeacerAddress GET ,CREATE ,DELETE 
@@ -193,6 +196,9 @@ class SingleTeachersAddressViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         return TeachersAddress.objects.filter(user=self.request.user)
+    
+    def list(self, request, *args, **kwargs):
+        return get_single_object(self, request)
 
 
 class EducationalQulificationViewSet(viewsets.ModelViewSet):   
@@ -306,6 +312,10 @@ class SingleTeacherSkillViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return TeacherSkill.objects.filter(user=self.request.user)
     
+    def list(self, request, *args, **kwargs):
+        return get_single_object(self)
+
+    
     
 class SubjectViewSet(viewsets.ModelViewSet):    
     permission_classes = [IsAuthenticated] 
@@ -347,12 +357,16 @@ class SingleTeacherViewSet(viewsets.ModelViewSet):
 
     def create(self,request,*args, **kwargs):
         return create_auth_data(self, TeacherSerializer, request.data, Teacher)
+    
     def get_queryset(self):
         user = self.request.user
         if user.is_authenticated:
             return Teacher.objects.filter(user=self.request.user)
         else:
             return Teacher.objects.none()
+        
+    def list(self, request, *args, **kwargs):
+        return get_single_object(self, request)
     
     
     
@@ -400,8 +414,12 @@ class SingleTeacherQualificationViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         return create_auth_data(self, TeacherQualificationSerializer, request.data, TeacherQualification)
+    
     def get_queryset(self):
         return TeacherQualification.objects.filter(user=self.request.user)
+    
+    def list(self, request, *args, **kwargs):
+        return get_single_object(self, request)
     
     
     
@@ -433,6 +451,8 @@ class SingleTeacherExperiencesViewSet(viewsets.ModelViewSet):
         return create_auth_data(self, TeacherExperiencesSerializer, request.data, TeacherExperiences)
     def get_queryset(self):
         return TeacherExperiences.objects.filter(user=self.request.user)
+    def list(self, request, *args, **kwargs):
+        return get_single_object(self, request)
     
     
 class QuestionViewSet(viewsets.ModelViewSet):
@@ -527,6 +547,8 @@ class SingleTeacherSubjectViewSet(viewsets.ModelViewSet):
         return create_auth_data(self, TeacherSubjectSerializer, request.data, TeacherSubject)
     def get_queryset(self):
         return TeacherSubject.objects.filter(user=self.request.user)
+    def list(self, request, *args, **kwargs):
+        return get_single_object(self, request)
    
 
 class TeacherClassCategoryViewSet(viewsets.ModelViewSet):
@@ -607,10 +629,5 @@ class BasicProfileViewSet(viewsets.ModelViewSet):
         return BasicProfile.objects.filter(user=self.request.user)
     
     def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        profile = queryset.first()
-        if profile:
-            serializer = self.get_serializer(profile)
-            return Response(serializer.data)
-        return Response({"detail": "profile not found"}, status=status.HTTP_404_NOT_FOUND)
+        return get_single_object(self, request)
         
