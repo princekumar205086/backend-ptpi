@@ -22,16 +22,21 @@ class UserSerializer(serializers.ModelSerializer):
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
+    Fname = serializers.CharField(required=True)
+    Lname = serializers.CharField(required=True)
     # email = serializers.EmailField(write_only=True, required=True)
 
     class Meta:
         model = CustomUser
-        fields = ['email', 'password']
+        fields = ['email', 'password', 'Fname', 'Lname']
+
 
     def create(self, validated_data):
         email = validated_data['email']
         base_username = email.split('@')[0]
         username = base_username
+        Fname = validated_data['Fname']
+        Lname = validated_data['Lname']
         if CustomUser.objects.filter(email=email).exists():
             raise ValidationError({'email': 'Email is already in use.'})
         while CustomUser.objects.filter(username=username).exists():
@@ -40,7 +45,9 @@ class RegisterSerializer(serializers.ModelSerializer):
             user = CustomUser.objects.create_user(
                 username=username,
                 email=email,
-                password=validated_data['password']
+                password=validated_data['password'],
+                Fname=Fname,
+                Lname=Lname
             )
         except Exception as e:
             raise ValidationError({'error': str(e)})

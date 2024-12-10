@@ -90,6 +90,7 @@ class LoginUser(APIView):
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
+        
 
         try:
             user = CustomUser.objects.get(email=email)
