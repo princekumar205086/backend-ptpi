@@ -588,6 +588,7 @@ class BasicProfileViewSet(viewsets.ModelViewSet):
     authentication_classes = [ExpiringTokenAuthentication]
     queryset = BasicProfile.objects.all()
     serializer_class = BasicProfileSerializer
+    
     def create(self, request, *args, **kwargs):
         data = request.data.copy()
         data['user'] = request.user.id

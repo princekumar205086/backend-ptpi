@@ -419,9 +419,15 @@ class JobPreferenceLocationSerializer(serializers.ModelSerializer):
         return value   
 
 class BasicProfileSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(), required=False)
     class Meta:
         model = BasicProfile
         fields = '__all__'
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['user'] = UserSerializer(instance.user).data
+        return representation
 
     def validate_mobile(self, value):
         if value:

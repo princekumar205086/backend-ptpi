@@ -215,7 +215,6 @@ class BasicProfile(models.Model):
     bio = models.TextField(blank=True, null=True)
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
-    address = models.ForeignKey(TeachersAddress, on_delete=models.CASCADE, related_name="user_address", blank=True, null=True)
     religion = models.CharField(max_length=100, blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
     marital_status = models.CharField(
@@ -239,7 +238,6 @@ class BasicProfile(models.Model):
         null=True
     )
     language = models.CharField(max_length=100, blank=True, null=True)
-    preferences = models.ForeignKey(Preference, on_delete=models.CASCADE, related_name="user_preference", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
