@@ -67,22 +67,20 @@ class RegisterUser(APIView):
 
         if not serializer.is_valid():
             return Response({
-                'status': 403,
                 'error': serializer.errors,
                 # Todo
                 'message': 'Something went wrong'
-            })
+            }, status=status.HTTP_403_FORBIDDEN)
         
         serializer.save()
         user = CustomUser.objects.get(email=serializer.data['email'])
         token_obj, __ = Token.objects.get_or_create(user=user)
 
         return Response({
-            'status': 200,
             'payload': serializer.data,
             'token': str(token_obj),
             'message': 'Your data is saved'
-        })
+        },status=status.HTTP_200_OK)
     
 
 def generate_refresh_token():
