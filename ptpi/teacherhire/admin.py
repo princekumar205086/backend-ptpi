@@ -36,8 +36,8 @@ class JobPreferenceLocationAdmin(admin.ModelAdmin):
     list_display = ['preference', 'state', 'city', 'sub_division', 'block', 'area', 'pincode']
 
 @admin.register(BasicProfile)
-class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ['user', 'bio', 'profile_picture', 'phone_number', 'address', 'religion', 'hometown', 'pincode', 'date_of_birth', 'marital_status','gender', 'language']
+class BasicProfileAdmin(admin.ModelAdmin):
+    list_display = ['user', 'bio', 'profile_picture', 'phone_number', 'religion', 'date_of_birth', 'marital_status','gender', 'language']
     
 @admin.register(TeachersAddress)
 class TeachersAddressAdmin(admin.ModelAdmin):
