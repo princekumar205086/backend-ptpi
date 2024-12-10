@@ -70,7 +70,6 @@ class LoginSerializer(serializers.Serializer):
         if not user.check_password(password):
             raise ValidationError({'password': 'Incorrect password.'})
         
-        
         is_admin = user.is_staff
         is_recruiter = user.is_recruiter
         if is_admin and is_recruiter:
@@ -420,6 +419,9 @@ class JobPreferenceLocationSerializer(serializers.ModelSerializer):
 
 class BasicProfileSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(), required=False)
+    bio = models.CharField(max_length=100, blank=True, null=True)    
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
+    religion = models.CharField(max_length=15, blank=True, null=True)
     class Meta:
         model = BasicProfile
         fields = '__all__'
