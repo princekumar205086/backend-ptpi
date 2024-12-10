@@ -154,7 +154,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         return UserProfile.objects.filter(user=self.request.user)
     
     def list(self, request, *args, **kwargs):
-        return get_single_object(self, request)
+        return get_single_object(self)
         
 
 #TeacerAddress GET ,CREATE ,DELETE 
@@ -191,7 +191,7 @@ class SingleTeachersAddressViewSet(viewsets.ModelViewSet):
         return TeachersAddress.objects.filter(user=self.request.user)
     
     def list(self, request, *args, **kwargs):
-        return get_single_object(self, request)
+        return get_single_object(self)
 
 
 class EducationalQulificationViewSet(viewsets.ModelViewSet):   
@@ -359,7 +359,7 @@ class SingleTeacherViewSet(viewsets.ModelViewSet):
             return Teacher.objects.none()
         
     def list(self, request, *args, **kwargs):
-        return get_single_object(self, request)
+        return get_single_object(self)
     
     
     
@@ -412,7 +412,7 @@ class SingleTeacherQualificationViewSet(viewsets.ModelViewSet):
         return TeacherQualification.objects.filter(user=self.request.user)
     
     def list(self, request, *args, **kwargs):
-        return get_single_object(self, request)
+        return get_single_object(self)
     
     
     
@@ -445,7 +445,7 @@ class SingleTeacherExperiencesViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return TeacherExperiences.objects.filter(user=self.request.user)
     def list(self, request, *args, **kwargs):
-        return get_single_object(self, request)
+        return get_single_object(self)
     
     
 class QuestionViewSet(viewsets.ModelViewSet):
@@ -541,7 +541,7 @@ class SingleTeacherSubjectViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return TeacherSubject.objects.filter(user=self.request.user)
     def list(self, request, *args, **kwargs):
-        return get_single_object(self, request)
+        return get_single_object(self)
    
 
 class TeacherClassCategoryViewSet(viewsets.ModelViewSet):
@@ -622,5 +622,5 @@ class BasicProfileViewSet(viewsets.ModelViewSet):
         return BasicProfile.objects.filter(user=self.request.user)
     
     def list(self, request, *args, **kwargs):
-        return get_single_object(self, request)
+        return get_single_object(self)
         
