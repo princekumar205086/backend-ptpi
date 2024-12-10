@@ -580,8 +580,6 @@ class JobPreferenceLocationViewSet(viewsets.ModelViewSet):
         instance.delete()
         return Response({"message": "Job preference location deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
     
-    
-    
 class BasicProfileViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     authentication_classes = [ExpiringTokenAuthentication]
