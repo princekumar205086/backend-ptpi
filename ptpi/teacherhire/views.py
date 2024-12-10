@@ -52,10 +52,11 @@ def create_auth_data(self, serializer_class, request_data, model_class, *args, *
 def get_single_object(viewset):
     queryset = viewset.get_queryset()
     profile = queryset.first()
-    if profile:
-        serializer = viewset.get_serializer(profile)
-        return Response(serializer.data)
-    return Response({"detail": f"{viewset.__class__.__name__} Profile not found"}, status=status.HTTP_404_NOT_FOUND)
+    serializer = viewset.get_serializer(profile)
+    return Response(serializer.data)
+    # if profile:
+        
+    # return Response({"detail": f"{viewset.__class__.__name__} Profile not found"}, status=status.HTTP_404_NOT_FOUND)
 
 def get_count(model_class):
     return model_class.objects.count()
