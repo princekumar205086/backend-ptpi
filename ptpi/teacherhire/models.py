@@ -211,49 +211,6 @@ class TeacherSubject(models.Model):
         return self.user.username	
    
 class BasicProfile(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
-    name = models.CharField(max_length=120, null=True)
-    email = models.EmailField(null=True)
-    mobile = models.CharField(max_length=15, blank=True, null=True)
-    profileDp = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
-    location = models.CharField(max_length=12, null=True,blank=True)
-    def _str_(self):
-        return f"Basic Profile of {self.user.username}"
-   
-class TeacherClassCategory(models.Model):	
-  user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)	
-  class_category = models.ForeignKey(ClassCategory, on_delete=models.CASCADE)
-
-  def __str__(self):
-        return self.user.username	
-  
-class TeacherExamResult(models.Model):
-    user = models.ForeignKey(CustomUser,on_delete=models.CASCADE)
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
-    correct_answer = models.IntegerField(default=0, null=True, blank=True)
-    is_unanswered = models.IntegerField(null=True, blank=True)
-    incorrect_answer = models.IntegerField(default=0, null=True, blank=True)
-    isqulified = models.BooleanField(default=False)
-    level = models.ForeignKey(Level, on_delete=models.CASCADE)
-    attempt = models.IntegerField(default=3)
-
-    def __str__(self):
-        return self.correct_answer
-    
-class JobPreferenceLocation(models.Model):
-    preference = models.ForeignKey(Preference, on_delete=models.CASCADE)
-    state = models.CharField(max_length=200,null=True, blank=True)
-    city = models.CharField(max_length=200,null=True, blank=True)
-    sub_division = models.CharField(max_length=200,null=True, blank=True)
-    block = models.CharField(max_length=200,null=True, blank=True)
-    area = models.TextField(null=True, blank=True)
-    pincode = models.CharField(max_length=6, null=True, blank=True)
-    def __str__(self):
-        return self.preference.user.username
-    
-    
-    
-class UserProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="user_profile", null=True)
     bio = models.TextField(blank=True, null=True)
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
@@ -288,11 +245,41 @@ class UserProfile(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    location = models.CharField(max_length=12, null=True,blank=True)
+    def _str_(self):
+        return f"Basic Profile of {self.user.username}"
+   
+class TeacherClassCategory(models.Model):	
+  user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)	
+  class_category = models.ForeignKey(ClassCategory, on_delete=models.CASCADE)
+
+  def __str__(self):
+        return self.user.username	
+  
+class TeacherExamResult(models.Model):
+    user = models.ForeignKey(CustomUser,on_delete=models.CASCADE)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    correct_answer = models.IntegerField(default=0, null=True, blank=True)
+    is_unanswered = models.IntegerField(null=True, blank=True)
+    incorrect_answer = models.IntegerField(default=0, null=True, blank=True)
+    isqulified = models.BooleanField(default=False)
+    level = models.ForeignKey(Level, on_delete=models.CASCADE)
+    attempt = models.IntegerField(default=3)
 
     def __str__(self):
-        return f"Profile of {self.user.username}"
-
-
+        return self.correct_answer
+    
+class JobPreferenceLocation(models.Model):
+    preference = models.ForeignKey(Preference, on_delete=models.CASCADE)
+    state = models.CharField(max_length=200,null=True, blank=True)
+    city = models.CharField(max_length=200,null=True, blank=True)
+    sub_division = models.CharField(max_length=200,null=True, blank=True)
+    block = models.CharField(max_length=200,null=True, blank=True)
+    area = models.TextField(null=True, blank=True)
+    pincode = models.CharField(max_length=6, null=True, blank=True)
+    def __str__(self):
+        return self.preference.user.username
 class Report(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="user_reports", null=True)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)

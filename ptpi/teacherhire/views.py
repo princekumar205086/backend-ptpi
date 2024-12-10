@@ -68,6 +68,7 @@ class RegisterUser(APIView):
             return Response({
                 'status': 403,
                 'error': serializer.errors,
+                # Todo
                 'message': 'Something went wrong'
             })
         
@@ -135,32 +136,8 @@ class LogoutUser(APIView):
             return Response({"success": "Logout successful"}, status=status.HTTP_200_OK)
         except Token.DoesNotExist:
             return Response({"error": "Invalid or expired token"}, status=status.HTTP_400_BAD_REQUEST)
+    
 
-    
-class UserProfileViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [ExpiringTokenAuthentication]   
-    queryset = UserProfile.objects.all().select_related('user')
-    serializer_class = UserProfileSerializer
-    
-    def create(self, request, *args, **kwargs):
-        data = request.data.copy()
-        data['user'] = request.user.id        
-        if UserProfile.objects.filter(user=request.user).exists():
-            return Response({"detail": "UserProfile already exists."}, status=status.HTTP_400_BAD_REQUEST)
-        serializer = self.get_serializer(data=data)
-        if serializer.is_valid():
-            self.perform_create(serializer)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def get_queryset(self):
-        return UserProfile.objects.filter(user=self.request.user)
-    
-    def list(self, request, *args, **kwargs):
-        return get_single_object(self)
-        
 
 #TeacerAddress GET ,CREATE ,DELETE 
 class TeachersAddressViewSet(viewsets.ModelViewSet):

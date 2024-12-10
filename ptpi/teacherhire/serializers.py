@@ -81,57 +81,6 @@ class LoginSerializer(serializers.Serializer):
         data["user"] = user
         return data
 
-
-class UserProfileSerializer(serializers.ModelSerializer):    
-    class Meta:
-        model = UserProfile
-        fields = '__all__'
-
-    def create(self, validated_data):
-        if 'user' not in validated_data:
-            validated_data['user'] = self.context['request'].user
-        return UserProfile.objects.create(**validated_data)
-
-    def update(self, instance, validated_data):
-        for field, value in validated_data.items():
-            setattr(instance, field, value)
-        instance.save()
-        return instance
-
-    def validate_bio(self, value):
-        value = value.strip() if value else ""
-        if not value:
-            raise serializers.ValidationError("Bio cannot be empty or just spaces.")
-        return value
-
-    def validate_address(self, value):
-        value = value.strip() if value else ""
-        if not value:
-            raise serializers.ValidationError("Address cannot be empty or just spaces.")
-        return value
-
-    def validate_phone_number(self, value):
-        if value:
-            cleaned_value = re.sub(r'[^0-9]', '', value)  # Remove non-numeric characters
-            if len(cleaned_value) != 10:
-                raise serializers.ValidationError("Phone number must be exactly 10 digits.")
-            if not cleaned_value.startswith(('6', '7', '8', '9')):
-                raise serializers.ValidationError("Phone number must start with 6, 7, 8, or 9.")
-            return cleaned_value
-        return value
-
-
-    def validate_profile_picture(self, value):
-        if value and value.size > 5 * 1024 * 1024:
-            raise serializers.ValidationError("Profile picture must be under 5 MB.")
-        return value
-
-    def validate(self, data):
-        if 'phone_number' in data and len(data['phone_number']) < 10:
-            raise serializers.ValidationError({"phone_number": "Phone number must have at least 10 digits."})
-        return data
-
-
 class TeacherExperiencesSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(), required=False)
     institution = serializers.CharField(max_length=255, required=False, allow_null=True)
