@@ -55,7 +55,7 @@ def get_single_object(viewset):
     if profile:
         serializer = viewset.get_serializer(profile)
         return Response(serializer.data)
-    return Response({"detail": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
+    return Response({"detail": f"{viewset.__class__.__name__} Profile not found"}, status=status.HTTP_404_NOT_FOUND)
 
 def get_count(model_class):
     return model_class.objects.count()
@@ -102,10 +102,14 @@ class LoginUser(APIView):
             token = Token.objects.create(user=user)
 
             refresh_token = generate_refresh_token()
-            roles = {
+      
+            is_admin =  user.is_staff and user.is_recruiter            
+            roles = {                
+                'is_admin': is_admin,
                 'is_admin': user.is_staff,
                 'is_recruiter': user.is_recruiter,
                 'is_user': True
+                
             }
             return Response({
                 'access_token': token.key,
