@@ -141,7 +141,7 @@ class LogoutUser(APIView):
 
 #TeacerAddress GET ,CREATE ,DELETE 
 class TeachersAddressViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated,IsRecruiterPermission]
+    permission_classes = [IsAuthenticated]
     authentication_classes = [ExpiringTokenAuthentication]
     serializer_class = TeachersAddressSerializer
     queryset = TeachersAddress.objects.all().select_related('user')
@@ -155,6 +155,7 @@ class TeachersAddressViewSet(viewsets.ModelViewSet):
         print(f"User: {request.user}")
         count = get_count(TeachersAddress)
         return Response({"count": count})
+    
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.delete()
@@ -236,7 +237,7 @@ class LevelViewSet(viewsets.ModelViewSet):
         serializer = QuestionSerializer(questions, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
-    def destroy(self, request, *args, **kwargs):
+    def destroy(self, request, *args, **kwargs):    
         instance = self.get_object()
         instance.delete()
         return Response({"message": "Level deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
@@ -245,13 +246,13 @@ class LevelViewSet(viewsets.ModelViewSet):
 class SkillViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     authentication_classes = [ExpiringTokenAuthentication] 
-    queryset = Skill.objects.all()
+    queryset = Skill.objects.all()    
     serializer_class = SkillSerializer
 
     @action(detail=False, methods=['get'])
     def count(self, request):
         count = get_count(Skill)
-        return Response({"Count": count})
+        return Response({"Count": count})    
     
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -265,9 +266,9 @@ class TeacherSkillViewSet(viewsets.ModelViewSet):
     authentication_classes = [ExpiringTokenAuthentication] 
     serializer_class = TeacherSkillSerializer
     
-    def create(self, request, *args, **kwargs):
-        return create_auth_data(self, TeacherSkillSerializer, request.data, TeacherSkill)
-    @action(detail=False, methods=['get'])
+    def create(self, request):
+        return create_object(TeacherSkillSerializer, request.data, TeacherSkill)
+    @action(detail=False, methods=['get'])    
     def count(self, request):
         count = get_count(TeacherSkill)
         return Response({"Count": count})
@@ -313,8 +314,8 @@ class TeacherViewSet(viewsets.ModelViewSet):
     queryset= Teacher.objects.all().select_related('user')
     serializer_class = TeacherSerializer
 
-    def create(self,request):
-        return create_object(TeacherSerializer,request.data,Teacher)
+    # def create(self,request):
+    #     return create_object(TeacherSerializer,request.data,Teacher)
     
     @action (detail=False,methods=['get'])
     def count(self,request):
@@ -375,7 +376,7 @@ class TeacherQualificationViewSet(viewsets.ModelViewSet):
         count = get_count(TeacherQualification)
         return Response({"count": count})
     def create(self, request, *args, **kwargs):
-        return create_auth_data(self, TeacherQualificationSerializer, request.data, TeacherQualification)
+        return create_object(TeacherQualificationSerializer, request.data, TeacherQualification)
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.delete()
@@ -405,7 +406,7 @@ class TeacherExperiencesViewSet(viewsets.ModelViewSet):
     serializer_class = TeacherExperiencesSerializer
 
     def create(self,request,*args, **kwargs):
-        return create_auth_data(self, TeacherExperiencesSerializer,request.data,TeacherExperiences)
+        return create_object(TeacherExperiencesSerializer,request.data,TeacherExperiences)
    
     @action (detail=False,methods=['get'])
     def count(self,request):
