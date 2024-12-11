@@ -266,8 +266,8 @@ class TeacherSkillViewSet(viewsets.ModelViewSet):
     authentication_classes = [ExpiringTokenAuthentication] 
     serializer_class = TeacherSkillSerializer
     
-    def create(self, request, *args, **kwargs):
-        return create_auth_data(self, TeacherSkillSerializer, request.data, TeacherSkill)
+    def create(self, request):
+        return create_object(TeacherSkillSerializer, request.data, TeacherSkill)
     @action(detail=False, methods=['get'])    
     def count(self, request):
         count = get_count(TeacherSkill)
@@ -376,7 +376,7 @@ class TeacherQualificationViewSet(viewsets.ModelViewSet):
         count = get_count(TeacherQualification)
         return Response({"count": count})
     def create(self, request, *args, **kwargs):
-        return create_auth_data(self, TeacherQualificationSerializer, request.data, TeacherQualification)
+        return create_object(TeacherQualificationSerializer, request.data, TeacherQualification)
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.delete()
@@ -406,7 +406,7 @@ class TeacherExperiencesViewSet(viewsets.ModelViewSet):
     serializer_class = TeacherExperiencesSerializer
 
     def create(self,request,*args, **kwargs):
-        return create_auth_data(self, TeacherExperiencesSerializer,request.data,TeacherExperiences)
+        return create_object(TeacherExperiencesSerializer,request.data,TeacherExperiences)
    
     @action (detail=False,methods=['get'])
     def count(self,request):
