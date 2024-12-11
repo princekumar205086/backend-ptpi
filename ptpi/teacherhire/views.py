@@ -170,11 +170,36 @@ class SingleTeachersAddressViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         return create_auth_data(self, TeachersAddressSerializer, request.data, TeachersAddress)
     
+    def put(self, request, *args, **kwargs):
+        data = request.data.copy()
+        data['user'] = request.user.id
+        
+        address = TeachersAddress.objects.filter(user=request.user).first()
+
+        if address:
+            serializer = self.get_serializer(address, data=data, partial=False)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"detail": "Address updated successfully.", "address": serializer.data}, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            serializer = self.get_serializer(data=data)
+            if serializer.is_valid():
+                self.perform_create(serializer)
+                return Response({"detail": "address created successfully.", "address": serializer.data}, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     def get_queryset(self):
         return TeachersAddress.objects.filter(user=self.request.user)
-    
+
     def list(self, request, *args, **kwargs):
-        return get_single_object(self)
+        return self.retrieve(request, *args, **kwargs)
+
+    def get_object(self):
+        try:
+            return TeachersAddress.objects.get(user=self.request.user)
+        except TeachersAddress.DoesNotExist:
+            raise Response({"detail": "this address not found."}, status=status.HTTP_404_NOT_FOUND)
 
 
 class EducationalQulificationViewSet(viewsets.ModelViewSet):   
