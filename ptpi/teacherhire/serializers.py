@@ -122,7 +122,7 @@ class TeacherExperiencesSerializer(serializers.ModelSerializer):
             representation['role'] = RoleSerializer(instance.role).data
         return representation
 
-
+#subject serializer 
 class SubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subject
@@ -169,7 +169,7 @@ class SkillSerializer(serializers.ModelSerializer):
     
     def validate_name(self, value):
         if Skill.objects.filter(name=value).exists():
-            raise serializers.ValidationError("A skil with this name already exists.")
+            raise serializers.ValidationError("A skill with this name already exists.")
         return value
     
 
@@ -179,12 +179,14 @@ class TeachersAddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = TeachersAddress
         fields = '__all__'
+
+    def validate_area(self, value):
+        if TeachersAddress.objects.filter(area=value).exists():
+            raise serializers.ValidationError( "this Address_type already exists.")
+        return value
     def validate_pincode(self, value):
-        user = self.context.get('request').user
-        if user and not user.is_recruiter:
-            raise serializers.ValidationError("Only recruiters can set the pincode.")        
         if value and (len(value) != 6 or not value.isdigit()):
-            raise serializers.ValidationError("Pincode must be exactly 6 digits.")        
+            raise serializers.ValidationError("Pincode must be exactly 6 digits.")
         return value
 
    
