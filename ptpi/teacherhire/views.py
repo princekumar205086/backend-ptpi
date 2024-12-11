@@ -601,16 +601,23 @@ class BasicProfileViewSet(viewsets.ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, *args, **kwargs):
-        try:
-            profile = BasicProfile.objects.get(user=request.user)
-        except BasicProfile.DoesNotExist:
-            return Response({"detail": "Profile not found."}, status=status.HTTP_404_NOT_FOUND)
+        data = request.data.copy()
+        data['user'] = request.user.id
+        
+        profile = BasicProfile.objects.filter(user=request.user).first()
 
-        serializer = BasicProfileSerializer(profile, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"detail": "Profile updated successfully.", "profile": serializer.data}, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if profile:
+            serializer = self.get_serializer(profile, data=data, partial=False)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"detail": "Profile updated successfully.", "profile": serializer.data}, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            serializer = self.get_serializer(data=data)
+            if serializer.is_valid():
+                self.perform_create(serializer)
+                return Response({"detail": "Profile created successfully.", "profile": serializer.data}, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get_queryset(self):
         return BasicProfile.objects.filter(user=self.request.user)
