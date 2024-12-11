@@ -37,16 +37,23 @@ def create_object(serializer_class, request_data, model_class):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # for authenticated teacher
-def create_auth_data(self, serializer_class, request_data, model_class, *args, **kwargs):
-    if not self.request.user.is_authenticated:
+def create_auth_data(serializer_class, request_data, model_class, *args, **kwargs):
+    if not kwargs.get('user') or not kwargs['user'].is_authenticated:
         return Response(
             {'message': 'Authentication required to perform this action.'},
             status=status.HTTP_401_UNAUTHORIZED
         )
     serializer = serializer_class(data=request_data)
     if serializer.is_valid():
-        serializer.save(user=self.request.user)  
+        serializer.save(user=kwargs['user'])  
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+def update_auth_data(serialiazer_class, instance, request_data, user):
+    serializer = serialiazer_class(instance, data=request_data, partial=False)
+    if serializer.is_valid():
+        serializer.save(user=user)
+        return Response({"detail": "Data updated successfully.", "data": serializer.data}, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 def get_single_object(viewset):
@@ -633,17 +640,19 @@ class BasicProfileViewSet(viewsets.ModelViewSet):
         profile = BasicProfile.objects.filter(user=request.user).first()
 
         if profile:
-            serializer = self.get_serializer(profile, data=data, partial=False)
-            if serializer.is_valid():
-                serializer.save()
-                return Response({"detail": "Profile updated successfully.", "profile": serializer.data}, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+           return update_auth_data(
+               serialiazer_class=self.get_serializer_class(),
+               instance=profile,
+               request_data=data,
+               user=request.user
+           )
         else:
-            serializer = self.get_serializer(data=data)
-            if serializer.is_valid():
-                self.perform_create(serializer)
-                return Response({"detail": "Profile created successfully.", "profile": serializer.data}, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return create_auth_data(
+                serializer_class=self.get_serializer_class(),
+                request_data=data,
+                user=request.user,
+                model_class=BasicProfile
+            )
 
     def get_queryset(self):
         return BasicProfile.objects.filter(user=self.request.user)
