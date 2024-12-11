@@ -37,17 +37,18 @@ def create_object(serializer_class, request_data, model_class):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # for authenticated teacher
-def create_auth_data(serializer_class, request_data, model_class, *args, **kwargs):
-    if not kwargs.get('user') or not kwargs['user'].is_authenticated:
+def create_auth_data(serializer_class, request_data, model_class, user, *args, **kwargs):
+    if not user or not user.is_authenticated:
         return Response(
             {'message': 'Authentication required to perform this action.'},
             status=status.HTTP_401_UNAUTHORIZED
         )
     serializer = serializer_class(data=request_data)
     if serializer.is_valid():
-        serializer.save(user=kwargs['user'])  
+        serializer.save(user=user)  
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 def update_auth_data(serialiazer_class, instance, request_data, user):
     serializer = serialiazer_class(instance, data=request_data, partial=False)
@@ -173,9 +174,14 @@ class SingleTeachersAddressViewSet(viewsets.ModelViewSet):
     authentication_classes = [ExpiringTokenAuthentication] 
     serializer_class = TeachersAddressSerializer 
     queryset = TeachersAddress.objects.all().select_related('user')
-
+    
     def create(self, request, *args, **kwargs):
-        return create_auth_data(self, TeachersAddressSerializer, request.data, TeachersAddress)
+        data = request.data.copy()
+        return create_auth_data(
+                serializer_class=self.get_serializer_class(),
+                request_data=data,
+                user=request.user,
+                model_class=TeachersAddress)
     
     def put(self, request, *args, **kwargs):
         data = request.data.copy()
@@ -184,23 +190,25 @@ class SingleTeachersAddressViewSet(viewsets.ModelViewSet):
         address = TeachersAddress.objects.filter(user=request.user).first()
 
         if address:
-            serializer = self.get_serializer(address, data=data, partial=False)
-            if serializer.is_valid():
-                serializer.save()
-                return Response({"detail": "Address updated successfully.", "address": serializer.data}, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return update_auth_data(
+               serialiazer_class=self.get_serializer_class(),
+               instance=address,
+               request_data=data,
+               user=request.user
+           )
         else:
-            serializer = self.get_serializer(data=data)
-            if serializer.is_valid():
-                self.perform_create(serializer)
-                return Response({"detail": "address created successfully.", "address": serializer.data}, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return create_auth_data(
+                serializer_class=self.get_serializer_class(),
+                request_data=data,
+                user=request.user,
+                model_class=TeachersAddress
+            )
 
     def get_queryset(self):
         return TeachersAddress.objects.filter(user=self.request.user)
 
-    def list(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
+    # def list(self, request, *args, **kwargs):
+    #     return self.retrieve(request, *args, **kwargs)
 
     def get_object(self):
         try:
