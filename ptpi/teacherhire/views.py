@@ -90,17 +90,18 @@ class LoginUser(APIView):
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
-        
-
+            
         try:
             user = CustomUser.objects.get(email=email)
         except CustomUser.DoesNotExist:
             return Response({'message': 'Invalid email or password'}, status=status.HTTP_401_UNAUTHORIZED)
 
+        # Check password validity
         if user.check_password(password):
             # Delete old token if it exists
             Token.objects.filter(user=user).delete()
             token = Token.objects.create(user=user)
+
 
             refresh_token = generate_refresh_token()
       
@@ -115,7 +116,7 @@ class LoginUser(APIView):
             return Response({
                 'access_token': token.key,
                 'refresh_token': refresh_token,
-                'username':user.username, 
+                'Fname':user.Fname, 
                 'email':user.email, 
                 'roles': roles,
                 # 'refresh_expires_at': refresh_expires_at,  
@@ -580,20 +581,19 @@ class JobPreferenceLocationViewSet(viewsets.ModelViewSet):
         instance.delete()
         return Response({"message": "Job preference location deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
     
-    
-    
 class BasicProfileViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     authentication_classes = [ExpiringTokenAuthentication]
     queryset = BasicProfile.objects.all()
     serializer_class = BasicProfileSerializer
-    
+
     def create(self, request, *args, **kwargs):
         data = request.data.copy()
         data['user'] = request.user.id
         
         if BasicProfile.objects.filter(user=request.user).exists():
             return Response({"detail": "Profile already exists."}, status=status.HTTP_400_BAD_REQUEST)
+        
         serializer = self.get_serializer(data=data)
         if serializer.is_valid():
             self.perform_create(serializer)
@@ -601,9 +601,40 @@ class BasicProfileViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def put(self, request, *args, **kwargs):
+        data = request.data.copy()
+        data['user'] = request.user.id
+        
+        profile = BasicProfile.objects.filter(user=request.user).first()
+
+        if profile:
+            serializer = self.get_serializer(profile, data=data, partial=False)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"detail": "Profile updated successfully.", "profile": serializer.data}, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            serializer = self.get_serializer(data=data)
+            if serializer.is_valid():
+                self.perform_create(serializer)
+                return Response({"detail": "Profile created successfully.", "profile": serializer.data}, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     def get_queryset(self):
         return BasicProfile.objects.filter(user=self.request.user)
-    
+
     def list(self, request, *args, **kwargs):
-        return get_single_object(self)
-        
+        return self.retrieve(request, *args, **kwargs)
+
+    def get_object(self):
+        try:
+            return BasicProfile.objects.get(user=self.request.user)
+        except BasicProfile.DoesNotExist:
+            raise Response({"detail": "Profile not found."}, status=status.HTTP_404_NOT_FOUND)
+    def delete(self, request):
+        try:
+            profile = BasicProfile.objects.get(user=request.user)            
+            profile.delete()            
+            return Response({"detail": "Profile deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+        except BasicProfile.DoesNotExist:
+            return Response({"detail": "Profile not found."}, status=status.HTTP_404_NOT_FOUND)
