@@ -314,8 +314,8 @@ class TeacherViewSet(viewsets.ModelViewSet):
     queryset= Teacher.objects.all().select_related('user')
     serializer_class = TeacherSerializer
 
-    def create(self,request):
-        return create_object(TeacherSerializer,request.data,Teacher)
+    # def create(self,request):
+    #     return create_object(TeacherSerializer,request.data,Teacher)
     
     @action (detail=False,methods=['get'])
     def count(self,request):
