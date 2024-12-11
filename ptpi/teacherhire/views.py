@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from teacherhire.models import *
+from rest_framework.exceptions import NotFound
 from teacherhire.serializers import *
 from .authentication import ExpiringTokenAuthentication  
 from rest_framework.decorators import action
@@ -334,8 +335,8 @@ class SingleTeacherSkillViewSet(viewsets.ModelViewSet):
     
     
 class SubjectViewSet(viewsets.ModelViewSet):    
-    permission_classes = [IsAuthenticated] 
-    authentication_classes = [ExpiringTokenAuthentication] 
+    # permission_classes = [IsAuthenticated] 
+    # authentication_classes = [ExpiringTokenAuthentication] 
     queryset = Subject.objects.all()
     serializer_class = SubjectSerializer
     
@@ -552,20 +553,61 @@ class TeacherSubjectViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         instance.delete()
         return Response({"message": "Teachersubject deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
-    
-class SingleTeacherSubjectViewSet(viewsets.ModelViewSet): 
+
+class SingleTeacherSubjectViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     authentication_classes = [ExpiringTokenAuthentication]
     queryset = TeacherSubject.objects.all()
     serializer_class = TeacherSubjectSerializer
 
-    def create(self, request, *args, **kwargs):
-        return create_auth_data(self, TeacherSubjectSerializer, request.data, TeacherSubject)
     def get_queryset(self):
         return TeacherSubject.objects.filter(user=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+            data = request.data.copy()
+            data['user'] = request.user.id
+            if TeacherSubject.objects.filter(user=request.user).exists():
+                return Response({"detail": "SingleTeacherSubject already exists. "}, status=status.HTTP_400_BAD_REQUEST)
+            serializer = self.get_serializer(data=data)
+            if serializer.is_valid():
+                self.perform_create(serializer)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     def list(self, request, *args, **kwargs):
-        return get_single_object(self)
-   
+        return self.retrieve(request, *args, **kwargs)
+    def get_object(self):
+        try:
+            return TeacherSubject.objects.get(user=self.request.user)
+        except TeacherSubject.DoesNotExist:
+            raise NotFound({"detail": "TeacherSubject not found."})
+    def put(self, request, *args, **kwargs):
+        data = request.data.copy()
+        data['user'] = request.user.id
+        
+        SingleTeacherSubject = TeacherSubject.objects.filter(user=request.user).first()
+
+        if SingleTeacherSubject:
+            return update_auth_data(
+                serializer_class=self.get_serializer_class(),
+                instance=SingleTeacherSubject,
+                request_data=data,
+                user=request.user
+            )
+        else:
+            return create_auth_data(
+                serializer_class=self.get_serializer_class(),
+                request_data=data,
+                user=request.user,
+                model_class=TeacherSubject
+            )
+    def delete(self, request, *args, **kwargs):
+        try:
+            profile = TeacherSubject.objects.get(user=request.user)
+            profile.delete()
+            return Response({"detail": "TeacherSubject deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+        except TeacherSubject.DoesNotExist:
+            return Response({"detail": "TeacherSubject not found."}, status=status.HTTP_404_NOT_FOUND)
 
 class TeacherClassCategoryViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]    
