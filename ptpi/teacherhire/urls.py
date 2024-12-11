@@ -5,7 +5,7 @@ from rest_framework import routers
 
 #access admin
 router = routers.DefaultRouter()
-router.register(r"teacher/teacherqualification", TeacherQualificationViewSet)
+router.register(r"admin/teacherqualification", TeacherQualificationViewSet)
 router.register(r"admin/skill", SkillViewSet)
 router.register(r"teacher/teacherskill", TeacherSkillViewSet)
 router.register(r"admin/subject", SubjectViewSet)
@@ -13,7 +13,7 @@ router.register(r"admin/classcategory", ClassCategoryViewSet)
 router.register(r"admin/teacher", TeacherViewSet)
 router.register(r'admin/question', QuestionViewSet)
 router.register(r'admin/educationalQulification', EducationalQulificationViewSet)
-router.register(r'teacher/teachersAddress', TeachersAddressViewSet)
+router.register(r'admin/teachersAddress', TeachersAddressViewSet)
 router.register(r'admin/teachersubject', TeacherSubjectViewSet)
 router.register(r'admin/level', LevelViewSet)
 router.register(r'admin/role', RoleViewSet, basename='role')

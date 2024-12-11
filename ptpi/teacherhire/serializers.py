@@ -181,7 +181,7 @@ class TeachersAddressSerializer(serializers.ModelSerializer):
 
     def validate_area(self, value):
         if TeachersAddress.objects.filter(area=value).exists():
-            raise serializers.ValidationError( "this Address_type already exists.")
+            raise serializers.ValidationError( "this area already exists.")
         return value
     def validate_pincode(self, value):
         if value and (len(value) != 6 or not value.isdigit()):
