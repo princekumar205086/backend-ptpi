@@ -8,12 +8,15 @@ from rest_framework.exceptions import ValidationError
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'password']
+        fields = ['id', 'password' ,'Fname', 'Lname', 'email',]
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
         user = CustomUser.objects.create(
-            username=validated_data['username'],
+            Fname=validated_data['Fname'],
+            Lname=validated_data['Lname'],
+            email=validated_data['email'],
+
         )
         user.set_password(validated_data['password'])
         user.save()
