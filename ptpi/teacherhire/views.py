@@ -623,3 +623,10 @@ class BasicProfileViewSet(viewsets.ModelViewSet):
             return BasicProfile.objects.get(user=self.request.user)
         except BasicProfile.DoesNotExist:
             raise Response({"detail": "Profile not found."}, status=status.HTTP_404_NOT_FOUND)
+    def delete(self, request):
+        try:
+            profile = BasicProfile.objects.get(user=request.user)            
+            profile.delete()            
+            return Response({"detail": "Profile deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+        except BasicProfile.DoesNotExist:
+            return Response({"detail": "Profile not found."}, status=status.HTTP_404_NOT_FOUND)
