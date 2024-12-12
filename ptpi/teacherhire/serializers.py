@@ -182,10 +182,10 @@ class TeachersAddressSerializer(serializers.ModelSerializer):
         model = TeachersAddress
         fields = '__all__'
 
-    def validate_area(self, value):
-        if TeachersAddress.objects.filter(area=value).exists():
-            raise serializers.ValidationError( "this area already exists.")
-        return value
+    # def validate_area(self, value):
+    #     if TeachersAddress.objects.filter(area=value).exists():
+    #         raise serializers.ValidationError( "this area already exists.")
+    #     return value
     def validate_pincode(self, value):
         if value and (len(value) != 6 or not value.isdigit()):
             raise serializers.ValidationError("Pincode must be exactly 6 digits.")
@@ -321,9 +321,11 @@ class TeacherSkillSerializer(serializers.ModelSerializer):
         representation['skill'] = SkillSerializer(instance.skill).data
         return representation
     
-    def validate_skill(self, value):
-        if TeacherSkill.objects.filter(skill=value).exists():
-            raise serializers.ValidationError({"user": "teacher with this skill already exist."})
+    def validate(self, data):
+        user = data.get('user')
+        if user and TeacherSkill.objects.filter(user=user).exists():
+            raise serializers.ValidationError({"user": "A teacher with this skill already exists."})
+        return data 
     
 
 class EducationalQualificationSerializer(serializers.ModelSerializer):

@@ -323,13 +323,45 @@ class SingleTeacherSkillViewSet(viewsets.ModelViewSet):
     serializer_class = TeacherSkillSerializer
     
     def create(self, request, *args, **kwargs):
-        return create_auth_data(self, TeacherSkillSerializer, request.data, TeacherSkill)
+        data = request.data.copy()
+        return create_auth_data(
+                serializer_class=self.get_serializer_class(),
+                request_data=data,
+                user=request.user,
+                model_class=TeacherSkill)
     
+    def put(self, request, *args, **kwargs):
+        data = request.data.copy()
+        data['user'] = request.user.id
+        
+        skill = TeacherSkill.objects.filter(user=request.user).first()
+
+        if skill:
+            return update_auth_data(
+               serialiazer_class=self.get_serializer_class(),
+               instance=skill,
+               request_data=data,
+               user=request.user
+           )
+        else:
+            return create_auth_data(
+                serializer_class=self.get_serializer_class(),
+                request_data=data,
+                user=request.user,
+                model_class=TeacherSkill
+            )
+
     def get_queryset(self):
         return TeacherSkill.objects.filter(user=self.request.user)
-    
-    def list(self, request, *args, **kwargs):
-        return get_single_object(self)
+
+    # def list(self, request, *args, **kwargs):
+    #     return self.retrieve(request, *args, **kwargs)
+
+    def get_object(self):
+        try:
+            return TeacherSkill.objects.get(user=self.request.user)
+        except TeacherSkill.DoesNotExist:
+            raise Response({"detail": "this user skill not found."}, status=status.HTTP_404_NOT_FOUND)
 
     
     
