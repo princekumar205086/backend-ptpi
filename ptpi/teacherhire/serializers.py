@@ -310,7 +310,6 @@ class QuestionSerializer(serializers.ModelSerializer):
 class TeacherSkillSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(), required=False)
     skill = serializers.PrimaryKeyRelatedField(queryset=Skill.objects.all(), required=False)
-
     class Meta:
         model = TeacherSkill
         fields = ['id', 'user', 'skill', 'proficiency_level', 'years_of_experience']
@@ -321,7 +320,13 @@ class TeacherSkillSerializer(serializers.ModelSerializer):
         representation['skill'] = SkillSerializer(instance.skill).data
         return representation
  
-    
+    def validate(self, attrs):
+        user = attrs.get('user')
+        skill = attrs.get('skill')
+        # This user have skill already exists
+        if TeacherSkill.objects.filter(user=user, skill=skill).exists():
+            raise serializers.ValidationError('This user already has this skill.')
+        return attrs
 
 class EducationalQualificationSerializer(serializers.ModelSerializer):
     class Meta:

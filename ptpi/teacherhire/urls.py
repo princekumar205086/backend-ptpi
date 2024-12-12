@@ -7,7 +7,7 @@ from rest_framework import routers
 router = routers.DefaultRouter()
 router.register(r"admin/teacherqualification", TeacherQualificationViewSet)
 router.register(r"admin/skill", SkillViewSet)
-router.register(r"teacher/teacherskill", TeacherSkillViewSet)
+router.register(r"admin/teacherskill", TeacherSkillViewSet)
 router.register(r"admin/subject", SubjectViewSet)
 router.register(r"admin/classcategory", ClassCategoryViewSet)
 router.register(r"admin/teacher", TeacherViewSet)
