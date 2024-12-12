@@ -751,3 +751,14 @@ class BasicProfileViewSet(viewsets.ModelViewSet):
             return Response({"detail": "Profile deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
         except BasicProfile.DoesNotExist:
             return Response({"detail": "Profile not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+
+class CustomUserViewSet(viewsets.ModelViewSet):
+    # permission_classes = [IsAuthenticated]    
+    # authentication_classes = [ExpiringTokenAuthentication]
+    queryset = CustomUser.objects.all()
+    serializer_class = CustomUserSerializer
+
+      
+
+    

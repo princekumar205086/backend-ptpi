@@ -451,4 +451,9 @@ class BasicProfileSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("Phone number must start with 6, 7, 8, or 9.")
             return cleaned_value
         return value
+    
+class CustomUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = '__all__'
 
