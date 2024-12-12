@@ -152,9 +152,9 @@ class TeachersAddressViewSet(viewsets.ModelViewSet):
     serializer_class = TeachersAddressSerializer
     queryset = TeachersAddress.objects.all().select_related('user')
 
-    def create(self, request, *args, **kwargs):
-        print(f"User: {request.user}")
-        return create_auth_data(self, TeachersAddressSerializer, request.data, TeachersAddress)
+    # def create(self, request, *args, **kwargs):
+    #     print(f"User: {request.user}")
+    #     return create_auth_data(self, TeachersAddressSerializer, request.data, TeachersAddress)
 
     @action(detail=False, methods=['get'])
     def count(self, request):
