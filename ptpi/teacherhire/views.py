@@ -364,8 +364,6 @@ class SingleTeacherSkillViewSet(viewsets.ModelViewSet):
         except TeacherSkill.DoesNotExist:
             raise Response({"detail": "this user skill not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    
-    
 class SubjectViewSet(viewsets.ModelViewSet):    
     # permission_classes = [IsAuthenticated] 
     # authentication_classes = [ExpiringTokenAuthentication] 
@@ -469,8 +467,7 @@ class SingleTeacherQualificationViewSet(viewsets.ModelViewSet):
     
     def list(self, request, *args, **kwargs):
         return get_single_object(self)
-    
-    
+
     
 class TeacherExperiencesViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
