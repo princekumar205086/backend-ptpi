@@ -457,8 +457,14 @@ class SingleTeacherQualificationViewSet(viewsets.ModelViewSet):
     serializer_class = TeacherQualificationSerializer
 
     def create(self, request, *args, **kwargs):
+        data = request.data.copy()
 
-        return create_auth_data(self, TeacherQualificationSerializer, request.data, TeacherQualification)
+        return create_auth_data(
+                serializer_class=self.get_serializer_class(),
+                request_data=data,
+                user=request.user,
+                model_class=TeacherQualification
+            )
     
     def put(self, request, *args, **kwargs):
         data = request.data.copy()
