@@ -247,7 +247,6 @@ class BasicProfile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
-    location = models.CharField(max_length=12, null=True,blank=True)
     def _str_(self):
         return f"Basic Profile of {self.user.username}"
    
