@@ -63,9 +63,6 @@ def get_single_object(viewset):
     profile = queryset.first()
     serializer = viewset.get_serializer(profile)
     return Response(serializer.data)
-    # if profile:
-        
-    # return Response({"detail": f"{viewset.__class__.__name__} Profile not found"}, status=status.HTTP_404_NOT_FOUND)
 
 def get_count(model_class):
     return model_class.objects.count()
@@ -155,9 +152,9 @@ class TeachersAddressViewSet(viewsets.ModelViewSet):
     serializer_class = TeachersAddressSerializer
     queryset = TeachersAddress.objects.all().select_related('user')
 
-    def create(self, request, *args, **kwargs):
-        print(f"User: {request.user}")
-        return create_auth_data(self, TeachersAddressSerializer, request.data, TeachersAddress)
+    # def create(self, request, *args, **kwargs):
+    #     print(f"User: {request.user}")
+    #     return create_auth_data(self, TeachersAddressSerializer, request.data, TeachersAddress)
 
     @action(detail=False, methods=['get'])
     def count(self, request):
@@ -460,13 +457,47 @@ class SingleTeacherQualificationViewSet(viewsets.ModelViewSet):
     serializer_class = TeacherQualificationSerializer
 
     def create(self, request, *args, **kwargs):
-        return create_auth_data(self, TeacherQualificationSerializer, request.data, TeacherQualification)
+        data = request.data.copy()
+
+        return create_auth_data(
+                serializer_class=self.get_serializer_class(),
+                request_data=data,
+                user=request.user,
+                model_class=TeacherQualification
+            )
     
+    def put(self, request, *args, **kwargs):
+        data = request.data.copy()
+        data['user'] = request.user.id
+        
+        teacher_qualification = TeacherQualification.objects.filter(user=request.user).first()
+
+        if teacher_qualification:
+           return update_auth_data(
+               serialiazer_class=self.get_serializer_class(),
+               instance=teacher_qualification,
+               request_data=data,
+               user=request.user
+           )
+        else:
+            return create_auth_data(
+                serializer_class=self.get_serializer_class(),
+                request_data=data,
+                user=request.user,
+                model_class=TeacherQualification
+            )
+
     def get_queryset(self):
         return TeacherQualification.objects.filter(user=self.request.user)
-    
+
     def list(self, request, *args, **kwargs):
-        return get_single_object(self)
+        return self.retrieve(request, *args, **kwargs)
+
+    def get_object(self):
+        try:
+            return TeacherQualification.objects.get(user=self.request.user)
+        except TeacherQualification.DoesNotExist:
+            raise Response({"detail": "Qualification not found."}, status=status.HTTP_404_NOT_FOUND)
 
     
 class TeacherExperiencesViewSet(viewsets.ModelViewSet):
