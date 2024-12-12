@@ -205,8 +205,8 @@ class SingleTeachersAddressViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return TeachersAddress.objects.filter(user=self.request.user)
 
-    # def list(self, request, *args, **kwargs):
-    #     return self.retrieve(request, *args, **kwargs)
+    def list(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
 
     def get_object(self):
         try:
