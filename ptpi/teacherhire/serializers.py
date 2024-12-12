@@ -353,11 +353,6 @@ class TeacherQualificationSerializer(serializers.ModelSerializer):
         representation['qualification'] = EducationalQualificationSerializer(instance.qualification).data
         return representation
     
-    def validate(self, data):
-        user = data.get('user')
-        if user and TeacherQualification.objects.filter(user=user).exists():
-            raise serializers.ValidationError({"user": "A teacher  pqualification entry for this user already exists."})
-        return data 
     
 class RoleSerializer(serializers.ModelSerializer):
     class Meta:
