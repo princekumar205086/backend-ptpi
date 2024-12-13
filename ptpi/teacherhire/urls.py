@@ -20,6 +20,7 @@ router.register(r'admin/role', RoleViewSet, basename='role')
 
 #access OnlyTeacher
 router.register(r'self/teacher', SingleTeacherViewSet, basename='self-teacher')
+router.register(r'self/customuser', CustomUserViewSet, basename='self-customuser')
 router.register(r"self/teacherexperience", TeacherExperiencesViewSet, basename="self-teacherexperience")
 router.register(r'self/teacherexamresult', TeacherExamResultViewSet, basename='self-teacherexamresult')
 router.register(r'self/teacherclasscategory', TeacherClassCategoryViewSet, basename='self-teacherclasscategory')
