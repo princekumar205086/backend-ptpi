@@ -237,8 +237,8 @@ class TeacherSerializer(serializers.ModelSerializer):
             cleaned_value = re.sub(r'[^0-9]', '', value)
             if len(cleaned_value) != 10:
                 raise serializers.ValidationError("Phone number must be exactly 10 digits.")
-            if Teacher.objects.filter(phone=value).exists():
-                raise serializers.ValidationError("This Phone no. is alreary exist.")
+            # if Teacher.objects.filter(phone=value).exists():
+            #     raise serializers.ValidationError("This Phone no. is alreary exist.")
             if not cleaned_value.startswith(('6', '7', '8', '9')):
                 raise serializers.ValidationError("Phone number must start with 6, 7, 8, or 9.")
             return cleaned_value
@@ -248,15 +248,15 @@ class TeacherSerializer(serializers.ModelSerializer):
         if value:
             if not re.match(r'^\d{12}$', value):
                 raise serializers.ValidationError("Aadhar number must be exactly 12 digits.")
-            if Teacher.objects.filter(aadhar_no=value).exists():
-                raise serializers.ValidationError("This Aadhar no. is alreary exist.")
+            # if Teacher.objects.filter(aadhar_no=value).exists():
+            #     raise serializers.ValidationError("This Aadhar no. is alreary exist.")
         return value
     
-    def validate(self, data):
-        user = data.get('user')
-        if user and Teacher.objects.filter(user=user).exists():
-            raise serializers.ValidationError({"user": "A teacher entry for this user already exists."})
-        return data 
+    # def validate(self, data):
+    #     user = data.get('user')
+    #     if user and Teacher.objects.filter(user=user).exists():
+    #         raise serializers.ValidationError({"user": "A teacher entry for this user already exists."})
+    #     return data 
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)

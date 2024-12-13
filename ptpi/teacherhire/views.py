@@ -402,15 +402,38 @@ class SingleTeacherViewSet(viewsets.ModelViewSet):
     def create(self,request,*args, **kwargs):
         return create_auth_data(self, TeacherSerializer, request.data, Teacher)
     
-    def get_queryset(self):
-        user = self.request.user
-        if user.is_authenticated:
-            return Teacher.objects.filter(user=self.request.user)
-        else:
-            return Teacher.objects.none()
+    def put(self, request, *args, **kwargs):
+        data = request.data.copy()
+        data['user'] = request.user.id
         
+        teacher = Teacher.objects.filter(user=request.user).first()
+
+        if teacher:
+           return update_auth_data(
+               serialiazer_class=self.get_serializer_class(),
+               instance=teacher,
+               request_data=data,
+               user=request.user
+           )
+        else:
+            return create_auth_data(
+                serializer_class=self.get_serializer_class(),
+                request_data=data,
+                user=request.user,
+                model_class=Teacher
+            )
+
+    def get_queryset(self):
+        return Teacher.objects.filter(user=self.request.user)
+
     def list(self, request, *args, **kwargs):
-        return get_single_object(self)
+        return self.retrieve(request, *args, **kwargs)
+
+    def get_object(self):
+        try:
+            return Teacher.objects.get(user=self.request.user)
+        except Teacher.DoesNotExist:
+            raise Response({"detail": "Profile not found."}, status=status.HTTP_404_NOT_FOUND)
     
     
     
@@ -785,73 +808,10 @@ class BasicProfileViewSet(viewsets.ModelViewSet):
         
 
 class CustomUserViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]    
-    authentication_classes = [ExpiringTokenAuthentication]
+    # permission_classes = [IsAuthenticated]    
+    # authentication_classes = [ExpiringTokenAuthentication]
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
-
-    def create(self, request, *args, **kwargs):
-        data = request.data.copy()
-        data['user'] = request.user.id
-        
-        if CustomUser.objects.filter(username=request.user.username).exists():
-
-            return Response({"detail": "Customuser already exists."}, status=status.HTTP_400_BAD_REQUEST)
-        
-        serializer = self.get_serializer(data=data)
-        if serializer.is_valid():
-            self.perform_create(serializer)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def put(self, request, *args, **kwargs):
-        data = request.data.copy()
-        data['user'] = request.user.id
-        
-        profile = CustomUser.objects.filter(username=request.user.username).first()
-
-        if profile:
-           return update_auth_data(
-               serialiazer_class=self.get_serializer_class(),
-               instance=profile,
-               request_data=data,
-               user=request.user
-           )
-        else:
-            return create_auth_data(
-                serializer_class=self.get_serializer_class(),
-                request_data=data,
-                user=request.user,
-                model_class=CustomUser
-            )
-
-    def get_queryset(self):
-        return CustomUser.objects.filter(username=self.request.user.username)
-
-    def list(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
-    def get_object(self):
-        try:
-           return CustomUser.objects.get(id=self.request.user.id)
-
-        except CustomUser.DoesNotExist:
-            raise Response({"detail": "Customuser not found."}, status=status.HTTP_404_NOT_FOUND)
-    def delete(self, request):
-        try:
-            profile = CustomUser.objects.get(user=request.user)            
-            profile.delete()            
-            return Response({"detail": "Customuser deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
-        except CustomUser.DoesNotExist:
-            return Response({"detail": "Customuser not found."}, status=status.HTTP_404_NOT_FOUND)
-
-
-
-    
-
-
-   
 
       
 
