@@ -172,15 +172,33 @@ class SingleTeachersAddressViewSet(viewsets.ModelViewSet):
     authentication_classes = [ExpiringTokenAuthentication] 
     serializer_class = TeachersAddressSerializer 
     queryset = TeachersAddress.objects.all().select_related('user')
-    
+
     def create(self, request, *args, **kwargs):
-        data = request.data.copy()
-        return create_auth_data(
-                serializer_class=self.get_serializer_class(),
-                request_data=data,
-                user=request.user,
-                model_class=TeachersAddress)
-    
+        print("Request data:", request.data)
+        data = request.data.copy()  
+        address_type = data.get('address_type')  
+
+        # Validate the `address_type`
+        if not address_type or address_type not in ['current', 'permanent']:
+            return Response(
+                {"detail": "Invalid or missing 'address_type'. Expected 'current' or 'permanent'."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        # Check if the address already exists for the user
+        if TeachersAddress.objects.filter(address_type=address_type, user=request.user).exists():
+            return Response(
+                {"detail": f"{address_type.capitalize()} address already exists for this user."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        # Associate the address with the authenticated user
+        data['user'] = request.user.id  
+        # Serialize and validate data
+        serializer = self.get_serializer(data=data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     def put(self, request, *args, **kwargs):
         data = request.data.copy()
         data['user'] = request.user.id
@@ -188,7 +206,7 @@ class SingleTeachersAddressViewSet(viewsets.ModelViewSet):
         address = TeachersAddress.objects.filter(user=request.user).first()
 
         if address:
-            return update_auth_data(
+           return update_auth_data(
                serialiazer_class=self.get_serializer_class(),
                instance=address,
                request_data=data,
@@ -201,18 +219,17 @@ class SingleTeachersAddressViewSet(viewsets.ModelViewSet):
                 user=request.user,
                 model_class=TeachersAddress
             )
-
     def get_queryset(self):
         return TeachersAddress.objects.filter(user=self.request.user)
 
-    # def list(self, request, *args, **kwargs):
-    #     return self.retrieve(request, *args, **kwargs)
-
+    def list(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+    
     def get_object(self):
-        try:
-            return TeachersAddress.objects.get(user=self.request.user)
-        except TeachersAddress.DoesNotExist:
-            raise Response({"detail": "this address not found."}, status=status.HTTP_404_NOT_FOUND)
+     try:
+        return TeachersAddress.objects.get(user=self.request.user)
+     except TeachersAddress.DoesNotExist:
+        return Response({"detail": "This address not found."}, status=status.HTTP_404_NOT_FOUND)
 
 
 class EducationalQulificationViewSet(viewsets.ModelViewSet):   
@@ -233,20 +250,19 @@ class EducationalQulificationViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         instance.delete()
         return Response({"message": "Educationqulification deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
-    
+
 class LevelViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]    
     authentication_classes = [ExpiringTokenAuthentication]     
     queryset = Level.objects.all()
     serializer_class = LevelSerializer
     
-    
-    @action (detail=False,methods=['get'])
+    @action(detail=False, methods=['get'])
     def count(self):
         count = get_count(Level)
-        return Response({"Count":count})
+        return Response({"Count": count})
     
-    @action(detail=True, methods=['get'], url_path='(subject/(?P<subject_id>[^/.]+)/)?(class-category/(?P<class_category_id>[^/.]+)/)?questions')
+    @action(detail=True, methods=['get'], url_path=r'classes/(?P<class_category_id>[^/.]+)/?subject/(?P<subject_id>[^/.]+)/?questions')
     def level_questions(self, request, pk=None, subject_id=None, class_category_id=None):
         """
         Custom action to fetch questions by level, optional subject, and optional class category.
@@ -255,25 +271,30 @@ class LevelViewSet(viewsets.ModelViewSet):
             level = Level.objects.get(pk=pk)
         except Level.DoesNotExist:
             return Response({"error": "Level not found"}, status=status.HTTP_404_NOT_FOUND)
-
+        
+        # Start with filtering by level
+        questions = Question.objects.filter(level=level)
+        
+        # Filter by subject if provided
         if subject_id:
             try:
                 subject = Subject.objects.get(pk=subject_id)
             except Subject.DoesNotExist:
                 return Response({"error": "Subject not found"}, status=status.HTTP_404_NOT_FOUND)
-            questions = Question.objects.filter(level=level, subject=subject)
-        else:
-            questions = Question.objects.filter(level=level)
+            questions = questions.filter(subject=subject)
 
+        # Filter by class category if provided
         if class_category_id:
             try:
                 class_category = ClassCategory.objects.get(pk=class_category_id)
             except ClassCategory.DoesNotExist:
                 return Response({"error": "Class Category not found"}, status=status.HTTP_404_NOT_FOUND)
-            questions = questions.filter(class_category=class_category)
-            
+            questions = questions.filter(classCategory=class_category)  # Use 'classCategory' instead of 'classes'
+
+        # Serialize the questions
         serializer = QuestionSerializer(questions, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
     
     def destroy(self, request, *args, **kwargs):    
         instance = self.get_object()
@@ -362,8 +383,8 @@ class SingleTeacherSkillViewSet(viewsets.ModelViewSet):
             raise Response({"detail": "this user skill not found."}, status=status.HTTP_404_NOT_FOUND)
 
 class SubjectViewSet(viewsets.ModelViewSet):    
-    # permission_classes = [IsAuthenticated] 
-    # authentication_classes = [ExpiringTokenAuthentication] 
+    permission_classes = [IsAuthenticated] 
+    authentication_classes = [ExpiringTokenAuthentication] 
     queryset = Subject.objects.all()
     serializer_class = SubjectSerializer
     
@@ -555,8 +576,8 @@ class SingleTeacherExperiencesViewSet(viewsets.ModelViewSet):
         return get_single_object(self)
     
     
-class QuestionViewSet(viewsets.ModelViewSet):
-    queryset = Question.objects.all().select_related('subject', 'level')
+class QuestionViewSet(viewsets.ModelViewSet): 
+    queryset = Question.objects.all().select_related('subject', 'level','class_Category')
     serializer_class = QuestionSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [ExpiringTokenAuthentication] 
@@ -792,12 +813,19 @@ class BasicProfileViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
-
+    
     def get_object(self):
-        try:
-            return BasicProfile.objects.get(user=self.request.user)
-        except BasicProfile.DoesNotExist:
-            raise Response({"detail": "Profile not found."}, status=status.HTTP_404_NOT_FOUND)
+      try:
+        return BasicProfile.objects.get(user=self.request.user)
+      except BasicProfile.DoesNotExist:
+       raise NotFound({"detail": "Profile not found."})
+
+
+    # def get_object(self):
+    #     try:
+    #         return BasicProfile.objects.get(user=self.request.user)
+    #     except BasicProfile.DoesNotExist:
+    #         raise Response({"detail": "Profile not found."}, status=status.HTTP_404_NOT_FOUND)
     def delete(self, request):
         try:
             profile = BasicProfile.objects.get(user=request.user)            
