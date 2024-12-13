@@ -172,15 +172,21 @@ class SingleTeachersAddressViewSet(viewsets.ModelViewSet):
     authentication_classes = [ExpiringTokenAuthentication] 
     serializer_class = TeachersAddressSerializer 
     queryset = TeachersAddress.objects.all().select_related('user')
-    
+
     def create(self, request, *args, **kwargs):
         data = request.data.copy()
-        return create_auth_data(
-                serializer_class=self.get_serializer_class(),
-                request_data=data,
-                user=request.user,
-                model_class=TeachersAddress)
-    
+        data['user'] = request.user.id
+        
+        if TeachersAddress.objects.filter(user=request.user).exists():
+            return Response({"detail": " A teacher address already exists."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer = self.get_serializer(data=data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     def put(self, request, *args, **kwargs):
         data = request.data.copy()
         data['user'] = request.user.id
@@ -188,7 +194,7 @@ class SingleTeachersAddressViewSet(viewsets.ModelViewSet):
         address = TeachersAddress.objects.filter(user=request.user).first()
 
         if address:
-            return update_auth_data(
+           return update_auth_data(
                serialiazer_class=self.get_serializer_class(),
                instance=address,
                request_data=data,
@@ -201,7 +207,6 @@ class SingleTeachersAddressViewSet(viewsets.ModelViewSet):
                 user=request.user,
                 model_class=TeachersAddress
             )
-
     def get_queryset(self):
         return TeachersAddress.objects.filter(user=self.request.user)
 
@@ -362,8 +367,8 @@ class SingleTeacherSkillViewSet(viewsets.ModelViewSet):
             raise Response({"detail": "this user skill not found."}, status=status.HTTP_404_NOT_FOUND)
 
 class SubjectViewSet(viewsets.ModelViewSet):    
-    # permission_classes = [IsAuthenticated] 
-    # authentication_classes = [ExpiringTokenAuthentication] 
+    permission_classes = [IsAuthenticated] 
+    authentication_classes = [ExpiringTokenAuthentication] 
     queryset = Subject.objects.all()
     serializer_class = SubjectSerializer
     
