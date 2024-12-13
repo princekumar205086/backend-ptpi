@@ -274,6 +274,7 @@ class TeacherSerializer(serializers.ModelSerializer):
 class QuestionSerializer(serializers.ModelSerializer):
     subject = serializers.PrimaryKeyRelatedField(queryset=Subject.objects.all(), required=True)
     level = serializers.PrimaryKeyRelatedField(queryset=Level.objects.all(), required=True)
+    class_Category = serializers.PrimaryKeyRelatedField(queryset=ClassCategory.objects.all(), required=True)
     text = serializers.CharField(max_length=2000, allow_null=True, required=False)
     options = serializers.JSONField(required=False, allow_null=True)
 

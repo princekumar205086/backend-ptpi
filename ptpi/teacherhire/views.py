@@ -238,20 +238,19 @@ class EducationalQulificationViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         instance.delete()
         return Response({"message": "Educationqulification deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
-    
+
 class LevelViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]    
     authentication_classes = [ExpiringTokenAuthentication]     
     queryset = Level.objects.all()
     serializer_class = LevelSerializer
     
-    
-    @action (detail=False,methods=['get'])
+    @action(detail=False, methods=['get'])
     def count(self):
         count = get_count(Level)
-        return Response({"Count":count})
+        return Response({"Count": count})
     
-    @action(detail=True, methods=['get'], url_path='(subject/(?P<subject_id>[^/.]+)/)?(class-category/(?P<class_category_id>[^/.]+)/)?questions')
+    @action(detail=True, methods=['get'], url_path=r'classes/(?P<class_category_id>[^/.]+)/?subject/(?P<subject_id>[^/.]+)/?questions')
     def level_questions(self, request, pk=None, subject_id=None, class_category_id=None):
         """
         Custom action to fetch questions by level, optional subject, and optional class category.
@@ -260,25 +259,30 @@ class LevelViewSet(viewsets.ModelViewSet):
             level = Level.objects.get(pk=pk)
         except Level.DoesNotExist:
             return Response({"error": "Level not found"}, status=status.HTTP_404_NOT_FOUND)
-
+        
+        # Start with filtering by level
+        questions = Question.objects.filter(level=level)
+        
+        # Filter by subject if provided
         if subject_id:
             try:
                 subject = Subject.objects.get(pk=subject_id)
             except Subject.DoesNotExist:
                 return Response({"error": "Subject not found"}, status=status.HTTP_404_NOT_FOUND)
-            questions = Question.objects.filter(level=level, subject=subject)
-        else:
-            questions = Question.objects.filter(level=level)
+            questions = questions.filter(subject=subject)
 
+        # Filter by class category if provided
         if class_category_id:
             try:
                 class_category = ClassCategory.objects.get(pk=class_category_id)
             except ClassCategory.DoesNotExist:
                 return Response({"error": "Class Category not found"}, status=status.HTTP_404_NOT_FOUND)
-            questions = questions.filter(class_category=class_category)
-            
+            questions = questions.filter(classCategory=class_category)  # Use 'classCategory' instead of 'classes'
+
+        # Serialize the questions
         serializer = QuestionSerializer(questions, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
     
     def destroy(self, request, *args, **kwargs):    
         instance = self.get_object()
@@ -537,8 +541,8 @@ class SingleTeacherExperiencesViewSet(viewsets.ModelViewSet):
         return get_single_object(self)
     
     
-class QuestionViewSet(viewsets.ModelViewSet):
-    queryset = Question.objects.all().select_related('subject', 'level')
+class QuestionViewSet(viewsets.ModelViewSet): 
+    queryset = Question.objects.all().select_related('subject', 'level','class_Category')
     serializer_class = QuestionSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [ExpiringTokenAuthentication] 
