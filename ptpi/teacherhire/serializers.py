@@ -445,5 +445,7 @@ class BasicProfileSerializer(serializers.ModelSerializer):
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = '__all__'
+        fields = ['id', 'last_login', 'is_superuser', 'email', 'username',
+            'Fname', 'Lname', 'is_staff', 'is_active', 'is_recruiter',
+            'is_teacher', 'groups', 'user_permissions']
 
