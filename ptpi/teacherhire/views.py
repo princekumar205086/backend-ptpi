@@ -174,18 +174,30 @@ class SingleTeachersAddressViewSet(viewsets.ModelViewSet):
     queryset = TeachersAddress.objects.all().select_related('user')
 
     def create(self, request, *args, **kwargs):
-        data = request.data.copy()
-        data['user'] = request.user.id
-        
-        if TeachersAddress.objects.filter(user=request.user).exists():
-            return Response({"detail": " A teacher address already exists."}, status=status.HTTP_400_BAD_REQUEST)
-        
+        print("Request data:", request.data)
+        data = request.data.copy()  
+        address_type = data.get('address_type')  
+
+        # Validate the `address_type`
+        if not address_type or address_type not in ['current', 'permanent']:
+            return Response(
+                {"detail": "Invalid or missing 'address_type'. Expected 'current' or 'permanent'."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        # Check if the address already exists for the user
+        if TeachersAddress.objects.filter(address_type=address_type, user=request.user).exists():
+            return Response(
+                {"detail": f"{address_type.capitalize()} address already exists for this user."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        # Associate the address with the authenticated user
+        data['user'] = request.user.id  
+        # Serialize and validate data
         serializer = self.get_serializer(data=data)
         if serializer.is_valid():
             self.perform_create(serializer)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, *args, **kwargs):
         data = request.data.copy()
@@ -778,12 +790,19 @@ class BasicProfileViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
-
+    
     def get_object(self):
-        try:
-            return BasicProfile.objects.get(user=self.request.user)
-        except BasicProfile.DoesNotExist:
-            raise Response({"detail": "Profile not found."}, status=status.HTTP_404_NOT_FOUND)
+      try:
+        return BasicProfile.objects.get(user=self.request.user)
+      except BasicProfile.DoesNotExist:
+       raise NotFound({"detail": "Profile not found."})
+
+
+    # def get_object(self):
+    #     try:
+    #         return BasicProfile.objects.get(user=self.request.user)
+    #     except BasicProfile.DoesNotExist:
+    #         raise Response({"detail": "Profile not found."}, status=status.HTTP_404_NOT_FOUND)
     def delete(self, request):
         try:
             profile = BasicProfile.objects.get(user=request.user)            
