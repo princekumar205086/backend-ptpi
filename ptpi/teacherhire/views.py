@@ -786,12 +786,19 @@ class BasicProfileViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
-
+    
     def get_object(self):
-        try:
-            return BasicProfile.objects.get(user=self.request.user)
-        except BasicProfile.DoesNotExist:
-            raise Response({"detail": "Profile not found."}, status=status.HTTP_404_NOT_FOUND)
+      try:
+        return BasicProfile.objects.get(user=self.request.user)
+      except BasicProfile.DoesNotExist:
+       raise NotFound({"detail": "Profile not found."})
+
+
+    # def get_object(self):
+    #     try:
+    #         return BasicProfile.objects.get(user=self.request.user)
+    #     except BasicProfile.DoesNotExist:
+    #         raise Response({"detail": "Profile not found."}, status=status.HTTP_404_NOT_FOUND)
     def delete(self, request):
         try:
             profile = BasicProfile.objects.get(user=request.user)            
