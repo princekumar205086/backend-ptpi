@@ -577,13 +577,14 @@ class SingleTeacherExperiencesViewSet(viewsets.ModelViewSet):
     
     
 class QuestionViewSet(viewsets.ModelViewSet): 
-    queryset = Question.objects.all().select_related('subject', 'level','class_Category')
-    serializer_class = QuestionSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [ExpiringTokenAuthentication] 
+    queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
+   
 
-    def create(self,request):
-        return create_object(QuestionSerializer,request.data,Question)
+    # def create(self,request):
+    #     return create_object(QuestionSerializer,request.data,Question)
     
     @action (detail=False,methods=['get'])
     def count(self,request):

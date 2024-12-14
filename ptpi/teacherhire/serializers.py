@@ -274,19 +274,19 @@ class TeacherSerializer(serializers.ModelSerializer):
 class QuestionSerializer(serializers.ModelSerializer):
     subject = serializers.PrimaryKeyRelatedField(queryset=Subject.objects.all(), required=True)
     level = serializers.PrimaryKeyRelatedField(queryset=Level.objects.all(), required=True)
-    class_Category = serializers.PrimaryKeyRelatedField(queryset=ClassCategory.objects.all(), required=True)
+    classCategory = serializers.PrimaryKeyRelatedField(queryset=ClassCategory.objects.all(), required=True)
     text = serializers.CharField(max_length=2000, allow_null=True, required=False)
     options = serializers.JSONField(required=False, allow_null=True)
-
     class Meta:
         model = Question
         fields = "__all__"
 
     def validate_text(self, value):
-        if value is not None:
-            if len(value) < 5:
-                raise serializers.ValidationError("Text must be at least 5 characters.")
-            return value
+        if value is not None and len(value)< 5:
+            raise serializers.ValidationError("Text must be at least 5 characters.")
+        if Question.objects.filter(text=value).exists():
+            raise serializers.ValidationError("This question is already exists.")
+        return value
 
     # def validate_options(self, value):
     #     if value is not None:
@@ -300,6 +300,7 @@ class QuestionSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['subject'] = SubjectSerializer(instance.subject).data
         representation['level'] = LevelSerializer(instance.level).data
+        representation['classCategory'] = ClassCategorySerializer(instance.classCategory).data
         return representation
 
 

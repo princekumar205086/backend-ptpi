@@ -63,17 +63,7 @@ class Subject(models.Model):
         return self.subject_name
 
 class ClassCategory(models.Model):
-    name = models.CharField(
-        max_length=100,
-        unique=True, null=True, blank=True,
-        choices=[
-            ("Nursery to U.K.G", "Nursery to U.K.G"),
-            ("1 to 5", "1 to 5"),
-            ("6 to 8", "6 to 8"),
-            ("9 to 10", "9 to 10"),
-            ("10 to 12", "10 to 12")
-        ]
-    )
+    name = models.CharField(max_length=100,unique=True, null=True, blank=True)
 
     def __str__(self):
         return self.name
