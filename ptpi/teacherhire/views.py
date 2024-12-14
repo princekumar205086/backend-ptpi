@@ -836,10 +836,13 @@ class BasicProfileViewSet(viewsets.ModelViewSet):
         
 
 class CustomUserViewSet(viewsets.ModelViewSet):
-    # permission_classes = [IsAuthenticated]    
-    # authentication_classes = [ExpiringTokenAuthentication]
+    permission_classes = [IsAuthenticated]    
+    authentication_classes = [ExpiringTokenAuthentication]
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
+    def get_queryset(self):
+        user = self.request.user
+        return CustomUser.objects.filter(email=user.email)
 
       
 
