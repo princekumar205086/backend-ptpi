@@ -898,7 +898,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         except CustomUser.DoesNotExist:
             return Response({"detail": "Customuser not found."}, status=status.HTTP_404_NOT_FOUND)
     
-class TeacherJobTypeViewSet(viewsets.ViewSet):
+class TeacherJobTypeViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]    
     authentication_classes = [ExpiringTokenAuthentication]
     queryset = TeacherJobType.objects.all()
