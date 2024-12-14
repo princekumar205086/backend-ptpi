@@ -222,14 +222,14 @@ class SingleTeachersAddressViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return TeachersAddress.objects.filter(user=self.request.user)
 
-    def list(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
+    # def list(self, request, *args, **kwargs):
+    #     return self.retrieve(request, *args, **kwargs)
     
-    def get_object(self):
-     try:
-        return TeachersAddress.objects.get(user=self.request.user)
-     except TeachersAddress.DoesNotExist:
-        return Response({"detail": "This address not found."}, status=status.HTTP_404_NOT_FOUND)
+    # def get_object(self):
+    #  try:
+    #     return TeachersAddress.objects.get(user=self.request.user)
+    #  except TeachersAddress.DoesNotExist:
+    #     return Response({"detail": "This address not found."}, status=status.HTTP_404_NOT_FOUND)
 
 
 class EducationalQulificationViewSet(viewsets.ModelViewSet):   
