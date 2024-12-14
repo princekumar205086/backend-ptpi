@@ -355,6 +355,7 @@ class PreferenceSerializer(serializers.ModelSerializer):
     class_category = serializers.PrimaryKeyRelatedField(queryset=ClassCategory.objects.all(), required=False)
     job_role = serializers.PrimaryKeyRelatedField(queryset=Role.objects.all(), required=False)
     prefered_subject = serializers.PrimaryKeyRelatedField(queryset=Subject.objects.all(), required=False, many=True)
+    teacher_job_type = serializers.PrimaryKeyRelatedField(queryset=TeacherJobType.objects.all(), required=False, many=True)
     class Meta:
         model = Preference
         fields = '__all__'
@@ -365,6 +366,7 @@ class PreferenceSerializer(serializers.ModelSerializer):
         representation['job_role'] = RoleSerializer(instance.job_role).data
         representation['class_category'] = ClassCategorySerializer(instance.class_category).data
         representation['prefered_subject'] = SubjectSerializer(instance.prefered_subject.all(), many=True).data
+        representation['teacher_job_type'] = TeacherJobTypeSerializer(instance.teacher_job_type.all(), many=True).data
         return representation
     
     def validate(self, data):
@@ -449,4 +451,9 @@ class CustomUserSerializer(serializers.ModelSerializer):
         fields = ['id', 'last_login', 'is_superuser', 'email', 'username',
             'Fname', 'Lname', 'is_staff', 'is_active', 'is_recruiter',
             'is_teacher', 'groups', 'user_permissions']
+
+class TeacherJobTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TeacherJobType
+        fields = ['id', 'teacher_job_name']
 

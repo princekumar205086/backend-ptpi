@@ -201,15 +201,23 @@ class TeacherSkill(models.Model):
 
     def __str__(self):
         return self.user.username
+    
+class TeacherJobType(models.Model):
+    teacher_job_name = models.CharField(max_length=255, null=True, blank=True)
+
+    def __str__(self):
+        return self.teacher_job_name
 
 class Preference(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     job_role = models.ForeignKey(Role, on_delete=models.CASCADE,default=1)
     class_category = models.ForeignKey(ClassCategory, on_delete=models.CASCADE,default=1)
     prefered_subject = models.ManyToManyField(Subject)
+    teacher_job_type = models.ManyToManyField(TeacherJobType)
 
     def __str__(self):
         return self.user.username
+    
 class TeacherSubject(models.Model):	
    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)	
    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
