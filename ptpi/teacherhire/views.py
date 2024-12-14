@@ -679,8 +679,8 @@ class SingleTeacherSubjectViewSet(viewsets.ModelViewSet):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    def list(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
+    # def list(self, request, *args, **kwargs):
+    #     return self.retrieve(request, *args, **kwargs)
     def get_object(self):
         try:
             return TeacherSubject.objects.get(user=self.request.user)
