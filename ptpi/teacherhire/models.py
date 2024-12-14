@@ -207,7 +207,6 @@ class Preference(models.Model):
 
     def __str__(self):
         return self.user.username
-    
 class TeacherSubject(models.Model):	
    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)	
    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)

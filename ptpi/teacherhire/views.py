@@ -610,8 +610,8 @@ class QuestionViewSet(viewsets.ModelViewSet):
         return Response({"message":" Question deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
 class RoleViewSet(viewsets.ModelViewSet):    
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [ExpiringTokenAuthentication] 
+    # permission_classes = [IsAuthenticated]
+    # authentication_classes = [ExpiringTokenAuthentication] 
     queryset= Role.objects.all()
     serializer_class = RoleSerializer
     def create(self,request):
@@ -633,15 +633,53 @@ class PreferenceViewSet(viewsets.ModelViewSet):
     queryset= Preference.objects.all()
     serializer_class = PreferenceSerializer
     def create(self, request, *args, **kwargs):
-        request.data['user'] = request.user.id
-        return super().create(request, *args, **kwargs)
+        data = request.data.copy()
+        data['user'] = request.user.id
+        
+        if Preference.objects.filter(user=request.user).exists():
+            return Response({"detail": "Preference already exists."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer = self.get_serializer(data=data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, *args, **kwargs):
+        data = request.data.copy()
+        data['user'] = request.user.id
+        
+        profile = Preference.objects.filter(user=request.user).first()
+
+        if profile:
+           return update_auth_data(
+               serialiazer_class=self.get_serializer_class(),
+               instance=profile,
+               request_data=data,
+               user=request.user
+           )
+        else:
+            return create_auth_data(
+                serializer_class=self.get_serializer_class(),
+                request_data=data,
+                user=request.user,
+                model_class=Preference
+            )
+
     def get_queryset(self):
         return Preference.objects.filter(user=self.request.user)
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.delete()
-        return Response({"message": "Prefernce deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
+    def list(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+    
+    def get_object(self):
+      try:
+        return Preference.objects.get(user=self.request.user)
+      except Preference.DoesNotExist:
+       raise NotFound({"detail": "Preference not found."})
+
+   
 class TeacherSubjectViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]    
     authentication_classes = [ExpiringTokenAuthentication]     
@@ -682,7 +720,7 @@ class SingleTeacherSubjectViewSet(viewsets.ModelViewSet):
     # def list(self, request, *args, **kwargs):
     #     return self.retrieve(request, *args, **kwargs)
     def get_object(self):
-        try:
+        try: 
             return TeacherSubject.objects.get(user=self.request.user)
         except TeacherSubject.DoesNotExist:
             raise NotFound({"detail": "TeacherSubject not found."})
