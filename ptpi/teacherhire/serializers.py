@@ -370,11 +370,6 @@ class PreferenceSerializer(serializers.ModelSerializer):
         representation['teacher_job_type'] = TeacherJobTypeSerializer(instance.teacher_job_type.all(), many=True).data
         return representation
     
-    def validate(self, data):
-        user = data.get('user')
-        if user and Preference.objects.filter(user=user).exists():
-            raise serializers.ValidationError({"user": "A preference entry for this user already exists."})
-        return data 
     
 class TeacherSubjectSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(), required=False)
